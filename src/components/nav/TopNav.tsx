@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ChevronDown, LogOut, User as UserIcon, LayoutDashboard, RotateCcw } from "lucide-react";
@@ -21,8 +22,7 @@ export function TopNav() {
       <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <Logo />
-          <span className="font-semibold tracking-tight">giivngo</span>
-          <span className="hidden sm:inline text-xs text-muted px-1.5 py-0.5 rounded-md bg-foreground/5 ml-1">
+          <span className="hidden sm:inline text-xs text-muted px-1.5 py-0.5 rounded-md bg-foreground/5">
             demo
           </span>
         </Link>
@@ -160,8 +160,13 @@ export function Avatar({ name, url, size = 28 }: { name: string; url?: string; s
 
 function Logo() {
   return (
-    <span className="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-accent text-accent-foreground font-bold text-sm">
-      g
-    </span>
+    <Image
+      src="/logo.png"
+      alt="giivngo"
+      width={1951}
+      height={541}
+      priority
+      className="h-7 w-auto"
+    />
   );
 }
