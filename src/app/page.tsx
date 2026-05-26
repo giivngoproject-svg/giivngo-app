@@ -1,101 +1,137 @@
-import Image from "next/image";
+import Link from "next/link";
+import {
+  Cake,
+  Trophy,
+  Heart,
+  Sparkles,
+  ArrowRight,
+  Ticket,
+  Share2,
+  Banknote,
+  Camera,
+} from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
-export default function Home() {
+const USE_CASES = [
+  { icon: Cake, title: "Birthday trip funds", body: "Pool flights, villas, and a few cocktails for the guest of honour." },
+  { icon: Trophy, title: "Footy tipping pools", body: "Collect the buy-in once and pay the winner with one click at season's end." },
+  { icon: Heart, title: "Farewell collections", body: "Send someone off properly without chasing 23 people for $20 over Slack." },
+  { icon: Ticket, title: "Group event entry", body: "Split tickets, dinners, and trips. Everyone pays their share to one link." },
+];
+
+const STEPS = [
+  { icon: Sparkles, title: "Create a campaign", body: "Title, photo, optional goal, end date. Two minutes, max." },
+  { icon: Share2, title: "Share the link", body: "Email, SMS, WhatsApp, or just paste it anywhere. Contributors don't need an account." },
+  { icon: Banknote, title: "Get paid out", body: "Funds held safely in escrow, then transferred to your bank on end date." },
+];
+
+export default function LandingPage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div>
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute -top-32 -left-20 w-[420px] h-[420px] rounded-full bg-accent/20 blur-3xl" />
+          <div className="absolute top-32 -right-24 w-[380px] h-[380px] rounded-full bg-sky-200/40 blur-3xl" />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-24 pb-16 text-center">
+          <span className="inline-flex items-center gap-2 text-xs font-medium text-accent bg-accent/10 px-3 py-1 rounded-full">
+            <Sparkles size={12} />
+            Built for Australia · Stripe escrow · 2.5% flat fee
+          </span>
+          <h1 className="mt-6 text-4xl sm:text-6xl font-bold tracking-tight text-balance">
+            Pool money.
+            <br />
+            <span className="text-accent">Skip the awkward chase.</span>
+          </h1>
+          <p className="mt-5 text-lg text-muted max-w-xl mx-auto text-balance">
+            One link, one place to chip in. Birthday trips, footy tipping, farewells, office lotto —
+            we hold the funds and pay them out automatically when your campaign ends.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/sign-up">
+              <Button size="lg" className="w-full sm:w-auto">
+                Start a campaign
+                <ArrowRight size={16} />
+              </Button>
+            </Link>
+            <Link href="/campaign/sarahs-30th">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                See a live campaign
+              </Button>
+            </Link>
+          </div>
+          <p className="text-xs text-muted mt-4">No account needed to contribute.</p>
+        </div>
+      </section>
+
+      {/* Use cases */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+        <p className="text-sm font-medium text-muted text-center">Use it for</p>
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {USE_CASES.map(({ icon: Icon, title, body }) => (
+            <div
+              key={title}
+              className="p-6 rounded-3xl border border-border bg-background hover:shadow-soft transition-shadow"
+            >
+              <Icon size={24} className="text-accent" />
+              <h3 className="mt-4 font-semibold">{title}</h3>
+              <p className="text-sm text-muted mt-1">{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">How it works</h2>
+          <p className="text-muted mt-2">Three steps. No spreadsheets, no Venmo screenshots.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {STEPS.map(({ icon: Icon, title, body }, i) => (
+            <div key={title} className="relative p-6 rounded-3xl bg-surface">
+              <span className="absolute top-5 right-5 text-7xl font-bold text-foreground/[.04] leading-none">
+                {i + 1}
+              </span>
+              <Icon size={28} className="text-accent" />
+              <h3 className="mt-4 font-semibold text-lg">{title}</h3>
+              <p className="text-sm text-muted mt-1.5">{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Photo feature strip */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+        <div className="rounded-3xl bg-foreground text-background p-8 sm:p-12 flex flex-col md:flex-row md:items-center gap-8">
+          <Camera size={48} className="text-accent shrink-0" />
+          <div className="flex-1">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Make it personal.
+            </h2>
+            <p className="mt-2 text-background/70 max-w-xl">
+              Contributors can attach a photo with their note — a memory, a goofy selfie, an old polaroid.
+              They appear on the campaign page next to the contribution.
+            </p>
+          </div>
+          <Link href="/sign-up" className="shrink-0">
+            <Button variant="primary" size="lg">
+              Try it now
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Fee transparency */}
+      <section className="max-w-3xl mx-auto px-5 sm:px-8 py-12 text-center">
+        <h2 className="text-2xl font-bold">Free to create, free to contribute</h2>
+        <p className="text-muted mt-2">
+          2.5% platform fee comes out at payout. Stripe processing fees pass through to the contributor at checkout.
+          No subscriptions. No paywalls.
+        </p>
+      </section>
     </div>
   );
 }
