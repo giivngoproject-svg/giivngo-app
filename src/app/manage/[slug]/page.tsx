@@ -24,6 +24,8 @@ import { AuthCheck } from "@/components/AuthCheck";
 import { useCampaigns } from "@/stores/campaigns";
 import { formatAUD, calcFee } from "@/lib/money";
 import { poolMode, tipTotal, POOL_MODE_LABELS } from "@/lib/pool";
+import { uid } from "@/lib/slug";
+import type { ContributionItem } from "@/lib/types";
 import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
@@ -580,7 +582,12 @@ function EditModal({
   const [title, setTitle] = useState(campaign.title);
   const [description, setDescription] = useState(campaign.description);
   const [goal, setGoal] = useState(campaign.goal_amount?.toString() ?? "");
-  const [items, setItems] = useState(campaign.contribution_items ?? []);
+  const [items, setItems] = useState<ContributionItem[]>(
+    (campaign.contribution_items ?? []).map((item) => ({
+      ...item,
+      id: uid("item"),
+    }))
+  );
   const [hideUntilBirthday, setHideUntilBirthday] = useState(campaign.hide_until_birthday ?? false);
 
   // Reset form when modal opens
@@ -589,7 +596,12 @@ function EditModal({
       setTitle(campaign.title);
       setDescription(campaign.description);
       setGoal(campaign.goal_amount?.toString() ?? "");
-      setItems(campaign.contribution_items ?? []);
+      setItems(
+        (campaign.contribution_items ?? []).map((item): ContributionItem => ({
+          ...item,
+          id: uid("item"),
+        }))
+      );
       setHideUntilBirthday(campaign.hide_until_birthday ?? false);
     }
   }, [open, campaign]);
@@ -616,10 +628,12 @@ function EditModal({
         </div>
 
         <div className="border-t pt-4">
+          <label className="text-sm font-medium text-foreground block mb-3">
+            Gift ideas / Contribution items (optional)
+          </label>
           <ItemEditor
             items={items}
             onChange={setItems}
-            label="Gift ideas / Contribution items (optional)"
           />
         </div>
 
