@@ -4,10 +4,10 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
 import { CheckCircle2, Building2, Banknote } from "lucide-react";
-import { useRequireAuth } from "@/lib/mock/auth";
 import { useAuth } from "@/stores/auth";
 import { useCampaigns } from "@/stores/campaigns";
-import { uploadImage } from "@/lib/mock/storage";
+import { AuthCheck } from "@/components/AuthCheck";
+import { storageApi, profileApi } from "@/lib/api";
 import { formatAUD } from "@/lib/money";
 import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
@@ -16,35 +16,74 @@ import { Modal } from "@/components/ui/Modal";
 import { Avatar } from "@/components/nav/TopNav";
 import { StatusBadge } from "@/components/ui/Badge";
 
-export default function ProfilePage() {
-  const user = useRequireAuth();
+function ProfilePageInner() {
+  const user = useAuth((s) => s.user);
   const updateUser = useAuth((s) => s.updateUser);
   const campaigns = useCampaigns((s) => s.campaigns);
   const contributions = useCampaigns((s) => s.contributions);
 
   const [tab, setTab] = useState<"created" | "contributed">("created");
   const [connectOpen, setConnectOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const mine = useMemo(
     () => (user ? campaigns.filter((c) => c.user_id === user.id) : []),
     [campaigns, user],
   );
   const myContributions = useMemo(
-    () => (user ? contributions.filter((c) => c.contributor_email === user?.email) : []),
+    () => (user ? Object.values(contributions).flat().filter((c) => c.contributor_email === user?.email) : []),
     [contributions, user],
   );
 
   if (!user) return null;
 
   const handleAvatar = async (file: File) => {
-    const url = await uploadImage(file);
-    updateUser({ avatar_url: url });
-    toast.success("Profile photo updated");
+    setIsUpdating(true);
+    try {
+      const { url } = await storageApi.uploadAvatar(file);
+      updateUser({ avatar_url: url });
+
+      // Auto-save avatar URL to backend
+      await profileApi.update({
+        name: user.name,
+        displayName: user.display_name,
+        phone: user.phone,
+        avatarUrl: url,
+      });
+
+      toast.success("Avatar updated");
+    } catch (error: any) {
+      toast.error("Upload failed", error.response?.data?.message || "Could not upload avatar");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    setIsUpdating(true);
+    try {
+      await profileApi.update({
+        name: user.name,
+        displayName: user.display_name,
+        phone: user.phone,
+        avatarUrl: user.avatar_url,
+      });
+      toast.success("Profile saved");
+    } catch (error: any) {
+      toast.error("Save failed", error.response?.data?.message || "Could not save profile");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
     <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10">
-      <h1 className="text-3xl font-bold tracking-tight mb-8">Your profile</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Your profile</h1>
+        <Button onClick={handleSaveProfile} disabled={isUpdating} size="sm">
+          {isUpdating ? "Saving..." : "Save changes"}
+        </Button>
+      </div>
 
       {/* Profile card */}
       <div className="rounded-3xl border border-border bg-background p-6">
@@ -311,5 +350,13 @@ function ConnectModal({
         </div>
       )}
     </Modal>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <AuthCheck requireAuth={true}>
+      <ProfilePageInner />
+    </AuthCheck>
   );
 }

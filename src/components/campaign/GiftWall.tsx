@@ -34,51 +34,71 @@ export function GiftWall({
       {sorted.map((c) => (
         <div
           key={c.id}
-          className="animate-pop rounded-3xl border border-border bg-background p-4 flex gap-3"
+          className="animate-pop rounded-3xl border border-border bg-background p-4 flex flex-col gap-3"
         >
-          <div className="shrink-0">
+          {/* Header: Emoji, Name, Amount */}
+          <div className="flex items-start gap-3">
+            {/* Emoji in circle */}
             {c.emoji ? (
-              <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center text-xl">
+              <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-2xl border-2 border-accent/20">
                 {c.emoji}
               </div>
-            ) : c.photo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={c.photo_url}
-                alt={c.contributor_name || "contributor"}
-                className="w-10 h-10 rounded-full object-cover"
-              />
             ) : (
-              <Avatar name={c.contributor_name || "Anonymous"} size={40} />
+              <div className="shrink-0">
+                <Avatar
+                  name={c.is_private ? "Anonymous" : c.contributor_name || "Anonymous"}
+                  size={48}
+                />
+              </div>
             )}
-          </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-baseline justify-between gap-2">
-              <p className="font-medium truncate">{c.contributor_name || "Anonymous"}</p>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium truncate">
+                {c.is_private ? "Anonymous" : c.contributor_name || "Anonymous"}
+              </p>
               {showAmounts && (
-                <p className="text-sm font-semibold shrink-0 tabular-nums">{formatAUD(c.amount)}</p>
+                <p className="text-sm font-semibold text-accent tabular-nums">{formatAUD(c.amount)}</p>
               )}
             </div>
-            {c.message && (
-              <p className="text-sm text-foreground/80 mt-1 whitespace-pre-wrap break-words">
-                {c.message}
-              </p>
-            )}
-            {c.video_url && (
-              <video
-                src={c.video_url}
-                controls
-                playsInline
-                className="mt-2 w-full max-h-48 rounded-2xl bg-black/5 object-cover"
-              />
-            )}
-            <p className="text-xs text-muted mt-1.5 inline-flex items-center gap-1">
-              {c.video_url && !c.message ? <PlayCircle size={12} /> : null}
-              {formatDistanceToNowStrict(new Date(c.created_at))} ago
-              {c.tip_amount ? <span className="text-accent">· +{formatAUD(c.tip_amount)} tip</span> : null}
-            </p>
           </div>
+
+          {/* Message */}
+          {c.message && (
+            <p className="text-sm text-foreground/80 whitespace-pre-wrap break-words">
+              {c.message}
+            </p>
+          )}
+
+          {/* Photo */}
+          {!c.is_private && c.photo_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={c.photo_url}
+              alt={c.contributor_name || "contributor"}
+              className="w-full rounded-2xl object-cover max-h-56"
+            />
+          )}
+
+          {/* Video */}
+          {c.video_url && (
+            <video
+              src={c.video_url}
+              controls
+              playsInline
+              className="w-full max-h-48 rounded-2xl bg-black/5 object-cover"
+            />
+          )}
+
+          {/* Footer: Time and Tip */}
+          <p className="text-xs text-muted inline-flex items-center gap-1">
+            {c.video_url && !c.message ? <PlayCircle size={12} /> : null}
+            {c.created_at ? (
+              <>
+                {formatDistanceToNowStrict(new Date(c.created_at))} ago
+              </>
+            ) : null}
+            {c.tip_amount ? <span className="text-accent">· +{formatAUD(c.tip_amount)} tip</span> : null}
+          </p>
         </div>
       ))}
     </div>

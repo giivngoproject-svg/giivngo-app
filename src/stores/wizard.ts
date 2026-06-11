@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import type { CampaignType, PoolMode } from "@/lib/types";
+import type { CampaignType, PoolMode, ContributionItem } from "@/lib/types";
 
 export type WizardData = {
   title: string;
@@ -15,6 +15,8 @@ export type WizardData = {
   max_contribution?: number;
   pool_mode: PoolMode;
   tiers: number[];
+  contribution_items: ContributionItem[];
+  hide_until_birthday: boolean;
 };
 
 type WizardState = {
@@ -43,6 +45,8 @@ const DEFAULTS: WizardData = {
   max_contribution: undefined,
   pool_mode: "standard",
   tiers: [20, 50, 100],
+  contribution_items: [],
+  hide_until_birthday: false,
 };
 
 export const useWizard = create<WizardState>((set) => ({

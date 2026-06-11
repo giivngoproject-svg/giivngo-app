@@ -13,9 +13,10 @@ const AMBIENT_NAMES = [
 ];
 
 function contributionActivity(c: Contribution, hideIdentities: boolean): Activity {
-  const name = hideIdentities ? "Someone" : c.contributor_name || "Someone";
+  const shouldHide = hideIdentities || c.is_private;
+  const name = shouldHide ? "Someone" : c.contributor_name || "Someone";
   const emoji = c.emoji ? ` ${c.emoji}` : "";
-  const text = hideIdentities
+  const text = shouldHide
     ? `${name} just contributed${emoji}`
     : `${name} just chipped in ${formatAUD(c.amount)}${emoji}`;
   return { id: `c-${c.id}`, text, at: +new Date(c.created_at) };

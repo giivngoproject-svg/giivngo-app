@@ -1,114 +1,192 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { Campaign, Contribution, Invite } from "@/lib/types";
-import { SEED_CAMPAIGNS, SEED_CONTRIBUTIONS } from "@/lib/seed";
-import { uid, uniqueSlug } from "@/lib/slug";
+import { campaignsApi, contributionsApi } from "@/lib/api";
 
 type CampaignsState = {
   campaigns: Campaign[];
-  contributions: Contribution[];
-  invites: Invite[];
-  _hydrated: boolean;
+  contributions: { [slug: string]: Contribution[] };
+  isLoading: boolean;
+  error: string | null;
 
-  hydrate: () => void;
+  // Campaign operations (API-backed)
+  loadCampaigns: () => Promise<void>;
+  createCampaign: (data: any) => Promise<Campaign | null>;
+  loadCampaign: (slug: string) => Promise<Campaign | null>;
+  refreshCampaign: (slug: string) => Promise<void>;
+  updateCampaign: (slug: string, data: any) => Promise<Campaign | null>;
+  closeCampaign: (slug: string) => Promise<Campaign | null>;
+  reactivateCampaign: (slug: string, endDate: string) => Promise<Campaign | null>;
+
+  // Contribution operations (API-backed)
+  loadContributions: (slug: string) => Promise<Contribution[]>;
+  addContribution: (contribution: Contribution) => void;
+
+  // Invite operations
+  addInvite: (invite: Invite) => void;
+
+  // Reset store
   reset: () => void;
-
-  addCampaign: (c: Campaign) => void;
-  updateCampaign: (id: string, patch: Partial<Campaign>) => void;
-  closeCampaign: (id: string) => void;
-  payoutCampaign: (id: string) => void;
-  /** Clone a past pool into a fresh active one. Returns the new campaign. */
-  reactivateCampaign: (id: string, endDate: string) => Campaign | undefined;
-
-  addContribution: (c: Contribution) => void;
-  addInvite: (i: Invite) => void;
 };
 
 export const useCampaigns = create<CampaignsState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       campaigns: [],
-      contributions: [],
-      invites: [],
-      _hydrated: false,
+      contributions: {},
+      isLoading: false,
+      error: null,
 
-      hydrate: () => {
-        if (get()._hydrated) return;
-        if (get().campaigns.length === 0) {
-          set({
-            campaigns: SEED_CAMPAIGNS,
-            contributions: SEED_CONTRIBUTIONS,
-            _hydrated: true,
-          });
-        } else {
-          set({ _hydrated: true });
+      loadCampaigns: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const campaigns = await campaignsApi.getAll();
+          set({ campaigns, isLoading: false });
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to load campaigns";
+          set({ error: message, isLoading: false });
         }
+      },
+
+      createCampaign: async (data: Partial<Campaign>) => {
+        set({ isLoading: true, error: null });
+        try {
+          const campaign = await campaignsApi.create(data);
+          set((state) => ({
+            campaigns: [campaign, ...state.campaigns],
+            isLoading: false,
+          }));
+          return campaign;
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to create campaign";
+          set({ error: message, isLoading: false });
+          return null;
+        }
+      },
+
+      loadCampaign: async (slug: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const campaign = await campaignsApi.getBySlug(slug);
+          set((state) => {
+            // If campaign exists in array, update it; otherwise add it
+            const exists = state.campaigns.some((c) => c.slug === slug);
+            return {
+              campaigns: exists
+                ? state.campaigns.map((c) => (c.slug === slug ? campaign : c))
+                : [...state.campaigns, campaign],
+              isLoading: false,
+            };
+          });
+          return campaign;
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to load campaign";
+          set({ error: message, isLoading: false });
+          return null;
+        }
+      },
+
+      refreshCampaign: async (slug: string) => {
+        try {
+          // Reload campaign data and contributions
+          await get().loadCampaign(slug);
+          await get().loadContributions(slug);
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to refresh campaign";
+          set({ error: message });
+        }
+      },
+
+      updateCampaign: async (slug: string, data: any) => {
+        set({ isLoading: true, error: null });
+        try {
+          const campaign = await campaignsApi.update(slug, data);
+          set((state) => ({
+            campaigns: state.campaigns.map((c) => (c.slug === slug ? campaign : c)),
+            isLoading: false,
+          }));
+          return campaign;
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to update campaign";
+          set({ error: message, isLoading: false });
+          return null;
+        }
+      },
+
+      closeCampaign: async (slug: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const campaign = await campaignsApi.close(slug);
+          set((state) => ({
+            campaigns: state.campaigns.map((c) => (c.slug === slug ? campaign : c)),
+            isLoading: false,
+          }));
+          return campaign;
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to close campaign";
+          set({ error: message, isLoading: false });
+          return null;
+        }
+      },
+
+      reactivateCampaign: async (slug: string, endDate: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const campaign = await campaignsApi.reactivate(slug, endDate);
+          set((state) => ({
+            campaigns: [campaign, ...state.campaigns],
+            isLoading: false,
+          }));
+          return campaign;
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to reactivate campaign";
+          set({ error: message, isLoading: false });
+          return null;
+        }
+      },
+
+      loadContributions: async (slug: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const contributions = await contributionsApi.getList(slug);
+          set((state) => ({
+            contributions: { ...state.contributions, [slug]: contributions },
+            isLoading: false,
+          }));
+          return contributions;
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to load contributions";
+          set({ error: message, isLoading: false });
+          return [];
+        }
+      },
+
+      addContribution: (contribution: Contribution) => {
+        set((state) => {
+          const campaignId = contribution.campaign_id;
+          const existingContributions = state.contributions[campaignId] || [];
+          return {
+            contributions: {
+              ...state.contributions,
+              [campaignId]: [...existingContributions, contribution],
+            },
+          };
+        });
+      },
+
+      addInvite: () => {
+        // Mock implementation - invites are not persisted in local state
       },
 
       reset: () => {
         set({
-          campaigns: SEED_CAMPAIGNS,
-          contributions: SEED_CONTRIBUTIONS,
-          invites: [],
-          _hydrated: true,
+          campaigns: [],
+          contributions: {},
+          isLoading: false,
+          error: null,
         });
       },
-
-      addCampaign: (c) => set({ campaigns: [c, ...get().campaigns] }),
-
-      updateCampaign: (id, patch) =>
-        set({
-          campaigns: get().campaigns.map((c) => (c.id === id ? { ...c, ...patch } : c)),
-        }),
-
-      closeCampaign: (id) =>
-        set({
-          campaigns: get().campaigns.map((c) =>
-            c.id === id ? { ...c, status: "ended", end_date: new Date().toISOString() } : c,
-          ),
-        }),
-
-      payoutCampaign: (id) =>
-        set({
-          campaigns: get().campaigns.map((c) => (c.id === id ? { ...c, status: "paid_out" } : c)),
-        }),
-
-      reactivateCampaign: (id, endDate) => {
-        const source = get().campaigns.find((c) => c.id === id);
-        if (!source) return undefined;
-        const slug = uniqueSlug(
-          source.title,
-          get().campaigns.map((c) => c.slug),
-        );
-        const clone: Campaign = {
-          ...source,
-          id: uid("camp"),
-          slug,
-          status: "active",
-          raised_amount: 0,
-          end_date: new Date(endDate).toISOString(),
-          created_at: new Date().toISOString(),
-        };
-        set({ campaigns: [clone, ...get().campaigns] });
-        return clone;
-      },
-
-      addContribution: (c) => {
-        const next = [c, ...get().contributions];
-        const campaigns = get().campaigns.map((camp) =>
-          camp.id === c.campaign_id
-            ? { ...camp, raised_amount: camp.raised_amount + c.amount }
-            : camp,
-        );
-        set({ contributions: next, campaigns });
-      },
-
-      addInvite: (i) => set({ invites: [i, ...get().invites] }),
     }),
-    { name: "giivngo.campaigns" },
-  ),
 );
 
 export function makeInvite(
@@ -117,7 +195,7 @@ export function makeInvite(
   recipient: string,
 ): Invite {
   return {
-    id: uid("inv"),
+    id: `inv_${Date.now()}`,
     campaign_id: campaignId,
     channel,
     recipient,

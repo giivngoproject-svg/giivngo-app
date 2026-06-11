@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useRequireAuth } from "@/lib/mock/auth";
+import { useAuth } from "@/stores/auth";
+import { AuthCheck } from "@/components/AuthCheck";
 import { useWizard } from "@/stores/wizard";
 import { useCampaigns } from "@/stores/campaigns";
-import { uid, uniqueSlug } from "@/lib/slug";
 import { formatAUD } from "@/lib/money";
 import {
   CAMPAIGN_TYPE_LABELS,
@@ -18,18 +18,20 @@ import { toast } from "@/stores/toast";
 import { WizardShell } from "@/components/wizard/WizardShell";
 import { PhotoUpload } from "@/components/wizard/PhotoUpload";
 import { TierEditor } from "@/components/wizard/TierEditor";
+import { ItemEditor } from "@/components/wizard/ItemEditor";
+import { deleteImage } from "@/lib/mock/storage";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
 import { Progress } from "@/components/ui/Progress";
-import { ChevronLeft, ChevronRight, Sparkles, EyeOff, Lock, Layers, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, EyeOff, Lock, Layers, Eye, ChevronDown } from "lucide-react";
 
-export default function CreatePage() {
-  const user = useRequireAuth();
+function CreatePageInner() {
+  const user = useAuth((s) => s.user);
   const router = useRouter();
   const { step, data, setStep, patch, reset } = useWizard();
-  const addCampaign = useCampaigns((s) => s.addCampaign);
-  const campaigns = useCampaigns((s) => s.campaigns);
+  const createCampaign = useCampaigns((s) => s.createCampaign);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -42,40 +44,60 @@ export default function CreatePage() {
   const goNext = () => setStep((Math.min(3, step + 1) as 1 | 2 | 3));
   const goBack = () => setStep((Math.max(1, step - 1) as 1 | 2 | 3));
 
-  const publish = () => {
-    const slug = uniqueSlug(
-      data.title,
-      campaigns.map((c) => c.slug),
-    );
-    const id = uid("camp");
-    const tiered = data.pool_mode === "tiers";
-    const tiers = tiered
-      ? data.tiers.filter((t) => t > 0).sort((a, b) => a - b)
-      : undefined;
-    addCampaign({
-      id,
-      user_id: user.id,
-      title: data.title.trim(),
-      description: data.description.trim(),
-      type: data.type,
-      goal_amount: data.goal_amount || undefined,
-      raised_amount: 0,
-      cover_photo_url: data.cover_photo_url,
-      end_date: new Date(data.end_date).toISOString(),
-      status: "active",
-      slug,
-      // Tiers replace freeform min/max amounts.
-      min_contribution: tiered ? undefined : data.min_contribution,
-      max_contribution: tiered ? undefined : data.max_contribution,
-      recipient_name: data.recipient_name?.trim() || undefined,
-      pool_mode: data.pool_mode,
-      tiers,
-      organiser_name: user.name,
-      created_at: new Date().toISOString(),
-    });
-    toast.success("Campaign published", `Share /campaign/${slug}`);
-    reset();
-    router.push(`/manage/${slug}`);
+  const publish = async () => {
+    setIsPublishing(true);
+    try {
+      const tiered = data.pool_mode === "tiers";
+      const tiers = tiered
+        ? data.tiers.filter((t) => t > 0).sort((a, b) => a - b)
+        : undefined;
+
+      const campaign = await createCampaign({
+        title: data.title.trim(),
+        description: data.description.trim(),
+        type: data.type,
+        goalAmount: data.goal_amount || undefined,
+        coverPhotoUrl: data.cover_photo_url,
+        endDate: new Date(data.end_date).toISOString(),
+        minContribution: tiered ? undefined : data.min_contribution,
+        maxContribution: tiered ? undefined : data.max_contribution,
+        recipientName: data.recipient_name?.trim() || undefined,
+        poolMode: data.pool_mode,
+        tiers,
+        contributionItems: data.contribution_items.length > 0
+          ? data.contribution_items.map(({ label, amount }) => ({ label, amount }))
+          : undefined,
+        organiserName: user.name,
+      });
+
+      if (campaign) {
+        toast.success("Campaign published", `Share /campaign/${campaign.slug}`);
+        reset();
+        router.push(`/manage/${campaign.slug}`);
+      } else {
+        toast.error("Failed to publish", "Could not create campaign");
+        // Delete uploaded image if campaign creation failed
+        if (data.cover_photo_url) {
+          try {
+            await deleteImage(data.cover_photo_url);
+          } catch (err) {
+            console.error("Could not delete uploaded image:", err);
+          }
+        }
+      }
+    } catch (error: any) {
+      toast.error("Error", error.response?.data?.message || "Could not create campaign");
+      // Delete uploaded image if campaign creation failed
+      if (data.cover_photo_url) {
+        try {
+          await deleteImage(data.cover_photo_url);
+        } catch (err) {
+          console.error("Could not delete uploaded image:", err);
+        }
+      }
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   return (
@@ -93,9 +115,23 @@ export default function CreatePage() {
       )}
       {step === 2 && <Step2 data={data} patch={patch} onNext={goNext} onBack={goBack} />}
       {step === 3 && (
-        <Step3 data={data} organiserName={user.name} onBack={goBack} onPublish={publish} />
+        <Step3
+          data={data}
+          organiserName={user.name}
+          onBack={goBack}
+          onPublish={publish}
+          isPublishing={isPublishing}
+        />
       )}
     </WizardShell>
+  );
+}
+
+export default function CreatePage() {
+  return (
+    <AuthCheck requireAuth={true}>
+      <CreatePageInner />
+    </AuthCheck>
   );
 }
 
@@ -201,7 +237,9 @@ function Step2({
   const today = new Date().toISOString().slice(0, 10);
   const isTiers = data.pool_mode === "tiers";
   const validTiers = data.tiers.filter((t) => t > 0);
+  const hasItems = data.contribution_items.length > 0;
   const canNext = !!data.end_date && (!isTiers || validTiers.length >= 1);
+  const [itemsExpanded, setItemsExpanded] = React.useState(false);
 
   return (
     <div className="space-y-5">
@@ -298,6 +336,48 @@ function Step2({
         </div>
       )}
 
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={() => setItemsExpanded(!itemsExpanded)}
+          className="w-full flex items-center justify-between px-3.5 py-3 rounded-2xl border border-border hover:bg-foreground/5 text-sm font-medium"
+        >
+          <span>Add contribution items (optional)</span>
+          <ChevronDown
+            size={16}
+            className={cn("transition-transform", itemsExpanded && "rotate-180")}
+          />
+        </button>
+        {itemsExpanded && (
+          <div className="px-3.5 py-3 rounded-2xl border border-border bg-foreground/[.02]">
+            <ItemEditor
+              items={data.contribution_items}
+              onChange={(items) => patch({ contribution_items: items })}
+            />
+            <p className="text-xs text-muted mt-3">
+              Named options contributors can pick from. Replaces the freeform amount field.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {data.type === "birthday" && (
+        <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-border hover:bg-foreground/5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={data.hide_until_birthday}
+            onChange={(e) => patch({ hide_until_birthday: e.target.checked })}
+            className="mt-1"
+          />
+          <div>
+            <p className="text-sm font-medium">Hide contributions until the end date</p>
+            <p className="text-xs text-muted mt-0.5">
+              Keep it a surprise — gifts, photos, and videos stay hidden until the birthday.
+            </p>
+          </div>
+        </label>
+      )}
+
       <div className="flex justify-between pt-4">
         <Button variant="ghost" onClick={onBack}>
           <ChevronLeft size={16} /> Back
@@ -320,11 +400,13 @@ function Step3({
   organiserName,
   onBack,
   onPublish,
+  isPublishing,
 }: {
   data: ReturnType<typeof useWizard.getState>["data"];
   organiserName: string;
   onBack: () => void;
-  onPublish: () => void;
+  onPublish: () => Promise<void>;
+  isPublishing: boolean;
 }) {
   return (
     <div>
@@ -348,10 +430,13 @@ function Step3({
             <h2 className="text-2xl font-bold tracking-tight">{data.title || "Untitled"}</h2>
             <StatusBadge status="active" />
           </div>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
             <p className="text-sm text-muted">by {organiserName}</p>
             {data.pool_mode !== "standard" && (
               <Badge tone="accent">{POOL_MODE_LABELS[data.pool_mode]}</Badge>
+            )}
+            {data.hide_until_birthday && (
+              <Badge tone="accent">🎂 Birthday surprise</Badge>
             )}
           </div>
           {data.recipient_name?.trim() && (
@@ -419,17 +504,28 @@ function Step3({
                 ) : null}
               </>
             )}
+            {data.contribution_items.length > 0 ? (
+              <>
+                <dt className="text-muted">Items</dt>
+                <dd className="text-right">
+                  {data.contribution_items
+                    .filter((i) => i.label.trim() && i.amount > 0)
+                    .map((i) => `${i.label} (${formatAUD(i.amount)})`)
+                    .join(" · ") || "—"}
+                </dd>
+              </>
+            ) : null}
           </dl>
         </div>
       </div>
 
       <div className="flex justify-between pt-6">
-        <Button variant="ghost" onClick={onBack}>
+        <Button variant="ghost" onClick={onBack} disabled={isPublishing}>
           <ChevronLeft size={16} /> Back
         </Button>
-        <Button onClick={onPublish} size="lg">
+        <Button onClick={onPublish} size="lg" disabled={isPublishing}>
           <Sparkles size={16} />
-          Publish campaign
+          {isPublishing ? "Publishing..." : "Publish campaign"}
         </Button>
       </div>
     </div>

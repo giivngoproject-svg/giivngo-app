@@ -12,6 +12,8 @@ export type CheckoutRequest = {
   emoji?: string;
   photo_url?: string;
   video_url?: string;
+  items?: Array<{ item_id: string; label: string; amount: number }>;
+  is_private?: boolean;
 };
 
 export type CheckoutResult =

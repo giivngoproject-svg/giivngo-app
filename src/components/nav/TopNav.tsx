@@ -23,12 +23,12 @@ export function TopNav() {
         <Link href="/" className="flex items-center gap-2">
           <Logo />
           <span className="hidden sm:inline text-xs text-muted px-1.5 py-0.5 rounded-md bg-foreground/5">
-            demo
+            V 1.0.0
           </span>
         </Link>
 
         <div className="flex items-center gap-2">
-          <button
+          {/* <button
             onClick={() => {
               reset();
               toast.success("Demo reset", "Seed data restored");
@@ -38,7 +38,7 @@ export function TopNav() {
           >
             <RotateCcw size={14} />
             Reset
-          </button>
+          </button> */}
 
           {user ? (
             <div className="relative">

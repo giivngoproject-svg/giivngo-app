@@ -53,6 +53,8 @@ export function MockStripeCheckout() {
         emoji: detail.request.emoji || undefined,
         photo_url: detail.request.photo_url,
         video_url: detail.request.video_url,
+        selected_items: detail.request.items,
+        is_private: detail.request.is_private,
         status: "succeeded",
         created_at: new Date().toISOString(),
       };
@@ -82,7 +84,9 @@ export function MockStripeCheckout() {
           </div>
           <h3 className="text-lg font-semibold">Payment successful</h3>
           <p className="text-sm text-muted mt-1">
-            {formatAUD(request.amount)} contributed
+            {done.selected_items && done.selected_items.length > 0
+              ? `Contributed ${done.selected_items.map((i) => i.label).join(" + ")}`
+              : `${formatAUD(request.amount)} contributed`}
             {tip > 0 ? ` + ${formatAUD(tip)} tip` : ""}. Receipt sent to your email.
           </p>
           <Button
@@ -103,13 +107,36 @@ export function MockStripeCheckout() {
           <Lock size={12} />
           <span>Stripe checkout · simulated</span>
         </div>
-        <p className="text-2xl font-semibold mt-2">{formatAUD(total, { withCents: true })}</p>
-        {tip > 0 ? (
-          <p className="text-sm text-muted">
-            {formatAUD(request.amount)} contribution + {formatAUD(tip)} tip
-          </p>
+        {request.items && request.items.length > 0 ? (
+          <div className="mt-3 space-y-1.5 text-sm">
+            {request.items.map((item) => (
+              <div key={item.item_id} className="flex justify-between">
+                <span>{item.label}</span>
+                <span className="font-medium">{formatAUD(item.amount)}</span>
+              </div>
+            ))}
+            {tip > 0 && (
+              <div className="flex justify-between text-muted">
+                <span>+ Tip</span>
+                <span>{formatAUD(tip)}</span>
+              </div>
+            )}
+            <div className="border-t border-border pt-1.5 flex justify-between font-semibold">
+              <span>Total</span>
+              <span>{formatAUD(total, { withCents: true })}</span>
+            </div>
+          </div>
         ) : (
-          <p className="text-sm text-muted">Contribution to campaign</p>
+          <>
+            <p className="text-2xl font-semibold mt-2">{formatAUD(total, { withCents: true })}</p>
+            {tip > 0 ? (
+              <p className="text-sm text-muted">
+                {formatAUD(request.amount)} contribution + {formatAUD(tip)} tip
+              </p>
+            ) : (
+              <p className="text-sm text-muted">Contribution to campaign</p>
+            )}
+          </>
         )}
       </div>
 

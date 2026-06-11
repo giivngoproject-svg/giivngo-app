@@ -34,7 +34,7 @@ export function HighlightReel({ contributions }: { contributions: Contribution[]
               className="w-44 h-64 rounded-2xl object-cover bg-black"
             />
             <figcaption className="text-xs text-muted mt-1.5 truncate">
-              {c.contributor_name || "Anonymous"}
+              {c.is_private ? "Anonymous" : c.contributor_name || "Anonymous"}
               {c.emoji ? ` ${c.emoji}` : ""}
             </figcaption>
           </figure>

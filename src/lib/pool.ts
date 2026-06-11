@@ -39,3 +39,8 @@ export function isTiered(c: Pick<Campaign, "pool_mode" | "tiers">): boolean {
 export function tipTotal(contributions: Contribution[]): number {
   return contributions.reduce((sum, c) => sum + (c.tip_amount || 0), 0);
 }
+
+/** Contribution content is hidden from the public when this campaign is active. */
+export function isBirthdayHidden(c: Pick<Campaign, "hide_until_birthday" | "status">): boolean {
+  return !!c.hide_until_birthday && c.status === "active";
+}

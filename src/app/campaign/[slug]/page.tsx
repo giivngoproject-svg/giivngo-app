@@ -1,22 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { formatDistanceToNowStrict } from "date-fns";
-import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff } from "lucide-react";
+import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2 } from "lucide-react";
 import { useCampaigns } from "@/stores/campaigns";
+import { contributionsApi, storageApi } from "@/lib/api";
 import { formatAUD } from "@/lib/money";
 import {
   isGoalHidden,
   isContributorsHidden,
   isTiered,
+  isBirthdayHidden,
   poolMode,
   tipTotal,
   POOL_MODE_LABELS,
 } from "@/lib/pool";
-import { openCheckout } from "@/lib/mock/stripe";
-import { uploadImage } from "@/lib/mock/storage";
 import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
@@ -31,14 +31,44 @@ import { VideoDrop } from "@/components/campaign/VideoDrop";
 const QUICK_AMOUNTS = [20, 50, 100, 200];
 const TIP_OPTIONS = [5, 10, 20];
 
+// Stable empty-array reference so the Zustand selector below doesn't return a
+// brand-new array each render (which triggers "getServerSnapshot should be
+// cached" and an infinite re-render loop via useSyncExternalStore).
+const EMPTY_CONTRIBUTIONS: never[] = [];
+
 export default function PublicCampaignPage() {
   const { slug } = useParams<{ slug: string }>();
   const campaign = useCampaigns((s) => s.campaigns.find((c) => c.slug === slug));
-  const allContributions = useCampaigns((s) => s.contributions);
+  const storeIsLoading = useCampaigns((s) => s.isLoading);
+  const loadCampaign = useCampaigns((s) => s.loadCampaign);
+  const loadContributions = useCampaigns((s) => s.loadContributions);
+  const refreshCampaign = useCampaigns((s) => s.refreshCampaign);
+  const allContributions = useCampaigns((s) => s.contributions[slug] ?? EMPTY_CONTRIBUTIONS);
+
+  // Load campaign and contributions on mount
+  useEffect(() => {
+    if (slug) {
+      loadCampaign(slug).catch(console.error);
+      loadContributions(slug).catch(console.error);
+
+      // Check if returning from Stripe checkout
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('checkout') === 'success') {
+        // Reload contributions after small delay to ensure webhook processed
+        setTimeout(() => {
+          loadContributions(slug).catch(console.error);
+        }, 2000);
+
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        toast.success('Payment received!', 'Your contribution has been recorded.');
+      }
+    }
+  }, [slug]);
 
   const contributions = useMemo(
-    () => allContributions.filter((c) => c.campaign_id === campaign?.id),
-    [allContributions, campaign?.id],
+    () => allContributions,
+    [allContributions],
   );
 
   const [amount, setAmount] = useState<number | "">("");
@@ -50,8 +80,51 @@ export default function PublicCampaignPage() {
   const [photo, setPhoto] = useState<string | undefined>(undefined);
   const [video, setVideo] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
+  const [isPrivate, setIsPrivate] = useState(false);
 
-  if (!campaign) {
+  // Show loading skeleton while fetching
+  if (storeIsLoading && !campaign) {
+    return (
+      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+        {/* Hero skeleton */}
+        <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft mb-8 animate-pulse">
+          <div className="aspect-[16/9] bg-foreground/10" />
+        </div>
+
+        {/* Title skeleton */}
+        <div className="space-y-4 mb-8 animate-pulse">
+          <div className="h-8 bg-foreground/10 rounded-lg w-3/4" />
+          <div className="h-4 bg-foreground/10 rounded-lg w-full" />
+          <div className="h-4 bg-foreground/10 rounded-lg w-5/6" />
+        </div>
+
+        {/* Progress bar skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 animate-pulse">
+          <div className="space-y-3">
+            <div className="h-4 bg-foreground/10 rounded-lg w-1/2" />
+            <div className="h-8 bg-foreground/10 rounded-lg" />
+          </div>
+        </div>
+
+        {/* Gift wall skeleton */}
+        <div className="space-y-4 animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex gap-4 p-4 border border-border rounded-lg">
+              <div className="w-10 h-10 bg-foreground/10 rounded-full shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-foreground/10 rounded-lg w-1/3" />
+                <div className="h-3 bg-foreground/10 rounded-lg w-2/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Only show "not found" after loading is complete and campaign doesn't exist
+  if (!storeIsLoading && !campaign) {
     return (
       <div className="max-w-md mx-auto px-5 py-20 text-center">
         <h1 className="text-2xl font-semibold">Campaign not found</h1>
@@ -67,6 +140,9 @@ export default function PublicCampaignPage() {
     );
   }
 
+  // Type guard: campaign must exist at this point
+  if (!campaign) return null;
+
   const end = new Date(campaign.end_date);
   const daysLeft = Math.max(0, Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
   const closed = campaign.status !== "active";
@@ -76,58 +152,207 @@ export default function PublicCampaignPage() {
   const goalHidden = isGoalHidden(campaign);
   const contributorsHidden = isContributorsHidden(campaign);
   const tiered = isTiered(campaign);
+  const hasItems = campaign.contribution_items?.length ?? 0 > 0;
+  const items = campaign.contribution_items ?? [];
   const tiers = campaign.tiers ?? [];
   const mode = poolMode(campaign);
   const tips = tipTotal(contributions);
   const recipient = campaign.recipient_name?.trim();
+  const birthdayHidden = isBirthdayHidden(campaign);
 
   const handlePhoto = async (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image too large", "Use a file under 5 MB");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image too large", "Use a file under 10 MB");
       return;
     }
-    const url = await uploadImage(file);
-    setPhoto(url);
+    try {
+      const { url } = await storageApi.uploadImage(file);
+      setPhoto(url);
+      toast.success("Photo uploaded");
+    } catch (error) {
+      toast.error("Upload failed", "Could not upload image");
+    }
   };
 
   const contribute = async () => {
-    const amt = Number(amount);
-    if (!amt || amt <= 0) {
-      toast.error("Enter an amount");
-      return;
-    }
-    if (!tiered) {
-      if (min && amt < min) {
-        toast.error(`Minimum is ${formatAUD(min)}`);
+    let amt: number;
+    let selectedItems: Array<{ itemId: string; amount: number }> = [];
+
+    if (hasItems) {
+      if (selectedItemIds.size === 0) {
+        toast.error("Select at least one item");
         return;
       }
-      if (max && amt > max) {
-        toast.error(`Maximum is ${formatAUD(max)}`);
+      const filtered = items.filter((i) => selectedItemIds.has(i.id));
+      selectedItems = filtered.map((i) => ({ itemId: i.id, amount: i.amount }));
+      amt = selectedItems.reduce((sum, i) => sum + i.amount, 0);
+    } else {
+      amt = Number(amount);
+      if (!amt || amt <= 0) {
+        toast.error("Enter an amount");
         return;
       }
+      if (!tiered) {
+        if (min && amt < min) {
+          toast.error(`Minimum is ${formatAUD(min)}`);
+          return;
+        }
+        if (max && amt > max) {
+          toast.error(`Maximum is ${formatAUD(max)}`);
+          return;
+        }
+      }
     }
+
     setSubmitting(true);
-    const result = await openCheckout({
-      campaignId: campaign.id,
-      amount: amt,
-      tip_amount: tip ? Number(tip) : undefined,
-      contributor_name: name.trim() || undefined,
-      contributor_email: email.trim() || undefined,
-      message: message.trim() || undefined,
-      emoji,
-      photo_url: photo,
-      video_url: video,
-    });
-    setSubmitting(false);
-    if (result.status === "succeeded") {
-      setAmount("");
-      setTip("");
-      setName("");
-      setEmail("");
-      setMessage("");
-      setEmoji(undefined);
-      setPhoto(undefined);
-      setVideo(undefined);
+    try {
+      const response = await contributionsApi.checkout(campaign.slug, {
+        amount: amt,
+        tipAmount: tip ? Number(tip) : undefined,
+        contributorName: name.trim() || undefined,
+        contributorEmail: email.trim() || undefined,
+        message: message.trim() || undefined,
+        emoji,
+        photoUrl: photo,
+        videoUrl: video,
+        selectedItems: selectedItems,
+        isPrivate: isPrivate,
+      });
+
+      // Initialize Stripe
+      const stripe = (window as any).Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+      const totalAmount = (amt + (tip ? Number(tip) : 0)).toFixed(2);
+
+      // Use Payment Element (modern approach)
+      const elements = stripe.elements({ clientSecret: response.clientSecret });
+      const paymentElement = elements.create('payment');
+
+      // Create modal HTML
+      const modalHTML = `
+        <div id="payment-modal" style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        ">
+          <div style="
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow-y: auto;
+          ">
+            <h2 style="margin: 0 0 8px; font-size: 24px; font-weight: 700;">Complete Payment</h2>
+            <p style="color: #999; margin: 0 0 24px; font-size: 14px;">Enter your payment details</p>
+
+            <div style="background: #f0f7ff; border: 1px solid #cce5ff; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+              <p style="margin: 0 0 8px; font-size: 13px; color: #666; font-weight: 500;">
+                💳 Test Card (Stripe test mode):
+              </p>
+              <p style="margin: 0; font-family: monospace; font-size: 16px; color: #222; font-weight: 600;">
+                4242 4242 4242 4242
+              </p>
+              <p style="margin: 8px 0 0; font-size: 13px; color: #666;">Any month/year, any 3-digit CVC</p>
+            </div>
+
+            <div id="payment-element" style="margin-bottom: 20px;"></div>
+
+            <div style="display: flex; gap: 10px;">
+              <button id="submit-btn" style="flex: 1; padding: 12px; background: #0066cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">Pay A$${totalAmount}</button>
+              <button id="cancel-btn" style="flex: 1; padding: 12px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      paymentElement.mount('#payment-element');
+
+      const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+      const cancelBtn = document.getElementById('cancel-btn') as HTMLButtonElement;
+      const modal = document.getElementById('payment-modal')!;
+
+      cancelBtn.addEventListener('click', () => {
+        modal.remove();
+        paymentElement.destroy();
+        setSubmitting(false);
+      });
+
+      submitBtn.addEventListener('click', async () => {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
+
+        // Step 1: Submit the Payment Element form for validation
+        console.log('🔵 [Payment] Submitting payment element for validation...');
+        const submitError = await elements.submit();
+        console.log('🔵 [Payment] elements.submit() result:', submitError);
+
+        if (submitError && submitError.error) {
+          const errorMsg = submitError.error.message || JSON.stringify(submitError.error);
+          console.error('❌ [Payment] Validation error:', submitError.error);
+          toast.error('Validation failed', errorMsg);
+          submitBtn.disabled = false;
+          submitBtn.textContent = `Pay A$${totalAmount}`;
+          return;
+        }
+
+        // Step 2: Confirm payment with Stripe
+        console.log('🔵 [Payment] Confirming payment with Stripe...');
+        const { error, paymentIntent } = await stripe.confirmPayment({
+          elements,
+          clientSecret: response.clientSecret,
+          confirmParams: {
+            return_url: `${window.location.origin}/campaign/${campaign.slug}?checkout=success`,
+          },
+        });
+
+        console.log('🔵 [Payment] confirmPayment() result:', { error, paymentIntent });
+
+        if (error) {
+          console.error('❌ [Payment] Payment error:', error);
+          toast.error('Payment failed', error.message);
+          submitBtn.disabled = false;
+          submitBtn.textContent = `Pay A$${totalAmount}`;
+        } else if (paymentIntent?.status === 'succeeded') {
+          console.log('✅ [Payment] Payment succeeded:', paymentIntent.id);
+          modal.remove();
+          paymentElement.destroy();
+          toast.success('Payment successful! ✅', 'Your contribution has been recorded.');
+
+          // Reset form
+          setAmount('');
+          setTip('');
+          setName('');
+          setEmail('');
+          setMessage('');
+          setEmoji(undefined);
+          setPhoto(undefined);
+          setVideo(undefined);
+          setSelectedItemIds(new Set());
+          setIsPrivate(false);
+          setSubmitting(false);
+
+          // Refresh campaign data to show updated raised amount
+          await refreshCampaign(slug);
+        }
+      });
+    } catch (error: any) {
+      console.error("Checkout error:", error);
+      toast.error(
+        "Checkout failed",
+        error.message || error.response?.data?.message || "Could not process checkout"
+      );
+      setSubmitting(false);
     }
   };
 
@@ -174,8 +399,23 @@ export default function PublicCampaignPage() {
             </p>
           </div>
 
-          {/* Gift wall / privacy panel */}
-          {contributorsHidden ? (
+          {/* Gift wall / privacy panel / birthday surprise */}
+          {birthdayHidden ? (
+            <div className="rounded-3xl border border-border bg-background p-6 text-center">
+              <div className="mx-auto w-11 h-11 rounded-full bg-foreground/5 flex items-center justify-center mb-3">
+                <span className="text-xl">🎂</span>
+              </div>
+              <h2 className="font-semibold">The surprise is being kept secret</h2>
+              <p className="text-sm text-muted mt-1 max-w-sm mx-auto">
+                Gifts, photos, and messages stay hidden until{" "}
+                {new Date(campaign.end_date).toLocaleDateString("en-AU", {
+                  day: "numeric",
+                  month: "long",
+                })}
+                .
+              </p>
+            </div>
+          ) : contributorsHidden ? (
             <div className="rounded-3xl border border-border bg-background p-6 text-center">
               <div className="mx-auto w-11 h-11 rounded-full bg-foreground/5 flex items-center justify-center mb-3">
                 <Lock size={18} className="text-muted" />
@@ -254,8 +494,51 @@ export default function PublicCampaignPage() {
             ) : (
               <div className="mt-5 space-y-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Amount</label>
-                  {tiered ? (
+                  <label className="block text-sm font-medium mb-1.5">
+                    {hasItems ? "Contribution Options" : "Contribution Fixed Amount"}
+                  </label>
+                  {hasItems ? (
+                    <div className="space-y-2">
+                      {items.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => {
+                            const next = new Set(selectedItemIds);
+                            if (next.has(item.id)) {
+                              next.delete(item.id);
+                            } else {
+                              next.add(item.id);
+                            }
+                            setSelectedItemIds(next);
+                          }}
+                          className={`w-full h-11 rounded-xl text-sm font-medium transition-colors flex items-center justify-between px-3 ${
+                            selectedItemIds.has(item.id)
+                              ? "bg-accent text-accent-foreground"
+                              : "bg-foreground/5 hover:bg-foreground/10"
+                          }`}
+                        >
+                          <span>{item.label}</span>
+                          <span>{formatAUD(item.amount)}</span>
+                        </button>
+                      ))}
+                      {selectedItemIds.size > 0 && (
+                        <div className="mt-2 p-3 rounded-2xl bg-accent/5 text-sm font-medium">
+                          Selected:{" "}
+                          {Array.from(selectedItemIds)
+                            .map((id) => items.find((i) => i.id === id)?.label)
+                            .filter(Boolean)
+                            .join(" + ")}{" "}
+                          = {formatAUD(
+                            Array.from(selectedItemIds).reduce(
+                              (sum, id) => sum + (items.find((i) => i.id === id)?.amount || 0),
+                              0,
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : tiered ? (
                     <div className="grid grid-cols-2 gap-2">
                       {tiers.map((t) => (
                         <button
@@ -367,6 +650,21 @@ export default function PublicCampaignPage() {
                   rows={2}
                 />
 
+                <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-border hover:bg-foreground/5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isPrivate}
+                    onChange={(e) => setIsPrivate(e.target.checked)}
+                    className="mt-1"
+                  />
+                  <div>
+                    <p className="text-sm font-medium">Make my contribution private</p>
+                    <p className="text-xs text-muted mt-0.5">
+                      Your name won't appear publicly — {campaign.organiser_name} can still see it.
+                    </p>
+                  </div>
+                </label>
+
                 <EmojiPicker value={emoji} onChange={setEmoji} />
 
                 <PhotoPicker value={photo} onChange={setPhoto} onUpload={handlePhoto} />
@@ -375,9 +673,18 @@ export default function PublicCampaignPage() {
 
                 <Button onClick={contribute} loading={submitting} className="w-full" size="lg">
                   <Heart size={16} />
-                  {amount
-                    ? `Contribute ${formatAUD(Number(amount) + (Number(tip) || 0))}`
-                    : "Contribute"}
+                  {hasItems
+                    ? selectedItemIds.size > 0
+                      ? `Contribute ${formatAUD(
+                          Array.from(selectedItemIds).reduce(
+                            (sum, id) => sum + (items.find((i) => i.id === id)?.amount || 0),
+                            0,
+                          ) + (Number(tip) || 0),
+                        )}`
+                      : "Select items"
+                    : amount
+                      ? `Contribute ${formatAUD(Number(amount) + (Number(tip) || 0))}`
+                      : "Contribute"}
                 </Button>
                 <p className="text-xs text-muted text-center inline-flex items-center justify-center gap-1 w-full">
                   <Lock size={11} /> Secure checkout · Stripe (simulated)

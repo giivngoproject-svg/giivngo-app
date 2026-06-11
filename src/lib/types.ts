@@ -12,6 +12,12 @@ export type CampaignStatus = "active" | "ended" | "paid_out";
 // campaign created before pool modes existed (persisted state may omit it).
 export type PoolMode = "standard" | "mystery" | "blind" | "tiers";
 
+export type ContributionItem = {
+  id: string;
+  label: string;
+  amount: number;
+};
+
 export type User = {
   id: string;
   email: string;
@@ -44,6 +50,10 @@ export type Campaign = {
   pool_mode?: PoolMode;
   // Locked contribution amounts when pool_mode === "tiers".
   tiers?: number[];
+  // Named contribution options (e.g. "Gift Fund $50") when using multi-item contributions.
+  contribution_items?: ContributionItem[];
+  // When true, hides gift wall, activity feed, and highlight reel until campaign ends.
+  hide_until_birthday?: boolean;
   created_at: string;
 };
 
@@ -61,6 +71,10 @@ export type Contribution = {
   photo_url?: string;
   // Short video drop (data URL in this mock) shown in the recipient's reel.
   video_url?: string;
+  // Selected items from a multi-item campaign (cart snapshot).
+  selected_items?: Array<{ item_id: string; label: string; amount: number }>;
+  // When true, contributor name is hidden publicly.
+  is_private?: boolean;
   status: "succeeded" | "pending" | "failed";
   created_at: string;
 };

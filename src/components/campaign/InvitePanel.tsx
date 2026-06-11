@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, MessageSquare, MessageCircle, Link2, Send } from "lucide-react";
+import { Mail, MessageSquare, MessageCircle, Link2, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import {
@@ -28,25 +28,37 @@ export function InvitePanel({
     `Hi! I'm collecting for "${campaignTitle}". Throw in whatever you can:`,
   );
   const [phones, setPhones] = useState("");
+  const [isLoadingEmail, setIsLoadingEmail] = useState(false);
+  const [isLoadingSms, setIsLoadingSms] = useState(false);
 
-  const sendEmails = () => {
+  const sendEmails = async () => {
     const list = emails
       .split(/[,\n]/)
       .map((s) => s.trim())
       .filter(Boolean);
     if (list.length === 0) return;
-    sendEmailInvites(campaignId, list, emailMessage);
-    setEmails("");
+    setIsLoadingEmail(true);
+    try {
+      await sendEmailInvites(campaignId, list, emailMessage, campaignTitle, shareUrl);
+      setEmails("");
+    } finally {
+      setIsLoadingEmail(false);
+    }
   };
 
-  const sendSms = () => {
+  const sendSms = async () => {
     const list = phones
       .split(/[,\n]/)
       .map((s) => s.trim())
       .filter(Boolean);
     if (list.length === 0) return;
-    sendSmsInvites(campaignId, list);
-    setPhones("");
+    setIsLoadingSms(true);
+    try {
+      await sendSmsInvites(campaignId, list);
+      setPhones("");
+    } finally {
+      setIsLoadingSms(false);
+    }
   };
 
   return (
@@ -85,16 +97,27 @@ export function InvitePanel({
               onChange={(e) => setEmails(e.target.value)}
               hint="One per line, or separated by commas."
               rows={3}
+              disabled={isLoadingEmail}
             />
             <Textarea
               label="Message"
               value={emailMessage}
               onChange={(e) => setEmailMessage(e.target.value)}
               rows={3}
+              disabled={isLoadingEmail}
             />
-            <Button onClick={sendEmails}>
-              <Send size={14} />
-              Send invites
+            <Button onClick={sendEmails} disabled={isLoadingEmail}>
+              {isLoadingEmail ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send size={14} />
+                  Send invites
+                </>
+              )}
             </Button>
           </div>
         )}
@@ -108,10 +131,20 @@ export function InvitePanel({
               onChange={(e) => setPhones(e.target.value)}
               hint="One per line, or separated by commas. AU numbers preferred."
               rows={3}
+              disabled={isLoadingSms}
             />
-            <Button onClick={sendSms}>
-              <Send size={14} />
-              Send SMS
+            <Button onClick={sendSms} disabled={isLoadingSms}>
+              {isLoadingSms ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send size={14} />
+                  Send SMS
+                </>
+              )}
             </Button>
           </div>
         )}

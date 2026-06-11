@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+
+const EMPTY_CONTRIBUTIONS: any[] = [];
 import {
   Banknote,
   Calendar,
@@ -17,7 +19,8 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { formatDistanceToNowStrict } from "date-fns";
-import { useRequireAuth } from "@/lib/mock/auth";
+import { useAuth } from "@/stores/auth";
+import { AuthCheck } from "@/components/AuthCheck";
 import { useCampaigns } from "@/stores/campaigns";
 import { formatAUD, calcFee } from "@/lib/money";
 import { poolMode, tipTotal, POOL_MODE_LABELS } from "@/lib/pool";
@@ -27,38 +30,97 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { Progress } from "@/components/ui/Progress";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
+import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 import { InvitePanel } from "@/components/campaign/InvitePanel";
 import { HighlightReel } from "@/components/campaign/HighlightReel";
+import { ItemEditor } from "@/components/wizard/ItemEditor";
 
-export default function ManagePage() {
-  const user = useRequireAuth();
+function ManagePageInner() {
+  const user = useAuth((s) => s.user);
   const router = useRouter();
   const { slug } = useParams<{ slug: string }>();
 
   const campaign = useCampaigns((s) => s.campaigns.find((c) => c.slug === slug));
-  const allContributions = useCampaigns((s) => s.contributions);
-  const updateCampaign = useCampaigns((s) => s.updateCampaign);
-  const closeCampaign = useCampaigns((s) => s.closeCampaign);
-  const payoutCampaign = useCampaigns((s) => s.payoutCampaign);
-  const reactivateCampaign = useCampaigns((s) => s.reactivateCampaign);
+  const isLoading = useCampaigns((s) => s.isLoading);
 
-  const contributions = useMemo(
-    () =>
-      allContributions
-        .filter((c) => c.campaign_id === campaign?.id)
-        .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at)),
-    [allContributions, campaign?.id],
-  );
+  const updateCampaignAPI = useCampaigns((s) => s.updateCampaign);
+  const closeCampaignAPI = useCampaigns((s) => s.closeCampaign);
+  const reactivateCampaignAPI = useCampaigns((s) => s.reactivateCampaign);
 
+  const allContributions = useCampaigns((s) => s.contributions[slug] || EMPTY_CONTRIBUTIONS);
   const [editOpen, setEditOpen] = useState(false);
   const [extendOpen, setExtendOpen] = useState(false);
   const [closeOpen, setCloseOpen] = useState(false);
   const [payoutOpen, setPayoutOpen] = useState(false);
   const [reactivateOpen, setReactivateOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Load campaign and contributions on mount - use inline callbacks to avoid dependency issues
+  useEffect(() => {
+    if (slug) {
+      const { loadCampaign, loadContributions } = useCampaigns.getState();
+      loadCampaign(slug).catch(console.error);
+      loadContributions(slug).catch(console.error);
+    }
+  }, [slug]);
+
+  const contributions = useMemo(
+    () =>
+      allContributions
+        .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at)),
+    [allContributions],
+  );
 
   if (!user) return null;
 
-  if (!campaign) {
+  // Show loading skeleton while fetching campaign
+  if (isLoading || !campaign) {
+    if (isLoading && !campaign) {
+      return (
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10">
+          <div className="mb-2">
+            <Skeleton className="h-6 w-32" />
+          </div>
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
+            <div className="min-w-0 flex-1">
+              <Skeleton className="h-12 w-2/3 mb-3" />
+              <Skeleton className="h-5 w-1/2" />
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Skeleton className="h-10 w-40" />
+              <Skeleton className="h-10 w-20" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="p-4 rounded-2xl border border-border bg-background">
+                <Skeleton className="h-4 w-20 mb-3" />
+                <Skeleton className="h-8 w-32" />
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="rounded-3xl border border-border bg-background p-5">
+                <Skeleton className="h-6 w-40" />
+              </div>
+              <div className="rounded-3xl border border-border bg-background p-5 h-64">
+                <Skeleton className="h-full" />
+              </div>
+            </div>
+            <div>
+              <div className="rounded-3xl border border-border bg-background p-5 h-64">
+                <Skeleton className="h-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Campaign not found after loading
     return (
       <div className="max-w-md mx-auto px-5 py-20 text-center">
         <h1 className="text-2xl font-semibold">Campaign not found</h1>
@@ -246,6 +308,59 @@ export default function ManagePage() {
             </div>
           )}
           </div>
+
+          {campaign.status !== "active" && contributions.length > 0 && (
+            <div className="rounded-3xl border border-border bg-background overflow-hidden mt-6">
+              <div className="p-5 border-b border-border">
+                <h3 className="font-semibold text-base">Contributor breakdown</h3>
+                <p className="text-sm text-muted mt-0.5">Private — only you can see this</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-muted border-b border-border">
+                      <th className="font-medium px-5 py-2">Name</th>
+                      <th className="font-medium px-5 py-2">Items</th>
+                      <th className="font-medium px-5 py-2 text-right">Amount</th>
+                      <th className="font-medium px-5 py-2 text-right">Tip</th>
+                      <th className="font-medium px-5 py-2">Date</th>
+                      <th className="font-medium px-5 py-2 text-center">Private</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {contributions.map((c) => (
+                      <tr key={c.id} className="border-b border-border last:border-0 hover:bg-foreground/[.02]">
+                        <td className="px-5 py-3 font-medium">
+                          {c.contributor_name || "Anonymous"}
+                        </td>
+                        <td className="px-5 py-3 text-muted text-xs max-w-[20ch] truncate">
+                          {c.selected_items && c.selected_items.length > 0
+                            ? c.selected_items.map((i) => i.label).join(", ")
+                            : "—"}
+                        </td>
+                        <td className="px-5 py-3 text-right font-semibold tabular-nums">
+                          {formatAUD(c.amount)}
+                        </td>
+                        <td className="px-5 py-3 text-right text-muted text-xs">
+                          {c.tip_amount ? formatAUD(c.tip_amount) : "—"}
+                        </td>
+                        <td className="px-5 py-3 text-muted text-xs">
+                          {new Date(c.created_at).toLocaleDateString("en-AU", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="px-5 py-3 text-center">
+                          {c.is_private && <span title="Private contribution">🔒</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -300,10 +415,17 @@ export default function ManagePage() {
         open={editOpen}
         onClose={() => setEditOpen(false)}
         campaign={campaign}
-        onSave={(patch) => {
-          updateCampaign(campaign.id, patch);
-          toast.success("Campaign updated");
-          setEditOpen(false);
+        onSave={async (patch) => {
+          setIsUpdating(true);
+          try {
+            await updateCampaignAPI(campaign.slug, patch);
+            toast.success("Campaign updated");
+          } catch (error: any) {
+            toast.error("Update failed", error.response?.data?.message);
+          } finally {
+            setIsUpdating(false);
+            setEditOpen(false);
+          }
         }}
       />
 
@@ -311,10 +433,15 @@ export default function ManagePage() {
         open={extendOpen}
         onClose={() => setExtendOpen(false)}
         currentEnd={campaign.end_date}
-        onSave={(endDate) => {
-          updateCampaign(campaign.id, { end_date: new Date(endDate).toISOString() });
-          toast.success("End date extended");
-          setExtendOpen(false);
+        onSave={async (endDate) => {
+          try {
+            await updateCampaignAPI(campaign.slug, { endDate: new Date(endDate).toISOString() });
+            toast.success("End date extended");
+          } catch (error: any) {
+            toast.error("Update failed", error.response?.data?.message);
+          } finally {
+            setExtendOpen(false);
+          }
         }}
       />
 
@@ -328,10 +455,17 @@ export default function ManagePage() {
           </Button>
           <Button
             variant="danger"
-            onClick={() => {
-              closeCampaign(campaign.id);
-              toast.success("Campaign closed");
-              setCloseOpen(false);
+            onClick={async () => {
+              setIsUpdating(true);
+              try {
+                await closeCampaignAPI(campaign.slug);
+                toast.success("Campaign closed");
+              } catch (error: any) {
+                toast.error("Close failed", error.response?.data?.message);
+              } finally {
+                setIsUpdating(false);
+                setCloseOpen(false);
+              }
             }}
           >
             Close campaign
@@ -352,7 +486,6 @@ export default function ManagePage() {
           {user.stripe_account_id ? (
             <Button
               onClick={() => {
-                payoutCampaign(campaign.id);
                 toast.success("Payout initiated", `${formatAUD(fee.net)} on its way to your bank (mock)`);
                 setPayoutOpen(false);
               }}
@@ -377,12 +510,19 @@ export default function ManagePage() {
         open={reactivateOpen}
         onClose={() => setReactivateOpen(false)}
         title={campaign.title}
-        onConfirm={(endDate) => {
-          const clone = reactivateCampaign(campaign.id, endDate);
-          setReactivateOpen(false);
-          if (clone) {
-            toast.success("Pool reactivated", "Same details, fresh dates and totals.");
-            router.push(`/manage/${clone.slug}`);
+        onConfirm={async (endDate) => {
+          setIsUpdating(true);
+          try {
+            const clone = await reactivateCampaignAPI(campaign.slug, endDate);
+            if (clone) {
+              toast.success("Pool reactivated", "Same details, fresh dates and totals.");
+              router.push(`/manage/${clone.slug}`);
+            }
+          } catch (error: any) {
+            toast.error("Reactivate failed", error.response?.data?.message);
+          } finally {
+            setIsUpdating(false);
+            setReactivateOpen(false);
           }
         }}
       />
@@ -421,33 +561,89 @@ function EditModal({
 }: {
   open: boolean;
   onClose: () => void;
-  campaign: { title: string; description: string; goal_amount?: number };
-  onSave: (patch: { title: string; description: string; goal_amount?: number }) => void;
+  campaign: {
+    title: string;
+    description: string;
+    goal_amount?: number;
+    contribution_items?: Array<{ label: string; amount: number }>;
+    type: string;
+    hide_until_birthday?: boolean;
+  };
+  onSave: (patch: {
+    title: string;
+    description: string;
+    goalAmount?: number;
+    contributionItems?: Array<{ label: string; amount: number }>;
+    hideUntilBirthday?: boolean;
+  }) => void;
 }) {
   const [title, setTitle] = useState(campaign.title);
   const [description, setDescription] = useState(campaign.description);
   const [goal, setGoal] = useState(campaign.goal_amount?.toString() ?? "");
+  const [items, setItems] = useState(campaign.contribution_items ?? []);
+  const [hideUntilBirthday, setHideUntilBirthday] = useState(campaign.hide_until_birthday ?? false);
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (open) {
+      setTitle(campaign.title);
+      setDescription(campaign.description);
+      setGoal(campaign.goal_amount?.toString() ?? "");
+      setItems(campaign.contribution_items ?? []);
+      setHideUntilBirthday(campaign.hide_until_birthday ?? false);
+    }
+  }, [open, campaign]);
 
   return (
     <Modal open={open} onClose={onClose} title="Edit campaign" size="lg">
-      <div className="space-y-3">
-        <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Textarea
-          label="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={5}
-        />
-        <Input
-          label="Goal (optional)"
-          type="number"
-          min={0}
-          value={goal}
-          onChange={(e) => setGoal(e.target.value)}
-          prefix="A$"
-        />
+      <div className="space-y-5">
+        <div className="space-y-3">
+          <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Textarea
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+          />
+          <Input
+            label="Goal (optional)"
+            type="number"
+            min={0}
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+            prefix="A$"
+          />
+        </div>
+
+        <div className="border-t pt-4">
+          <ItemEditor
+            items={items}
+            onChange={setItems}
+            label="Gift ideas / Contribution items (optional)"
+          />
+        </div>
+
+        {campaign.type === "birthday" && (
+          <div className="border-t pt-4">
+            <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-border hover:bg-foreground/5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hideUntilBirthday}
+                onChange={(e) => setHideUntilBirthday(e.target.checked)}
+                className="mt-1"
+              />
+              <div>
+                <p className="text-sm font-medium">Hide contributions until the end date</p>
+                <p className="text-xs text-muted mt-0.5">
+                  Keep the gift wall, names, photos and messages hidden until the event
+                </p>
+              </div>
+            </label>
+          </div>
+        )}
       </div>
-      <div className="flex justify-end gap-2 mt-5">
+
+      <div className="flex justify-end gap-2 mt-6">
         <Button variant="ghost" onClick={onClose}>
           Cancel
         </Button>
@@ -456,7 +652,11 @@ function EditModal({
             onSave({
               title: title.trim() || campaign.title,
               description: description.trim(),
-              goal_amount: goal ? Number(goal) : undefined,
+              goalAmount: goal ? Number(goal) : undefined,
+              contributionItems: items.length > 0
+                ? items.map(({ label, amount }) => ({ label, amount }))
+                : undefined,
+              hideUntilBirthday: campaign.type === "birthday" ? hideUntilBirthday : undefined,
             })
           }
         >
@@ -466,6 +666,7 @@ function EditModal({
     </Modal>
   );
 }
+
 
 function ExtendModal({
   open,
@@ -509,7 +710,7 @@ function ReactivateModal({
     d.setDate(d.getDate() + 14);
     return d.toISOString().slice(0, 10);
   };
-  const [date, setDate] = useState(twoWeeks);
+  const [date, setDate] = useState(twoWeeks());
 
   return (
     <Modal open={open} onClose={onClose} title="Reactivate pool">
@@ -537,5 +738,14 @@ function ReactivateModal({
         </Button>
       </div>
     </Modal>
+  );
+}
+
+
+export default function ManagePage() {
+  return (
+    <AuthCheck requireAuth={true}>
+      <ManagePageInner />
+    </AuthCheck>
   );
 }
