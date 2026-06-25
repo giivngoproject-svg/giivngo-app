@@ -46,12 +46,28 @@ function SignInInner() {
     return null;
   }
 
-  return (
-    <div className="max-w-md mx-auto px-5 py-12 sm:py-16">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
-        <p className="text-muted mt-1.5">Sign in to manage your campaigns</p>
+  return (<>
+    <section
+      className="relative pb-0 overflow-hidden min-h-[30vh]  flex items-center py-14"
+      style={{
+        backgroundImage:
+          'url(https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&h=1080&fit=crop)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+
+      <div className="w-full relative z-10 text-center mb-8 text-white">
+        <h1 className="text-4xl font-bold tracking-tight">Welcome back</h1>
+        <p className="text-blue-200 mt-1.5 font-bold bg-black/50 rounded-lg inline-block px-4 mx-auto">Sign in to manage your campaigns</p>
       </div>
+
+
+    </section>
+
+    <div className="max-w-md mx-auto px-5 py-12 sm:py-20 ">
+
 
       {expired && (
         <div className="mb-6 p-3 rounded-lg bg-yellow-50 border border-yellow-200 flex items-start gap-3 text-sm">
@@ -98,16 +114,9 @@ function SignInInner() {
         </Link>
       </p>
 
-      <div className="mt-8 p-3 rounded-lg bg-blue-50 border border-blue-200">
-        <p className="text-xs text-blue-700 font-medium mb-2">Demo Users:</p>
-        <div className="text-xs text-blue-600 space-y-1">
-          <p>📧 alex@demo.local</p>
-          <p>📧 jordan@demo.local</p>
-          <p className="text-blue-500 mt-2">Any password works (e.g., "password123")</p>
-        </div>
-      </div>
+
     </div>
-  );
+  </>);
 }
 
 export default function SignInPage() {

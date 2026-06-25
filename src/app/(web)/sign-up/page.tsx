@@ -26,12 +26,28 @@ export default function SignUpPage() {
     }
   };
 
-  return (
-    <div className="max-w-md mx-auto px-5 py-12 sm:py-16">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Create your account</h1>
-        <p className="text-muted mt-1.5">Start your first campaign in two minutes</p>
+  return (<>
+    <section
+      className="relative pb-0 overflow-hidden min-h-[30vh]  flex items-center py-14"
+      style={{
+        backgroundImage:
+          'url(https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&h=1080&fit=crop)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+
+      <div className="w-full relative z-10 text-center mb-8 text-white">
+        <h1 className="text-4xl font-bold tracking-tight">Create your account</h1>
+        <p className="text-blue-200 mt-1.5 font-bold bg-black/50 rounded-lg inline-block px-4 mx-auto">Start your first campaign in two minutes</p>
       </div>
+
+
+    </section>
+
+
+    <div className="max-w-md mx-auto px-5 py-12 sm:py-28">
 
       {error && (
         <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3 text-sm">
@@ -40,13 +56,14 @@ export default function SignUpPage() {
         </div>
       )}
 
-      <form onSubmit={submit} className="space-y-4">
+      <form onSubmit={submit} className="space-y-4" autoComplete="Off">
         <Input
           label="Full name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           prefix={<User size={16} />}
           required
+          name="fullname_"
           disabled={isLoading}
         />
         <Input
@@ -56,6 +73,7 @@ export default function SignUpPage() {
           onChange={(e) => setEmail(e.target.value)}
           prefix={<Mail size={16} />}
           required
+          name="email_"
           disabled={isLoading}
           placeholder="newuser@example.com"
         />
@@ -65,6 +83,7 @@ export default function SignUpPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          name="password_"
           disabled={isLoading}
           minLength={6}
         />
@@ -80,5 +99,5 @@ export default function SignUpPage() {
         </Link>
       </p>
     </div>
-  );
+  </>);
 }

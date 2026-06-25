@@ -3,12 +3,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ChevronDown, LogOut, User as UserIcon, LayoutDashboard, RotateCcw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronDown, LogOut, User as UserIcon, LayoutDashboard, RotateCcw, MenuIcon, LogIn, SignalIcon, UserPen, ToolCase, FolderTree, CircleDollarSign, Building2 } from "lucide-react";
 import { useAuth } from "@/stores/auth";
 import { useCampaigns } from "@/stores/campaigns";
 import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
+
+
+const desktopLinks = [
+  { href: "/how-it-works", label: "How it works", icon: <LayoutDashboard size={15} /> },
+  { href: "/use-cases", label: "Use Cases", icon: <ToolCase size={15} /> },
+  { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
+  { href: "/pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
+  { href: "/about", label: "About Us", icon: <Building2 size={15} /> }
+];
 
 export function TopNav() {
   const router = useRouter();
@@ -16,29 +25,34 @@ export function TopNav() {
   const signOut = useAuth((s) => s.signOut);
   const reset = useCampaigns((s) => s.reset);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isTop, setIsTop] = useState(true);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsTop(window.scrollY < 100);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
 
   return (
-    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border">
+    <header className={`fixed w-full top-0 z-50  backdrop-blur bg-transparent ${isTop ? "bg-black/20  " : "bg-white text-black"}`}>
       <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-">
           <Logo />
-          <span className="hidden sm:inline text-xs text-muted px-1.5 py-0.5 rounded-md bg-foreground/5">
+          {/* <span className="hidden sm:inline text-xs text-muted px-1.5 py-0.5 rounded-md bg-foreground/5">
             V 1.0.0
-          </span>
+          </span> */}
         </Link>
-
-        <div className="flex items-center gap-2">
-          {/* <button
-            onClick={() => {
-              reset();
-              toast.success("Demo reset", "Seed data restored");
-            }}
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted hover:text-foreground px-2.5 py-1.5 rounded-full hover:bg-foreground/5"
-            title="Reset demo data"
-          >
-            <RotateCcw size={14} />
-            Reset
-          </button> */}
+        <nav className="desktop-nav hidden sm:flex">
+          {desktopLinks.map((link, index) => (
+            <MenuLink key={index} href={link.href} icon={null} onClick={() => setSidebarOpen(!sidebarOpen)}  > <span className={`${isTop ? "text-white" : "text-black"} text-pretty`}>{link.label}</span> </MenuLink>
+          ))}
+        </nav>
+        <div className="flex items-center ">
 
           {user ? (
             <div className="relative">
@@ -57,20 +71,8 @@ export function TopNav() {
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                   <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-2xl shadow-lift overflow-hidden z-20">
-                    <MenuLink
-                      href="/dashboard"
-                      icon={<LayoutDashboard size={15} />}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Dashboard
-                    </MenuLink>
-                    <MenuLink
-                      href="/profile"
-                      icon={<UserIcon size={15} />}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Profile
-                    </MenuLink>
+                    <MenuLink href="/dashboard" icon={<LayoutDashboard size={15} />} onClick={() => setMenuOpen(false)} > Dashboard </MenuLink>
+                    <MenuLink href="/profile" icon={<UserIcon size={15} />} onClick={() => setMenuOpen(false)}> Profile </MenuLink>
                     <button
                       onClick={() => {
                         setMenuOpen(false);
@@ -87,19 +89,36 @@ export function TopNav() {
               )}
             </div>
           ) : (
-            <>
+            <div className="flex flex-row items-center gap-1.5">
               <Link
                 href="/sign-in"
-                className="text-sm font-medium px-3 py-1.5 rounded-full hover:bg-foreground/5"
+                className="text-sm font-medium  py-1.5 rounded-full hover:bg-foreground/5"
               >
-                Log in
+                <Button size="sm" variant="outline" className="flex flex-row gap-3 items-center"><LogIn size={14} className="inline-block md:hidden" /> <span className="hidden sm:inline">Log in</span></Button>
               </Link>
               <Link href="/sign-up">
-                <Button size="sm">Sign up</Button>
+                <Button size="sm"><UserPen size={14} className="inline-block md:hidden" /> <span className="hidden sm:inline">Get started free</span></Button>
               </Link>
-            </>
+            </div>
+
           )}
+          <Button
+            onClick={() => {
+              setSidebarOpen(!sidebarOpen);
+            }}
+            variant="outline"
+            size="sm"
+            className="md:hidden inline-flex items-center bg-white hover:bg-slate-200"
+            title="Open or Close Menu"
+          >
+            <MenuIcon size={14} />
+          </Button>
         </div>
+      </div>
+      <div className={`md:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "min-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
+        {desktopLinks.map((link, index) => (
+          <MenuLink key={index} href={link.href} icon={link.icon} onClick={() => setSidebarOpen(false)}  > <span className="py-3 text-pretty text-slate-900  w-full block font-bold">{link.label}</span> </MenuLink>
+        ))}
       </div>
     </header>
   );
@@ -158,7 +177,7 @@ export function Avatar({ name, url, size = 28 }: { name: string; url?: string; s
   );
 }
 
-function Logo() {
+export function Logo() {
   return (
     <Image
       src="/logo.png"

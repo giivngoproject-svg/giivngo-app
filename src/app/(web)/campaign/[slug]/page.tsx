@@ -8,6 +8,7 @@ import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2 } 
 import { useCampaigns } from "@/stores/campaigns";
 import { contributionsApi, storageApi } from "@/lib/api";
 import { formatAUD } from "@/lib/money";
+import { AnonymousAvatarSelector } from "@/components/anonymous-avatar-selector";
 import {
   isGoalHidden,
   isContributorsHidden,
@@ -82,6 +83,7 @@ export default function PublicCampaignPage() {
   const [submitting, setSubmitting] = useState(false);
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
   const [isPrivate, setIsPrivate] = useState(false);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>();
 
   // Show loading skeleton while fetching
   if (storeIsLoading && !campaign) {
@@ -217,6 +219,7 @@ export default function PublicCampaignPage() {
         videoUrl: video,
         selectedItems: selectedItems,
         isPrivate: isPrivate,
+        anonymousAvatarId: isPrivate ? selectedAvatarId : undefined,
       });
 
       // Initialize Stripe
@@ -340,6 +343,7 @@ export default function PublicCampaignPage() {
           setVideo(undefined);
           setSelectedItemIds(new Set());
           setIsPrivate(false);
+          setSelectedAvatarId(undefined);
           setSubmitting(false);
 
           // Refresh campaign data to show updated raised amount
@@ -664,6 +668,16 @@ export default function PublicCampaignPage() {
                     </p>
                   </div>
                 </label>
+
+                {isPrivate && (
+                  <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-3">
+                    <h3 className="text-sm font-semibold text-gray-900">🎭 Choose Your Anonymous Identity</h3>
+                    <AnonymousAvatarSelector
+                      value={selectedAvatarId}
+                      onChange={setSelectedAvatarId}
+                    />
+                  </div>
+                )}
 
                 <EmojiPicker value={emoji} onChange={setEmoji} />
 

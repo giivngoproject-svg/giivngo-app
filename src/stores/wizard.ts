@@ -17,6 +17,7 @@ export type WizardData = {
   tiers: number[];
   contribution_items: ContributionItem[];
   hide_until_birthday: boolean;
+  show_on_search: boolean;
 };
 
 type WizardState = {
@@ -47,6 +48,7 @@ const DEFAULTS: WizardData = {
   tiers: [20, 50, 100],
   contribution_items: [],
   hide_until_birthday: false,
+  show_on_search: true,
 };
 
 export const useWizard = create<WizardState>((set) => ({

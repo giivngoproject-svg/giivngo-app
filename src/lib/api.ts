@@ -44,6 +44,7 @@ function transformCampaignFromApi(data: any) {
     tiers: data.tiers,
     contribution_items: data.contributionItems,
     hide_until_birthday: data.hideUntilBirthday,
+    show_on_search: data.showOnSearch ?? true,
     created_at: data.createdAt,
   };
 }
@@ -64,6 +65,16 @@ function transformContributionFromApi(data: any) {
     photo_url: data.photoUrl,
     video_url: data.videoUrl,
     is_private: data.isPrivate,
+    anonymous_avatar_id: data.anonymousAvatarId,
+    anonymous_avatar: data.anonymousAvatar
+      ? {
+          id: data.anonymousAvatar.id,
+          name: data.anonymousAvatar.name,
+          imageUrl: data.anonymousAvatar.imageUrl,
+          description: data.anonymousAvatar.description,
+          color: data.anonymousAvatar.color,
+        }
+      : undefined,
     status: data.status,
     stripe_payment_id: data.stripePaymentId,
     selected_items: (data.selectedItems || []).map((item: any) => ({

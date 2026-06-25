@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CreditCard, Lock, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { AnonymousAvatarSelector } from "@/components/anonymous-avatar-selector";
 import { formatAUD } from "@/lib/money";
 import { uid } from "@/lib/slug";
 import { useCampaigns } from "@/stores/campaigns";
@@ -19,6 +20,7 @@ export function MockStripeCheckout() {
   const [card, setCard] = useState({ number: "4242 4242 4242 4242", exp: "12/29", cvc: "123" });
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState<Contribution | null>(null);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>();
   const addContribution = useCampaigns((s) => s.addContribution);
 
   useEffect(() => {
@@ -28,6 +30,7 @@ export function MockStripeCheckout() {
       setProcessing(false);
       setDone(null);
       setTab("card");
+      setSelectedAvatarId(undefined);
     };
     window.addEventListener("giivngo:checkout:open", handler);
     return () => window.removeEventListener("giivngo:checkout:open", handler);
@@ -45,8 +48,9 @@ export function MockStripeCheckout() {
       const contribution: Contribution = {
         id: uid("contrib"),
         campaign_id: detail.request.campaignId,
-        contributor_name: detail.request.contributor_name?.trim() || undefined,
-        contributor_email: detail.request.contributor_email?.trim() || undefined,
+        anonymous_avatar_id: detail.request.is_private ? selectedAvatarId : undefined,
+        contributor_name: detail.request.is_private ? undefined : detail.request.contributor_name?.trim() || undefined,
+        contributor_email: detail.request.is_private ? undefined : detail.request.contributor_email?.trim() || undefined,
         amount: detail.request.amount,
         tip_amount: detail.request.tip_amount || undefined,
         message: detail.request.message?.trim() || undefined,
@@ -65,6 +69,11 @@ export function MockStripeCheckout() {
         toast.success(
           "Receipt emailed",
           `Sent to ${contribution.contributor_email} (mock)`,
+        );
+      } else if (contribution.is_private) {
+        toast.success(
+          "Contribution received",
+          `You're contributing as ${selectedAvatarId ? '🎭 Anonymous' : 'Anonymous'} (mock)`,
         );
       }
     }, 900);
@@ -139,6 +148,22 @@ export function MockStripeCheckout() {
           </>
         )}
       </div>
+
+      {request.is_private && (
+        <div className="mt-5 p-4 rounded-lg bg-purple-50 border border-purple-200 space-y-4">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-1">🎭 Stay Anonymous</h3>
+            <p className="text-sm text-gray-600">
+              Choose a fun identity to hide your real name from other contributors
+            </p>
+          </div>
+          <AnonymousAvatarSelector
+            value={selectedAvatarId}
+            onChange={setSelectedAvatarId}
+            disabled={processing}
+          />
+        </div>
+      )}
 
       <div className="flex gap-2 mt-5">
         <TabPill active={tab === "card"} onClick={() => setTab("card")}>

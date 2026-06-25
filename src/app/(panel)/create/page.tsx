@@ -68,6 +68,7 @@ function CreatePageInner() {
           ? data.contribution_items.map(({ label, amount }) => ({ label, amount }))
           : undefined,
         organiserName: user.name,
+        showOnSearch: data.show_on_search,
       });
 
       if (campaign) {
@@ -117,6 +118,7 @@ function CreatePageInner() {
       {step === 3 && (
         <Step3
           data={data}
+          patch={patch}
           organiserName={user.name}
           onBack={goBack}
           onPublish={publish}
@@ -397,12 +399,14 @@ function Step2({
 
 function Step3({
   data,
+  patch,
   organiserName,
   onBack,
   onPublish,
   isPublishing,
 }: {
   data: ReturnType<typeof useWizard.getState>["data"];
+  patch: (p: Partial<typeof data>) => void;
   organiserName: string;
   onBack: () => void;
   onPublish: () => Promise<void>;
@@ -518,6 +522,19 @@ function Step3({
           </dl>
         </div>
       </div>
+
+      <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-border hover:bg-foreground/5 cursor-pointer mt-6">
+        <input
+          type="checkbox"
+          checked={data.show_on_search}
+          onChange={(e) => patch({ show_on_search: e.target.checked })}
+          className="mt-1"
+        />
+        <div>
+          <p className="text-sm font-medium">Show on Public Search</p>
+          <p className="text-xs text-muted mt-0.5">Allow others to find this campaign when searching on the homepage</p>
+        </div>
+      </label>
 
       <div className="flex justify-between pt-6">
         <Button variant="ghost" onClick={onBack} disabled={isPublishing}>

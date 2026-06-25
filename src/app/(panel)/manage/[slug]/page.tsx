@@ -570,6 +570,7 @@ function EditModal({
     contribution_items?: Array<{ label: string; amount: number }>;
     type: string;
     hide_until_birthday?: boolean;
+    show_on_search?: boolean;
   };
   onSave: (patch: {
     title: string;
@@ -577,6 +578,7 @@ function EditModal({
     goalAmount?: number;
     contributionItems?: Array<{ label: string; amount: number }>;
     hideUntilBirthday?: boolean;
+    showOnSearch?: boolean;
   }) => void;
 }) {
   const [title, setTitle] = useState(campaign.title);
@@ -589,6 +591,7 @@ function EditModal({
     }))
   );
   const [hideUntilBirthday, setHideUntilBirthday] = useState(campaign.hide_until_birthday ?? false);
+  const [showOnSearch, setShowOnSearch] = useState((campaign as any).show_on_search ?? true);
 
   // Reset form when modal opens
   useEffect(() => {
@@ -603,6 +606,7 @@ function EditModal({
         }))
       );
       setHideUntilBirthday(campaign.hide_until_birthday ?? false);
+      setShowOnSearch((campaign as any).show_on_search ?? true);
     }
   }, [open, campaign]);
 
@@ -655,6 +659,23 @@ function EditModal({
             </label>
           </div>
         )}
+
+        <div className="border-t pt-4">
+          <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-border hover:bg-foreground/5 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showOnSearch}
+              onChange={(e) => setShowOnSearch(e.target.checked)}
+              className="mt-1"
+            />
+            <div>
+              <p className="text-sm font-medium">Show on Public Search</p>
+              <p className="text-xs text-muted mt-0.5">
+                Allow others to find this campaign when searching on the homepage
+              </p>
+            </div>
+          </label>
+        </div>
       </div>
 
       <div className="flex justify-end gap-2 mt-6">
@@ -671,6 +692,7 @@ function EditModal({
                 ? items.map(({ label, amount }) => ({ label, amount }))
                 : undefined,
               hideUntilBirthday: campaign.type === "birthday" ? hideUntilBirthday : undefined,
+              showOnSearch: showOnSearch,
             })
           }
         >

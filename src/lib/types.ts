@@ -54,12 +54,23 @@ export type Campaign = {
   contribution_items?: ContributionItem[];
   // When true, hides gift wall, activity feed, and highlight reel until campaign ends.
   hide_until_birthday?: boolean;
+  show_on_search?: boolean;
   created_at: string;
+};
+
+export type AnonymousAvatar = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description?: string;
+  color: string;
 };
 
 export type Contribution = {
   id: string;
   campaign_id: string;
+  anonymous_avatar_id?: string;
+  anonymous_avatar?: AnonymousAvatar;
   contributor_name?: string;
   contributor_email?: string;
   amount: number;

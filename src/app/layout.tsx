@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import { TopNav } from "@/components/nav/TopNav";
-import { Footer } from "@/components/nav/Footer";
-import { Toaster } from "@/components/ui/Toaster";
-import { MockStripeCheckout } from "@/components/checkout/MockStripeCheckout";
 import { SeedBootstrap } from "@/components/SeedBootstrap";
 import { TokenExpiryMonitor } from "@/components/TokenExpiryMonitor";
 
 export const metadata: Metadata = {
-  title: "giivngo · Group money pooling demo",
+  title: "giivngo · Group money pooling",
   description:
-    "Frontend-only demo of a group money pooling platform — birthday funds, footy tipping, farewells, anything.",
+    "Social gifting for life's happy moments. Create a pool, invite your people, and make amazing things happen together.",
 };
 
 export default function RootLayout({
@@ -21,15 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col antialiased">
+      <body className="min-h-screen antialiased">
         <Script src="https://js.stripe.com/v3/" strategy="beforeInteractive" />
         <SeedBootstrap />
         <TokenExpiryMonitor />
-        <TopNav />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <Toaster />
-        <MockStripeCheckout />
+        {children}
       </body>
     </html>
   );

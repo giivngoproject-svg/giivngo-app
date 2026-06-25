@@ -31,22 +31,49 @@ export function GiftWall({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {sorted.map((c) => (
+      {sorted.map((c) => {
+        // For private contributions with anonymous avatar
+        const showAnonymousAvatar = c.is_private && c.anonymous_avatar;
+        const displayName = showAnonymousAvatar
+          ? `🎭 ${c.anonymous_avatar?.name}`
+          : c.is_private
+            ? "Anonymous"
+            : c.contributor_name || "Anonymous";
+
+        return (
         <div
           key={c.id}
           className="animate-pop rounded-3xl border border-border bg-background p-4 flex flex-col gap-3"
         >
-          {/* Header: Emoji, Name, Amount */}
+          {/* Header: Icon/Avatar, Name, Amount */}
           <div className="flex items-start gap-3">
-            {/* Emoji in circle */}
-            {c.emoji ? (
+            {/* Priority: Photo > Video > Anonymous Avatar > Emoji > Default Avatar */}
+            {c.photo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={c.photo_url}
+                alt={displayName}
+                className="shrink-0 w-12 h-12 rounded-full object-cover border-2 border-border"
+              />
+            ) : c.video_url ? (
+              <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center border-2 border-accent/20">
+                <PlayCircle size={24} className="text-accent" />
+              </div>
+            ) : showAnonymousAvatar && c.anonymous_avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={c.anonymous_avatar.imageUrl}
+                alt={c.anonymous_avatar.name}
+                className="shrink-0 w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+              />
+            ) : c.emoji ? (
               <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-2xl border-2 border-accent/20">
                 {c.emoji}
               </div>
             ) : (
               <div className="shrink-0">
                 <Avatar
-                  name={c.is_private ? "Anonymous" : c.contributor_name || "Anonymous"}
+                  name={displayName}
                   size={48}
                 />
               </div>
@@ -54,7 +81,7 @@ export function GiftWall({
 
             <div className="min-w-0 flex-1">
               <p className="font-medium truncate">
-                {c.is_private ? "Anonymous" : c.contributor_name || "Anonymous"}
+                {displayName}
               </p>
               {showAmounts && (
                 <p className="text-sm font-semibold text-accent tabular-nums">{formatAUD(c.amount)}</p>
@@ -69,26 +96,6 @@ export function GiftWall({
             </p>
           )}
 
-          {/* Photo */}
-          {!c.is_private && c.photo_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={c.photo_url}
-              alt={c.contributor_name || "contributor"}
-              className="w-full rounded-2xl object-cover max-h-56"
-            />
-          )}
-
-          {/* Video */}
-          {c.video_url && (
-            <video
-              src={c.video_url}
-              controls
-              playsInline
-              className="w-full max-h-48 rounded-2xl bg-black/5 object-cover"
-            />
-          )}
-
           {/* Footer: Time and Tip */}
           <p className="text-xs text-muted inline-flex items-center gap-1">
             {c.video_url && !c.message ? <PlayCircle size={12} /> : null}
@@ -100,7 +107,8 @@ export function GiftWall({
             {c.tip_amount ? <span className="text-accent">· +{formatAUD(c.tip_amount)} tip</span> : null}
           </p>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
