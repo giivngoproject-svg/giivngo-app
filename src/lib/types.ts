@@ -26,6 +26,7 @@ export type User = {
   avatar_url?: string;
   phone?: string;
   stripe_account_id?: string;
+  email_verified: boolean;
   created_at: string;
 };
 

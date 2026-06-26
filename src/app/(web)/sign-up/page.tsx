@@ -22,7 +22,7 @@ export default function SignUpPage() {
 
     const success = await signUp(email, password, name);
     if (success) {
-      router.push("/dashboard");
+      router.push("/verify-email");
     }
   };
 

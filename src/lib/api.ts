@@ -16,6 +16,7 @@ function transformUserFromApi(data: any) {
     avatar_url: data.avatarUrl,
     phone: data.phone,
     stripe_account_id: data.stripeAccountId,
+    email_verified: data.emailVerified ?? false,
     created_at: data.createdAt,
   };
 }
@@ -201,6 +202,16 @@ export const authApi = {
   getMe: async () => {
     const res = await apiClient.get('/auth/me');
     return transformUserFromApi(res.data);
+  },
+
+  verifyEmail: async (token: string) => {
+    const res = await apiClient.post('/auth/verify-email', { token });
+    return res.data;
+  },
+
+  resendVerification: async () => {
+    const res = await apiClient.post('/auth/resend-verification');
+    return res.data;
   },
 };
 

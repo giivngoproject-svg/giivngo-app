@@ -94,9 +94,9 @@ export const useAuth = create<AuthState>()(
           const payload = decodeJwt(access_token);
           const expiryTime = payload?.exp ? payload.exp * 1000 : null;
 
-          // Store token in sessionStorage
+          // Store token in localStorage (consistent with signIn)
           if (typeof window !== "undefined") {
-            sessionStorage.setItem("auth_token", access_token);
+            localStorage.setItem("auth_token", access_token);
           }
 
           set({

@@ -148,10 +148,10 @@ export default function Home1() {
                 Start a pool – it's free
                 <ArrowRight size={18} />
               </button>
-              <button className="border-2 border-white/80 hover:border-white text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors bg-white/10 hover:bg-white/20">
+              {/* <button className="border-2 border-white/80 hover:border-white text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors bg-white/10 hover:bg-white/20">
                 <Play size={18} />
                 See how it works
-              </button>
+              </button> */}
             </div>
 
             {/* Trust Signals */}

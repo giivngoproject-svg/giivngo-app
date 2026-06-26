@@ -10,14 +10,12 @@ import { useCampaigns } from "@/stores/campaigns";
 import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
 
-
-const desktopLinks = [
-  { href: "/how-it-works", label: "How it works", icon: <LayoutDashboard size={15} /> },
-  { href: "/use-cases", label: "Use Cases", icon: <ToolCase size={15} /> },
-  { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
-  { href: "/pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
-  { href: "/about", label: "About Us", icon: <Building2 size={15} /> }
-];
+// { href: "/how-it-works", label: "How it works", icon: <LayoutDashboard size={15} /> },
+// { href: "/use-cases", label: "Use Cases", icon: <ToolCase size={15} /> },
+// { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
+// { href: "/pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
+// { href: "/about", label: "About Us", icon: <Building2 size={15} /> }
+const desktopLinks: Object[] = [];
 
 export function TopNav() {
   const router = useRouter();
@@ -102,17 +100,19 @@ export function TopNav() {
             </div>
 
           )}
-          <Button
-            onClick={() => {
-              setSidebarOpen(!sidebarOpen);
-            }}
-            variant="outline"
-            size="sm"
-            className="md:hidden inline-flex items-center bg-white hover:bg-slate-200"
-            title="Open or Close Menu"
-          >
-            <MenuIcon size={14} />
-          </Button>
+          {desktopLinks.length > 0 && (
+            <Button
+              onClick={() => {
+                setSidebarOpen(!sidebarOpen);
+              }}
+              variant="outline"
+              size="sm"
+              className="md:hidden inline-flex items-center bg-white hover:bg-slate-200"
+              title="Open or Close Menu"
+            >
+              <MenuIcon size={14} />
+            </Button>
+          )}
         </div>
       </div>
       <div className={`md:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "min-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
