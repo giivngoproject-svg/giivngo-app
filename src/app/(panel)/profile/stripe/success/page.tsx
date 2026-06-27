@@ -23,24 +23,31 @@ function StripeSuccessInner() {
       try {
         // Fetch updated profile with stripeAccountId
         const profile = await profileApi.get();
+        console.log("[Stripe Success] Profile data:", {
+          stripe_account_id: profile.stripe_account_id,
+          email_verified: profile.email_verified,
+        });
+
         updateUser({
           name: profile.name,
           email: profile.email,
-          display_name: profile.displayName,
-          avatar_url: profile.avatarUrl,
+          display_name: profile.display_name,
+          avatar_url: profile.avatar_url,
           phone: profile.phone,
-          stripe_account_id: profile.stripeAccountId,
-          email_verified: profile.emailVerified,
-          created_at: profile.createdAt,
+          stripe_account_id: profile.stripe_account_id,
+          email_verified: profile.email_verified,
+          created_at: profile.created_at,
         });
 
         // Fetch Stripe status to check if charges are enabled
         const status = await profileApi.getStripeStatus();
+        console.log("[Stripe Success] Stripe status:", status);
 
         if (status.chargesEnabled) {
           setPageState("success");
           // Auto-redirect to profile after 3 seconds
           setTimeout(() => {
+            console.log("[Stripe Success] Redirecting to profile");
             setRedirect(true);
           }, 3000);
         } else {

@@ -37,7 +37,8 @@ export function AuthCheck({ children, requireAuth = true }: AuthCheckProps) {
     }
 
     // Check email verification - if authenticated but unverified, redirect to verify page
-    if (requireAuth && isAuthenticated && user && !user.email_verified) {
+    // Exception: if user has Stripe account connected, skip email verification
+    if (requireAuth && isAuthenticated && user && !user.email_verified && !user.stripe_account_id) {
       if (!pathname.startsWith('/verify-email')) {
         router.push('/verify-email');
       }
@@ -58,7 +59,8 @@ export function AuthCheck({ children, requireAuth = true }: AuthCheckProps) {
   }
 
   // If email not verified, don't show content (except on verify-email page)
-  if (requireAuth && isAuthenticated && user && !user.email_verified && !pathname.startsWith('/verify-email')) {
+  // Exception: if user has Stripe account connected, show content anyway
+  if (requireAuth && isAuthenticated && user && !user.email_verified && !user.stripe_account_id && !pathname.startsWith('/verify-email')) {
     return null;
   }
 

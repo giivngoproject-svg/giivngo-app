@@ -30,6 +30,34 @@ function ProfilePageInner() {
     status?: string;
   } | null>(null);
 
+  // Refresh profile on mount to get latest data from server
+  useEffect(() => {
+    const refreshProfile = async () => {
+      try {
+        console.log("[Profile] Refreshing profile from server");
+        const profile = await profileApi.get();
+        console.log("[Profile] Updated profile:", {
+          stripe_account_id: profile.stripe_account_id,
+          email: profile.email,
+        });
+        updateUser({
+          name: profile.name,
+          email: profile.email,
+          display_name: profile.display_name,
+          avatar_url: profile.avatar_url,
+          phone: profile.phone,
+          stripe_account_id: profile.stripe_account_id,
+          email_verified: profile.email_verified,
+          created_at: profile.created_at,
+        });
+      } catch (err) {
+        console.error("Failed to refresh profile", err);
+      }
+    };
+
+    refreshProfile();
+  }, [updateUser]);
+
   // Fetch stripe status on mount if connected
   useEffect(() => {
     console.log("[Profile] User stripe_account_id:", user?.stripe_account_id);

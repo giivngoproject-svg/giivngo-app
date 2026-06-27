@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Mail, CheckCircle, AlertCircle, Loader } from "lucide-react";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 
 type State = "checking" | "verify-prompt" | "success" | "error" | "resend-sent";
 
-export default function VerifyEmailPage() {
+function VerifyEmailInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -191,5 +191,20 @@ export default function VerifyEmailPage() {
         )}
       </div>
     </section>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <section className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader size={40} className="animate-spin text-[#4f46e5] mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </section>
+    }>
+      <VerifyEmailInner />
+    </Suspense>
   );
 }

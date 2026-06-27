@@ -6,21 +6,24 @@ const iso = (offsetDays: number) => new Date(NOW + offsetDays * DAY).toISOString
 
 export const DEMO_USER: User = {
   id: "user_demo",
-  email: "demo@giivngo.app",
+  email: "[EMAIL_ADDRESS]",
   name: "Alex Morgan",
   display_name: "Alex",
   avatar_url: undefined,
   phone: "+61 400 111 222",
   stripe_account_id: undefined,
+  email_verified: true,
   created_at: iso(-30),
 };
 
 const otherOrganiser: User = {
   id: "user_other",
-  email: "jamie@example.com",
+  email: "[EMAIL_ADDRESS]",
   name: "Jamie Reeves",
   display_name: "Jamie",
   created_at: iso(-60),
+  stripe_account_id: undefined,
+  email_verified: true,
 };
 
 export const SEED_USERS: User[] = [DEMO_USER, otherOrganiser];
