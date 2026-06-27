@@ -56,6 +56,7 @@ export type Campaign = {
   // When true, hides gift wall, activity feed, and highlight reel until campaign ends.
   hide_until_birthday?: boolean;
   show_on_search?: boolean;
+  creator_stripe_account_id?: string; // Stripe Connect account ID of campaign creator
   created_at: string;
 };
 

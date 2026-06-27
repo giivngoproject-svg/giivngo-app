@@ -26,7 +26,7 @@ export default function PanelLayout({
   const user = useAuth((s) => s.user);
   const signOut = useAuth((s) => s.signOut);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [asideOpen, setAsideOpen] = useState(false);
+  const [asideOpen, setAsideOpen] = useState(true);
 
   const handleSignOut = () => {
     setMenuOpen(false);

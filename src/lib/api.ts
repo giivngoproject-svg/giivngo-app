@@ -46,6 +46,7 @@ function transformCampaignFromApi(data: any) {
     contribution_items: data.contributionItems,
     hide_until_birthday: data.hideUntilBirthday,
     show_on_search: data.showOnSearch ?? true,
+    creator_stripe_account_id: data.creatorStripeAccountId,
     created_at: data.createdAt,
   };
 }

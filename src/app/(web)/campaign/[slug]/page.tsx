@@ -220,6 +220,7 @@ export default function PublicCampaignPage() {
         selectedItems: selectedItems,
         isPrivate: isPrivate,
         anonymousAvatarId: isPrivate ? selectedAvatarId : undefined,
+        creatorStripeAccountId: (campaign as any).creatorStripeAccountId || undefined,
       });
 
       // Initialize Stripe
@@ -362,21 +363,7 @@ export default function PublicCampaignPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
-      {/* Hero */}
-      <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft">
-        <div className="aspect-[16/9] bg-foreground/5">
-          {campaign.cover_photo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={campaign.cover_photo_url}
-              alt={campaign.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-accent/20 to-sky-200/40" />
-          )}
-        </div>
-      </div>
+
 
       {/* Live activity ticker */}
       {!closed && (
@@ -388,6 +375,21 @@ export default function PublicCampaignPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         {/* Left: info */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Hero */}
+          <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft">
+            <div className="aspect-[16/9] bg-foreground/5">
+              {campaign.cover_photo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={campaign.cover_photo_url}
+                  alt={campaign.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-accent/20 to-sky-200/40" />
+              )}
+            </div>
+          </div>
           <div>
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               <StatusBadge status={campaign.status} />
@@ -516,11 +518,10 @@ export default function PublicCampaignPage() {
                             }
                             setSelectedItemIds(next);
                           }}
-                          className={`w-full h-11 rounded-xl text-sm font-medium transition-colors flex items-center justify-between px-3 ${
-                            selectedItemIds.has(item.id)
+                          className={`w-full h-11 rounded-xl text-sm font-medium transition-colors flex items-center justify-between px-3 ${selectedItemIds.has(item.id)
                               ? "bg-accent text-accent-foreground"
                               : "bg-foreground/5 hover:bg-foreground/10"
-                          }`}
+                            }`}
                         >
                           <span>{item.label}</span>
                           <span>{formatAUD(item.amount)}</span>
@@ -549,11 +550,10 @@ export default function PublicCampaignPage() {
                           key={t}
                           type="button"
                           onClick={() => setAmount(t)}
-                          className={`h-11 rounded-xl text-sm font-semibold transition-colors ${
-                            amount === t
+                          className={`h-11 rounded-xl text-sm font-semibold transition-colors ${amount === t
                               ? "bg-foreground text-background"
                               : "bg-foreground/5 hover:bg-foreground/10"
-                          }`}
+                            }`}
                         >
                           {formatAUD(t)}
                         </button>
@@ -567,11 +567,10 @@ export default function PublicCampaignPage() {
                             key={q}
                             type="button"
                             onClick={() => setAmount(q)}
-                            className={`flex-1 h-9 rounded-xl text-sm font-medium transition-colors ${
-                              amount === q
+                            className={`flex-1 h-9 rounded-xl text-sm font-medium transition-colors ${amount === q
                                 ? "bg-foreground text-background"
                                 : "bg-foreground/5 hover:bg-foreground/10"
-                            }`}
+                              }`}
                           >
                             {formatAUD(q)}
                           </button>
@@ -610,11 +609,10 @@ export default function PublicCampaignPage() {
                         key={t}
                         type="button"
                         onClick={() => setTip(tip === t ? "" : t)}
-                        className={`flex-1 h-9 rounded-xl text-sm font-medium transition-colors ${
-                          tip === t
+                        className={`flex-1 h-9 rounded-xl text-sm font-medium transition-colors ${tip === t
                             ? "bg-accent text-accent-foreground"
                             : "bg-foreground/5 hover:bg-foreground/10"
-                        }`}
+                          }`}
                       >
                         +{formatAUD(t)}
                       </button>
@@ -690,11 +688,11 @@ export default function PublicCampaignPage() {
                   {hasItems
                     ? selectedItemIds.size > 0
                       ? `Contribute ${formatAUD(
-                          Array.from(selectedItemIds).reduce(
-                            (sum, id) => sum + (items.find((i) => i.id === id)?.amount || 0),
-                            0,
-                          ) + (Number(tip) || 0),
-                        )}`
+                        Array.from(selectedItemIds).reduce(
+                          (sum, id) => sum + (items.find((i) => i.id === id)?.amount || 0),
+                          0,
+                        ) + (Number(tip) || 0),
+                      )}`
                       : "Select items"
                     : amount
                       ? `Contribute ${formatAUD(Number(amount) + (Number(tip) || 0))}`

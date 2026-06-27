@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className='scroll-smooth'>
       <body className="min-h-screen antialiased">
         <Script src="https://js.stripe.com/v3/" strategy="beforeInteractive" />
         <SeedBootstrap />

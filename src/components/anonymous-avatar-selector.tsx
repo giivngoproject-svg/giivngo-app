@@ -150,17 +150,16 @@ export function AnonymousAvatarSelector({
         </p>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-2 gap-3">
         {avatars.map((avatar) => (
           <button
             key={avatar.id}
             onClick={() => onChange(avatar.id)}
             disabled={disabled}
-            className={`p-3 rounded-lg transition-all border-2 group ${
-              value === avatar.id
-                ? 'border-[#7C5CFF] bg-[#7C5CFF]/5'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-            } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            className={`p-3 rounded-lg transition-all border-2 group ${value === avatar.id
+              ? 'border-[#7C5CFF] bg-[#7C5CFF]/5'
+              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+              } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
             <div className="relative mb-2 overflow-hidden rounded bg-gray-100">
               <img
