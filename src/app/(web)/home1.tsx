@@ -23,7 +23,7 @@ const FEATURED_CARDS = [
   {
     id: 1,
     title: 'Weekend away',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop',
+    image: '/weekend-away.png',
     icon: '🏖️',
     stats: '8 friends • $1,850 contributed',
     badge: 'Trip booked! ✈️',
@@ -32,7 +32,7 @@ const FEATURED_CARDS = [
   {
     id: 2,
     title: '30th birthday surprise',
-    image: 'https://images.unsplash.com/photo-1773332611573-5e5bfa8e5de5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8',
+    image: '/birthday-surprise.png',
     icon: '🎂',
     stats: '18 friends • $1,200 contributed',
     badge: 'Gift delivered! 🎉',
@@ -41,7 +41,7 @@ const FEATURED_CARDS = [
   {
     id: 3,
     title: 'Footy tipping',
-    image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=500&h=500&fit=crop',
+    image: '/footy-tipping.png',
     icon: '🏈',
     stats: '24 mates • $650 prize pool',
     badge: 'Season underway 🏈',
@@ -50,7 +50,7 @@ const FEATURED_CARDS = [
   {
     id: 4,
     title: 'Lotto syndicate',
-    image: 'https://images.unsplash.com/photo-1594882471743-2758d2ce5f00?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    image: '/lotto-syndicate.png',
     icon: '🎰',
     stats: '14 members • Weekly pool ready',
     badge: 'Next draw Sat 🎰',
@@ -59,7 +59,7 @@ const FEATURED_CARDS = [
   {
     id: 5,
     title: 'Wedding gift',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=500&h=500&fit=crop',
+    image: '/wedding-gift.png',
     icon: '💍',
     stats: '20 guests • $3,000 contributed',
     badge: 'Celebration sorted! 🥂',
@@ -77,7 +77,7 @@ export default function Home1() {
         className="relative pb-0 overflow-hidden min-h-screen  flex items-center py-14"
         style={{
           backgroundImage:
-            'url(https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&h=1080&fit=crop)',
+            'url(/giivngo-hero.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -271,7 +271,7 @@ export default function Home1() {
         className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden"
         style={{
           backgroundImage:
-            'linear-gradient(135deg, #1E1B4B 0%, #1E1B4B 40%, rgba(30, 27, 75, 0.8) 100%), url(https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&h=1080&fit=crop)',
+            'linear-gradient(135deg, #1E1B4B 0%, #1E1B4B 40%, rgba(30, 27, 75, 0.8) 100%), url(/giivngo-footer.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'right center',
         }}
