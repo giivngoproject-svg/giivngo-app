@@ -11,8 +11,8 @@ const CHIPS: { label: string; Icon: LucideIcon }[] = [
 
 export function Pricing() {
   return (
-    <section className="mx-auto max-w-[1180px] px-5 py-12 sm:px-8">
-      <h2 className={`${heading} mb-7 text-3xl font-extrabold text-foreground`}>
+    <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
+      <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground`}>
         Simple, transparent <span className="text-brand">pricing</span>
       </h2>
       <div className="grid items-stretch gap-10 lg:grid-cols-2">

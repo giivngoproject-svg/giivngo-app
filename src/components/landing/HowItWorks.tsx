@@ -37,8 +37,8 @@ const BENEFITS = [
 
 export function HowItWorks() {
   return (
-    <section className="mx-auto max-w-[1180px] px-5 py-12 sm:px-8">
-      <h2 className={`${heading} mb-7 text-3xl font-extrabold text-foreground`}>
+    <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
+      <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground`}>
         How Giivngo works
       </h2>
       <div className="grid items-center gap-10 lg:grid-cols-2">

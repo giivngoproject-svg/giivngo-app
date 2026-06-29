@@ -85,7 +85,7 @@ export default function Home1() {
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-row justify-between items-end">
+        <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-row justify-between items-end gap-8">
           <div className="max-w-2xl">
             {/* Tagline Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#7C5CFF]/40 bg-[#7C5CFF]/20 mb-6">
@@ -96,7 +96,7 @@ export default function Home1() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
               Turn dreams into reality.{' '}
               <span className="relative inline-block text-[#7C5CFF]">
                 Together.
@@ -182,11 +182,11 @@ export default function Home1() {
       </section>
 
       {/* Social Proof Banner */}
-      <section className="relative -mt-12 mx-4 sm:mx-6 lg:mx-8 max-w-7xl lg:mx-auto z-30 mb-24">
+      <section className="relative -mt-12 z-30 mb-24 w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="bg-white rounded-3xl shadow-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-16 md:gap-4">
             <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map((i) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <img
                   key={i}
                   src={`https://i.pravatar.cc/40?img=${i}`}
@@ -195,7 +195,7 @@ export default function Home1() {
                 />
               ))}
               <div className="w-10 h-10 rounded-full bg-[#7C5CFF] text-white flex items-center justify-center text-xs font-bold border-2 border-white">
-                +24K
+                24K+
               </div>
             </div>
             <span className="font-semibold text-gray-900 text-xs md:text-inherit">
@@ -210,10 +210,10 @@ export default function Home1() {
       </section>
 
       {/* What People Are Making Possible */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
               What people are making{' '}
               <span className="text-[#7C5CFF]">possible</span>
             </h2>
