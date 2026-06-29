@@ -8,13 +8,16 @@ import {
   Shield,
   Users,
   ChevronRight,
-  Star,
   Heart,
   MapPin,
   TrendingUp,
   ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { poppins } from '@/components/landing/fonts';
+import { HowItWorks } from '@/components/landing/HowItWorks';
+import { Pricing } from '@/components/landing/Pricing';
+import { Testimonials } from '@/components/landing/Testimonials';
 
 const FEATURED_CARDS = [
   {
@@ -61,33 +64,6 @@ const FEATURED_CARDS = [
     stats: '20 guests • $3,000 contributed',
     badge: 'Celebration sorted! 🥂',
     badgeColor: '#00C29A',
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    name: 'Jess',
-    location: 'Sydney',
-    quote: 'No more awkward Venmo requests. Everyone just chips in and we see the magic happen.',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop',
-  },
-  {
-    name: 'Liam',
-    location: 'Melbourne',
-    quote: 'Organized my entire bachelor party without a single spreadsheet. Worth every penny.',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop',
-  },
-  {
-    name: 'Mark',
-    location: 'Brisbane',
-    quote: 'The footy pool is legendary. Real-time updates, instant payouts. Perfect.',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop',
-  },
-  {
-    name: 'Priya',
-    location: 'Perth',
-    quote: 'Finally a way to ask friends for help without feeling like I\'m imposing.',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop',
   },
 ];
 
@@ -283,120 +259,12 @@ export default function Home1() {
         </div>
       </section>
 
-      {/* How Giivngo Works */}
-      <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">
-            How Giivngo works
-          </h2>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Process Flow */}
-            <div>
-              <div className="space-y-8">
-                {[
-                  { num: 1, title: 'Create your pool', description: 'Set a goal and add the details', color: '#7C5CFF' },
-                  { num: 2, title: 'Share your link', description: 'Invite your people in seconds.', color: '#00C29A' },
-                  { num: 3, title: 'Everyone chips in', description: 'Contributions are safe and simple.', color: '#FFC857' },
-                  { num: 4, title: 'Goal reached', description: 'Enjoy the moment together!', color: '#4DB6FF' },
-                ].map((step, idx) => (
-                  <div key={step.num} className="flex items-center gap-4">
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0"
-                      style={{ backgroundColor: step.color }}
-                    >
-                      {step.num}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg text-gray-900">
-                        {step.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        {step.description}
-                      </p>
-                      {idx < 3 && (
-                        <div
-                          className="h-12 w-1 mt-4 ml-6"
-                          style={{ backgroundColor: step.color + '40' }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Phone Mockup & Features */}
-            <div className="flex flex-row flex-wrap md:flex-nowrap justify-center items-center gap-12">
-
-              <img src={`https://images.unsplash.com/photo-1691256676376-357c3aa66c89?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHBob25lJTIwbW9ja3VwfGVufDB8fDB8fHww`}
-                alt="Phone Mockup"
-                height={500}
-                className="relative p-3 w-[300px] transform -rotate-12"
-              />
-
-              <div className="space-y-4 w-full">
-                {[
-                  { icon: '✓', title: 'No awkward asks', desc: 'People chip in because they want to.' },
-                  { icon: '✓', title: 'Transparent', desc: 'Everyone sees progress in real time.' },
-                  { icon: '✓', title: 'Safe & secure', desc: 'Your money is protected always.' },
-                ].map((feature, idx) => (
-                  <div key={idx} className="flex gap-4">
-                    <div className="w-8 h-8 rounded-full bg-[#00C29A] text-white flex items-center justify-center font-bold shrink-0">
-                      {feature.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">{feature.title}</h4>
-                      <p className="text-sm text-gray-600">{feature.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">
-            Loved by real people
-          </h2>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {TESTIMONIALS.map((testimonial, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-6 shadow-lg">
-                <div className="flex items-center gap-4 mb-4">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">
-                      {testimonial.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {testimonial.location}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className="fill-[#FFC857] text-[#FFC857]"
-                    />
-                  ))}
-                </div>
-                <p className="text-gray-700 italic">"{testimonial.quote}"</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Redesigned landing sections (Poppins-scoped) */}
+      <div className={poppins.variable}>
+        <HowItWorks />
+        <Pricing />
+        <Testimonials />
+      </div>
 
       {/* Final CTA Section */}
       <section
