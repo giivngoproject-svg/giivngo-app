@@ -12,6 +12,10 @@ const CHIPS: { label: string; Icon: LucideIcon }[] = [
 export function Pricing() {
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
+      {/* mobile-only title (shown above the fee panel); the desktop title lives in the right column */}
+      <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground lg:hidden`}>
+        Simple <span className="text-brand">pricing</span>
+      </h2>
       <div className="grid items-stretch gap-10 lg:grid-cols-2">
         {/* left: fee focal panel */}
         <div className="flex flex-col items-center justify-center rounded-[22px] bg-brand/10 px-8 py-11 text-center">
@@ -27,7 +31,7 @@ export function Pricing() {
         </div>
         {/* right: title + copy + chips, vertically centered within shared height */}
         <div className="flex flex-col justify-center">
-          <h2 className={`${heading} mb-6 text-5xl md:text-6xl font-extrabold text-foreground`}>
+          <h2 className={`${heading} mb-6 text-5xl md:text-6xl font-extrabold text-foreground hidden lg:block`}>
             Simple <span className="text-brand">pricing</span>
           </h2>
           <p className="mb-3.5 text-[16.5px] leading-relaxed text-gray-700">
