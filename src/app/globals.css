@@ -10,6 +10,11 @@
   --accent: 244 95 71;
   --accent-foreground: 255 255 255;
   --surface: 249 250 251;
+  --brand: 124 92 255;
+  --brand-strong: 109 59 235;
+  --accent-teal: 16 185 129;
+  --accent-amber: 245 158 11;
+  --accent-blue: 59 167 245;
 }
 
 html, body {

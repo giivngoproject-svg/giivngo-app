@@ -18,6 +18,11 @@ const config: Config = {
           DEFAULT: "rgb(var(--accent) / <alpha-value>)",
           foreground: "rgb(var(--accent-foreground) / <alpha-value>)",
         },
+        brand: "rgb(var(--brand) / <alpha-value>)",
+        brandStrong: "rgb(var(--brand-strong) / <alpha-value>)",
+        accentTeal: "rgb(var(--accent-teal) / <alpha-value>)",
+        accentAmber: "rgb(var(--accent-amber) / <alpha-value>)",
+        accentBlue: "rgb(var(--accent-blue) / <alpha-value>)",
       },
       borderRadius: {
         "2xl": "1rem",

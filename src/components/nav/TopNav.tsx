@@ -12,11 +12,12 @@ import { Button } from "@/components/ui/Button";
 
 
 const desktopLinks: { href: string, label: string, icon: React.ReactNode }[] = [
-  { href: "#how-it-works", label: "How it works", icon: <LayoutDashboard size={15} /> },
-  { href: "/use-cases", label: "Use Cases", icon: <ToolCase size={15} /> },
-  { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
-  { href: "/pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
-  { href: "/about", label: "About Us", icon: <Building2 size={15} /> }
+  { href: "/#how-it-works", label: "How it works", icon: <LayoutDashboard size={15} /> },
+  { href: "/#use-cases", label: "Use Cases", icon: <ToolCase size={15} /> },
+  // Hidden for now — re-enable once these pages/sections exist:
+  // { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
+  { href: "/#pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
+  // { href: "/about", label: "About Us", icon: <Building2 size={15} /> },
 ];
 
 export function TopNav() {
@@ -40,7 +41,7 @@ export function TopNav() {
 
   return (
     <header className={`fixed w-full top-0 z-50  backdrop-blur bg-transparent ${isTop ? "bg-black/20  " : "bg-white text-black"}`}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-">
           <Logo />
           {/* <span className="hidden sm:inline text-xs text-muted px-1.5 py-0.5 rounded-md bg-foreground/5">
@@ -109,7 +110,7 @@ export function TopNav() {
               }}
               variant="outline"
               size="sm"
-              className="md:hidden inline-flex items-center bg-white hover:bg-slate-200"
+              className="hidden items-center bg-white hover:bg-slate-200"
               title="Open or Close Menu"
             >
               <MenuIcon size={14} />
@@ -182,7 +183,7 @@ export function Avatar({ name, url, size = 28 }: { name: string; url?: string; s
 export function Logo() {
   return (
     <Image
-      src="/logo.png"
+      src="/logo.webp"
       alt="giivngo"
       width={1951}
       height={541}
