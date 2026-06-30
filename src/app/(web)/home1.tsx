@@ -267,16 +267,16 @@ export default function Home1() {
       </div>
 
       {/* Final CTA Section */}
-      <section
-        className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden"
-        style={{
-          backgroundImage:
-            'linear-gradient(135deg, #1E1B4B 0%, #1E1B4B 40%, rgba(30, 27, 75, 0.8) 100%), url(/giivngo-footer.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'right center',
-        }}
-      >
-        <div className="max-w-7xl mx-auto">
+      <section className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16 py-12">
+        <div
+          className="relative overflow-hidden rounded-3xl px-8 py-16 sm:px-12 lg:px-20"
+          style={{
+            backgroundImage:
+              'linear-gradient(135deg, #1E1B4B 0%, #1E1B4B 40%, rgba(30, 27, 75, 0.8) 100%), url(/giivngo-footer.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'right center',
+          }}
+        >
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
