@@ -38,13 +38,14 @@ const BENEFITS = [
 export function HowItWorks() {
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
-      <div className="grid items-center gap-10 lg:grid-cols-2">
+      <div className="grid items-stretch gap-10 lg:grid-cols-2">
         {/* left: title + steps */}
-        <div>
+        <div className="flex flex-col">
           <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground`}>
             How It Works
           </h2>
-          <div className="flex justify-between gap-1.5">
+          <div className="flex flex-1 items-center">
+            <div className="flex w-full justify-between gap-1.5">
             {STEPS.map((step, i) => (
               <div
                 key={step.num}
@@ -74,6 +75,7 @@ export function HowItWorks() {
                 </p>
               </div>
             ))}
+            </div>
           </div>
         </div>
 
