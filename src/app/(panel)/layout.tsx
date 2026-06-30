@@ -9,13 +9,7 @@ import { MockStripeCheckout } from '@/components/checkout/MockStripeCheckout';
 import { Avatar, Logo } from '@/components/nav/TopNav';
 import { useAuth } from '@/stores/auth';
 import { Button } from '@/components/ui/Button';
-
-const SIDEBAR_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/create', label: 'Create pool', icon: Plus },
-  { href: '/profile', label: 'My account', icon: CircleUserRound },
-  { href: '/settings', label: 'App settings', icon: Cog },
-];
+import { useTranslation } from '@/lib/useTranslation';
 
 export default function PanelLayout({
   children,
@@ -26,8 +20,16 @@ export default function PanelLayout({
   const pathname = usePathname();
   const user = useAuth((s) => s.user);
   const signOut = useAuth((s) => s.signOut);
+  const t = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [asideOpen, setAsideOpen] = useState(false);
+
+  const SIDEBAR_ITEMS = [
+    { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
+    { href: '/create', label: t('nav.create'), icon: Plus },
+    { href: '/profile', label: t('nav.profile'), icon: CircleUserRound },
+    { href: '/settings', label: t('nav.settings'), icon: Cog },
+  ];
 
 
   const handleSignOut = () => {
@@ -92,7 +94,7 @@ export default function PanelLayout({
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 border-t border-gray-200"
                   >
                     <LogOut size={16} />
-                    Sign Out
+                    {t('nav.logout')}
                   </button>
                 </div>
               </>
@@ -131,7 +133,9 @@ export default function PanelLayout({
             </Button>
             <div>
               {/* <h1 className="text-2xl font-bold text-gray-900">{pathname}</h1> */}
-              <p className="text-sm text-gray-500 mt-1">Welcome back, {user?.display_name || user?.name?.split(' ')[0] || 'User'}! 👋</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {t('layout.welcome_back', { name: user?.display_name || user?.name?.split(' ')[0] || 'User' })}
+              </p>
             </div>
           </div>
         </div>

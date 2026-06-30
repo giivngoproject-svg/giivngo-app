@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle, Clock, AlertCircle, Loader } from "lucide-react";
 import { useAuth } from "@/stores/auth";
+import { useTranslation } from "@/lib/useTranslation";
 import { profileApi } from "@/lib/api";
 import { AuthCheck } from "@/components/AuthCheck";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 type PageState = "loading" | "success" | "pending" | "error";
 
 function StripeSuccessInner() {
+  const t = useTranslation();
   const router = useRouter();
   const { updateUser } = useAuth();
 
@@ -78,7 +80,7 @@ function StripeSuccessInner() {
         {state === "loading" && (
           <div className="text-center">
             <Loader size={48} className="animate-spin text-[#4f46e5] mx-auto mb-4" />
-            <p className="text-gray-600 font-medium">Setting up your account...</p>
+            <p className="text-gray-600 font-medium">{t("common.loading")}...</p>
           </div>
         )}
 
@@ -87,7 +89,7 @@ function StripeSuccessInner() {
           <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 text-center">
             <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Account connected!
+              {t("profile.stripe.connected", { email: "" })}
             </h1>
             <p className="text-gray-600 mb-6">
               Your payout account is all set. You can now receive funds from your
@@ -122,7 +124,7 @@ function StripeSuccessInner() {
 
             <div className="flex justify-center">
               <Button onClick={() => router.push("/profile")}>
-                Return to profile
+                {t("nav.profile")}
               </Button>
             </div>
           </div>
@@ -134,20 +136,20 @@ function StripeSuccessInner() {
             <div className="text-center mb-6">
               <AlertCircle size={48} className="mx-auto text-red-500 mb-4" />
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Setup failed
+                {t("common.error")}
               </h1>
               <p className="text-gray-600">{error}</p>
             </div>
 
             <div className="flex flex-col gap-3">
               <Button onClick={() => router.push("/profile")}>
-                Back to profile
+                {t("common.back")}
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => window.location.reload()}
               >
-                Try again
+                {t("common.cancel")}
               </Button>
             </div>
           </div>

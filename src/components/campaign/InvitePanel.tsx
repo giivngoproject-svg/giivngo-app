@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Mail, MessageSquare, MessageCircle, Link2, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
+import { useTranslation } from "@/lib/useTranslation";
 import {
   sendEmailInvites,
   sendSmsInvites,
@@ -22,6 +23,7 @@ export function InvitePanel({
   shareUrl: string;
   campaignTitle: string;
 }) {
+  const t = useTranslation();
   const [tab, setTab] = useState<Tab>("link");
   const [emailChips, setEmailChips] = useState<string[]>([]);
   const [emailInput, setEmailInput] = useState("");
@@ -80,26 +82,26 @@ export function InvitePanel({
   return (
     <div className="rounded-3xl border border-border bg-background overflow-hidden">
       <div className="p-5 border-b border-border">
-        <h3 className="font-semibold text-base">Invite contributors</h3>
-        <p className="text-sm text-muted mt-0.5">Share the link any way you like.</p>
+        <h3 className="font-semibold text-base">{t('invite.title')}</h3>
+        <p className="text-sm text-muted mt-0.5">{t('invite.subtitle')}</p>
       </div>
 
       <div className="flex border-b border-border overflow-x-auto">
         <TabBtn active={tab === "link"} icon={<Link2 size={14} />} onClick={() => setTab("link")}>
-          Copy link
+          {t('invite.copy_link')}
         </TabBtn>
         <TabBtn
           active={tab === "whatsapp"}
           icon={<MessageCircle size={14} />}
           onClick={() => setTab("whatsapp")}
         >
-          WhatsApp
+          {t('invite.whatsapp')}
         </TabBtn>
         <TabBtn active={tab === "email"} icon={<Mail size={14} />} onClick={() => setTab("email")}>
-          Email
+          {t('invite.email')}
         </TabBtn>
         <TabBtn active={tab === "sms"} icon={<MessageSquare size={14} />} onClick={() => setTab("sms")}>
-          SMS
+          {t('invite.sms')}
         </TabBtn>
       </div>
 
@@ -107,7 +109,7 @@ export function InvitePanel({
         {tab === "email" && (
           <div className="space-y-3">
             <div>
-              <label className="text-sm font-medium block mb-2">Email addresses</label>
+              <label className="text-sm font-medium block mb-2">{t('invite.email_addresses')}</label>
               <div className="flex gap-2 mb-2">
                 <Input
                   placeholder="alex@example.com"
@@ -117,7 +119,7 @@ export function InvitePanel({
                   disabled={isLoadingEmail}
                 />
                 <Button onClick={addEmailChip} disabled={isLoadingEmail} variant="outline">
-                  Add
+                  {t('invite.add')}
                 </Button>
               </div>
               {emailChips.length > 0 && (
@@ -139,11 +141,11 @@ export function InvitePanel({
                 </div>
               )}
               <p className="text-xs text-muted">
-                {emailChips.length} email{emailChips.length !== 1 ? "s" : ""} added
+                {emailChips.length} {emailChips.length !== 1 ? t('invite.emails_added').replace('{s}', 's') : t('invite.emails_added').replace('{s}', '')}
               </p>
             </div>
             <Textarea
-              label="Message"
+              label={t('invite.message')}
               value={emailMessage}
               onChange={(e) => setEmailMessage(e.target.value)}
               rows={3}
@@ -153,12 +155,12 @@ export function InvitePanel({
               {isLoadingEmail ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  Sending...
+                  {t('invite.sending')}
                 </>
               ) : (
                 <>
                   <Send size={14} />
-                  Send invites
+                  {t('invite.send_invites')}
                 </>
               )}
             </Button>
@@ -168,7 +170,7 @@ export function InvitePanel({
         {tab === "sms" && (
           <div className="space-y-3">
             <div>
-              <label className="text-sm font-medium block mb-2">Phone numbers</label>
+              <label className="text-sm font-medium block mb-2">{t('invite.phone_numbers')}</label>
               <div className="flex gap-2 mb-2">
                 <Input
                   placeholder="+61 400 111 222"
@@ -178,7 +180,7 @@ export function InvitePanel({
                   disabled={isLoadingSms}
                 />
                 <Button onClick={addPhoneChip} disabled={isLoadingSms} variant="outline">
-                  Add
+                  {t('invite.add')}
                 </Button>
               </div>
               {phoneChips.length > 0 && (
@@ -200,19 +202,19 @@ export function InvitePanel({
                 </div>
               )}
               <p className="text-xs text-muted">
-                {phoneChips.length} number{phoneChips.length !== 1 ? "s" : ""} added
+                {phoneChips.length} {phoneChips.length !== 1 ? t('invite.numbers_added').replace('{s}', 's') : t('invite.numbers_added').replace('{s}', '')}
               </p>
             </div>
             <Button onClick={sendSms} disabled={isLoadingSms || phoneChips.length === 0}>
               {isLoadingSms ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  Sending...
+                  {t('invite.sending')}
                 </>
               ) : (
                 <>
                   <Send size={14} />
-                  Send SMS
+                  {t('invite.send_sms')}
                 </>
               )}
             </Button>
@@ -222,7 +224,7 @@ export function InvitePanel({
         {tab === "whatsapp" && (
           <div className="space-y-3">
             <p className="text-sm text-muted">
-              Opens WhatsApp with a pre-filled message and your share link. Pick who to send it to from your contacts.
+              {t('invite.whatsapp_desc')}
             </p>
             <Button
               onClick={() =>
@@ -230,7 +232,7 @@ export function InvitePanel({
               }
             >
               <MessageCircle size={14} />
-              Open WhatsApp
+              {t('invite.open_whatsapp')}
             </Button>
           </div>
         )}
@@ -238,14 +240,14 @@ export function InvitePanel({
         {tab === "link" && (
           <div className="space-y-3">
             <Input
-              label="Shareable link"
+              label={t('invite.shareable_link')}
               value={shareUrl}
               readOnly
               onFocus={(e) => e.currentTarget.select()}
             />
             <Button onClick={() => copyToClipboard(shareUrl)}>
               <Link2 size={14} />
-              Copy to clipboard
+              {t('invite.copy_clipboard')}
             </Button>
           </div>
         )}

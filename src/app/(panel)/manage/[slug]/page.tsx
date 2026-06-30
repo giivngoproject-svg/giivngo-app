@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useAuth } from "@/stores/auth";
+import { useTranslation } from "@/lib/useTranslation";
 import { AuthCheck } from "@/components/AuthCheck";
 import { useCampaigns } from "@/stores/campaigns";
 import { formatAUD, calcFee } from "@/lib/money";
@@ -42,6 +43,7 @@ import { HighlightReel } from "@/components/campaign/HighlightReel";
 import { ItemEditor } from "@/components/wizard/ItemEditor";
 
 function ManagePageInner() {
+  const t = useTranslation();
   const user = useAuth((s) => s.user);
   const router = useRouter();
   const { slug } = useParams<{ slug: string }>();
@@ -130,11 +132,11 @@ function ManagePageInner() {
   if (!campaign) {
     return (
       <div className="max-w-md mx-auto px-5 py-20 text-center">
-        <h1 className="text-2xl font-semibold">Campaign not found</h1>
-        <p className="text-muted mt-2">It may have been deleted.</p>
+        <h1 className="text-2xl font-semibold">{t('manage.campaign_not_found')}</h1>
+        <p className="text-muted mt-2">{t('manage.campaign_deleted')}</p>
         <Link href="/dashboard">
           <Button variant="outline" className="mt-6">
-            Back to dashboard
+            {t('manage.back_to_dashboard')}
           </Button>
         </Link>
       </div>
@@ -144,11 +146,11 @@ function ManagePageInner() {
   if (campaign.user_id !== user.id) {
     return (
       <div className="max-w-md mx-auto px-5 py-20 text-center">
-        <h1 className="text-2xl font-semibold">Not your campaign</h1>
-        <p className="text-muted mt-2">You can only manage campaigns you created.</p>
+        <h1 className="text-2xl font-semibold">{t('manage.not_your_campaign')}</h1>
+        <p className="text-muted mt-2">{t('manage.only_owner')}</p>
         <Link href={`/campaign/${campaign.slug}`}>
           <Button variant="outline" className="mt-6">
-            View public page
+            {t('manage.view_public')}
           </Button>
         </Link>
       </div>
@@ -174,7 +176,7 @@ function ManagePageInner() {
           className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground"
         >
           <ArrowLeft size={14} />
-          All campaigns
+          {t('manage.all_campaigns')}
         </Link>
       </div>
 
@@ -191,13 +193,13 @@ function ManagePageInner() {
         <div className="flex gap-2 shrink-0">
           <Link href={`/campaign/${campaign.slug}`} target="_blank">
             <Button variant="outline">
-              View public page
+              {t('manage.view_public')}
               <ExternalLink size={14} />
             </Button>
           </Link>
           <Button variant="ghost" onClick={() => setEditOpen(true)}>
             <Pencil size={14} />
-            Edit
+            {t('manage.edit')}
           </Button>
         </div>
       </div>
@@ -206,26 +208,26 @@ function ManagePageInner() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         <Stat
           icon={<TrendingUp size={16} />}
-          label="Total raised"
+          label={t('manage.total_raised')}
           value={formatAUD(campaign.raised_amount)}
-          hint={tips > 0 ? `+ ${formatAUD(tips)} tips for ${recipient || "recipient"}` : undefined}
+          hint={tips > 0 ? `+ ${formatAUD(tips)} tips for ${recipient || t('manage.anonymous')}` : undefined}
         />
         <Stat
           icon={<Banknote size={16} />}
-          label="Net payout"
+          label={t('manage.net_payout')}
           value={formatAUD(fee.net)}
-          hint={`After 2.5% fee (${formatAUD(fee.fee, { withCents: true })})`}
+          hint={`${t('manage.after_fee')} (${formatAUD(fee.fee, { withCents: true })})`}
         />
-        <Stat icon={<Users size={16} />} label="Contributors" value={String(contributions.length)} />
+        <Stat icon={<Users size={16} />} label={t('manage.contributors')} value={String(contributions.length)} />
         <Stat
           icon={<Calendar size={16} />}
-          label={campaign.status === "active" ? "Days left" : "Status"}
+          label={campaign.status === "active" ? t('manage.days_left') : t('manage.status')}
           value={
             campaign.status === "active"
               ? String(daysLeft)
               : campaign.status === "ended"
-                ? "Awaiting payout"
-                : "Paid out"
+                ? t('manage.awaiting_payout')
+                : t('manage.paid_out')
           }
         />
       </div>
@@ -234,14 +236,14 @@ function ManagePageInner() {
       {campaign.goal_amount ? (
         <div className="mb-8 p-5 rounded-3xl border border-border bg-background">
           <div className="flex items-baseline justify-between mb-2">
-            <p className="text-sm text-muted">Progress towards goal</p>
+            <p className="text-sm text-muted">{t('manage.progress')}</p>
             <p className="text-sm font-medium">
               {Math.round((campaign.raised_amount / campaign.goal_amount) * 100)}%
             </p>
           </div>
           <Progress value={campaign.raised_amount} max={campaign.goal_amount} />
           <p className="text-xs text-muted mt-2">
-            {formatAUD(campaign.raised_amount)} of {formatAUD(campaign.goal_amount)}
+            {formatAUD(campaign.raised_amount)} {t('manage.of')} {formatAUD(campaign.goal_amount)}
           </p>
         </div>
       ) : null}
@@ -254,26 +256,26 @@ function ManagePageInner() {
           <div className="rounded-3xl border border-border bg-background overflow-hidden">
           <div className="p-5 border-b border-border flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-base">Contributions</h3>
-              <p className="text-sm text-muted">{contributions.length} total</p>
+              <h3 className="font-semibold text-base">{t('manage.contributions')}</h3>
+              <p className="text-sm text-muted">{contributions.length} {t('dashboard.created')}</p>
             </div>
           </div>
 
           {contributions.length === 0 ? (
             <p className="p-10 text-center text-sm text-muted">
-              No contributions yet — invite some friends.
+              {t('manage.no_contributions')}
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-xs text-muted border-b border-border">
-                    <th className="font-medium px-5 py-2">Contributor</th>
-                    <th className="font-medium px-5 py-2 text-right">Amount</th>
-                    <th className="font-medium px-5 py-2">Date</th>
-                    <th className="font-medium px-5 py-2">Message</th>
-                    <th className="font-medium px-5 py-2">Media</th>
-                    <th className="font-medium px-5 py-2 text-center">Private</th>
+                    <th className="font-medium px-5 py-2">{t('manage.table_contributor')}</th>
+                    <th className="font-medium px-5 py-2 text-right">{t('manage.table_amount')}</th>
+                    <th className="font-medium px-5 py-2">{t('manage.table_date')}</th>
+                    <th className="font-medium px-5 py-2">{t('manage.table_message')}</th>
+                    <th className="font-medium px-5 py-2">{t('manage.table_media')}</th>
+                    <th className="font-medium px-5 py-2 text-center">{t('manage.table_private')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -294,7 +296,7 @@ function ManagePageInner() {
                             ) : null}
                           </div>
                           <div>
-                            <div className="text-sm">{c.contributor_name || "Anonymous"}</div>
+                            <div className="text-sm">{c.contributor_name || t('manage.anonymous')}</div>
                           </div>
                         </div>
                       </td>
@@ -302,12 +304,12 @@ function ManagePageInner() {
                         {formatAUD(c.amount)}
                         {c.tip_amount ? (
                           <span className="block text-[11px] font-normal text-accent">
-                            +{formatAUD(c.tip_amount)} tip
+                            +{formatAUD(c.tip_amount)} {t('manage.tip')}
                           </span>
                         ) : null}
                       </td>
                       <td className="px-5 py-3 text-muted text-xs">
-                        {formatDistanceToNowStrict(new Date(c.created_at))} ago
+                        {formatDistanceToNowStrict(new Date(c.created_at))} {t('manage.ago')}
                       </td>
                       <td className="px-5 py-3 text-muted max-w-[20ch] truncate text-xs">
                         {c.message || "—"}
@@ -344,26 +346,26 @@ function ManagePageInner() {
           {campaign.status !== "active" && contributions.length > 0 && (
             <div className="rounded-3xl border border-border bg-background overflow-hidden mt-6">
               <div className="p-5 border-b border-border">
-                <h3 className="font-semibold text-base">Contributor breakdown</h3>
-                <p className="text-sm text-muted mt-0.5">Private — only you can see this</p>
+                <h3 className="font-semibold text-base">{t('manage.breakdown')}</h3>
+                <p className="text-sm text-muted mt-0.5">{t('manage.breakdown_desc')}</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-xs text-muted border-b border-border">
-                      <th className="font-medium px-5 py-2">Name</th>
-                      <th className="font-medium px-5 py-2">Items</th>
-                      <th className="font-medium px-5 py-2 text-right">Amount</th>
-                      <th className="font-medium px-5 py-2 text-right">Tip</th>
-                      <th className="font-medium px-5 py-2">Date</th>
-                      <th className="font-medium px-5 py-2 text-center">Private</th>
+                      <th className="font-medium px-5 py-2">{t('manage.table_name')}</th>
+                      <th className="font-medium px-5 py-2">{t('manage.table_items')}</th>
+                      <th className="font-medium px-5 py-2 text-right">{t('manage.table_amount')}</th>
+                      <th className="font-medium px-5 py-2 text-right">{t('manage.table_tip')}</th>
+                      <th className="font-medium px-5 py-2">{t('manage.table_date')}</th>
+                      <th className="font-medium px-5 py-2 text-center">{t('manage.table_private')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {contributions.map((c) => (
                       <tr key={c.id} className="border-b border-border last:border-0 hover:bg-foreground/[.02]">
                         <td className="px-5 py-3 font-medium">
-                          {c.contributor_name || "Anonymous"}
+                          {c.contributor_name || t('manage.anonymous')}
                         </td>
                         <td className="px-5 py-3 text-muted text-xs max-w-[20ch] truncate">
                           {c.selected_items && c.selected_items.length > 0
@@ -404,29 +406,29 @@ function ManagePageInner() {
           />
 
           <div className="rounded-3xl border border-border bg-background p-5 space-y-2">
-            <h3 className="font-semibold text-base">Manage campaign</h3>
-            <p className="text-sm text-muted">Quick actions you might need.</p>
+            <h3 className="font-semibold text-base">{t('manage.quick_actions')}</h3>
+            <p className="text-sm text-muted">{t('manage.quick_actions_desc')}</p>
             <div className="pt-2 space-y-2">
               <button
                 onClick={() => setExtendOpen(true)}
                 disabled={campaign.status !== "active"}
                 className="w-full flex items-center gap-2 text-sm px-3 py-2 rounded-2xl hover:bg-foreground/5 disabled:opacity-50"
               >
-                <CalendarPlus size={14} /> Extend end date
+                <CalendarPlus size={14} /> {t('manage.extend_end_date')}
               </button>
               <button
                 onClick={() => setCloseOpen(true)}
                 disabled={campaign.status !== "active"}
                 className="w-full flex items-center gap-2 text-sm px-3 py-2 rounded-2xl hover:bg-foreground/5 disabled:opacity-50 text-red-600"
               >
-                <XCircle size={14} /> Close campaign early
+                <XCircle size={14} /> {t('manage.close_early')}
               </button>
               {campaign.status === "ended" && (
                 <button
                   onClick={() => setPayoutOpen(true)}
                   className="w-full flex items-center gap-2 text-sm px-3 py-2 rounded-2xl bg-accent text-accent-foreground hover:brightness-95"
                 >
-                  <Wallet size={14} /> Trigger payout
+                  <Wallet size={14} /> {t('manage.trigger_payout')}
                 </button>
               )}
               {campaign.status !== "active" && (
@@ -434,7 +436,7 @@ function ManagePageInner() {
                   onClick={() => setReactivateOpen(true)}
                   className="w-full flex items-center gap-2 text-sm px-3 py-2 rounded-2xl hover:bg-foreground/5"
                 >
-                  <RotateCcw size={14} /> Reactivate (clone)
+                  <RotateCcw size={14} /> {t('manage.reactivate_clone')}
                 </button>
               )}
             </div>
@@ -447,13 +449,14 @@ function ManagePageInner() {
         open={editOpen}
         onClose={() => setEditOpen(false)}
         campaign={campaign}
+        t={t}
         onSave={async (patch) => {
           setIsUpdating(true);
           try {
             await updateCampaignAPI(campaign.slug, patch);
-            toast.success("Campaign updated");
+            toast.success(t('manage.campaign_updated'));
           } catch (error: any) {
-            toast.error("Update failed", error.response?.data?.message);
+            toast.error(t('manage.update_failed'), error.response?.data?.message);
           } finally {
             setIsUpdating(false);
             setEditOpen(false);
@@ -465,25 +468,26 @@ function ManagePageInner() {
         open={extendOpen}
         onClose={() => setExtendOpen(false)}
         currentEnd={campaign.end_date}
+        t={t}
         onSave={async (endDate) => {
           try {
             await updateCampaignAPI(campaign.slug, { endDate: new Date(endDate).toISOString() });
-            toast.success("End date extended");
+            toast.success(t('manage.end_date_extended'));
           } catch (error: any) {
-            toast.error("Update failed", error.response?.data?.message);
+            toast.error(t('manage.update_failed'), error.response?.data?.message);
           } finally {
             setExtendOpen(false);
           }
         }}
       />
 
-      <Modal open={closeOpen} onClose={() => setCloseOpen(false)} title="Close campaign early?">
+      <Modal open={closeOpen} onClose={() => setCloseOpen(false)} title={t('manage.close_confirm')}>
         <p className="text-sm text-muted">
-          Contributors won&apos;t be able to add new contributions. You can trigger payout right after.
+          {t('manage.close_desc')}
         </p>
         <div className="flex gap-2 mt-5 justify-end">
           <Button variant="ghost" onClick={() => setCloseOpen(false)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant="danger"
@@ -491,39 +495,39 @@ function ManagePageInner() {
               setIsUpdating(true);
               try {
                 await closeCampaignAPI(campaign.slug);
-                toast.success("Campaign closed");
+                toast.success(t('manage.campaign_closed'));
               } catch (error: any) {
-                toast.error("Close failed", error.response?.data?.message);
+                toast.error(t('manage.close_failed'), error.response?.data?.message);
               } finally {
                 setIsUpdating(false);
                 setCloseOpen(false);
               }
             }}
           >
-            Close campaign
+            {t('manage.close_button')}
           </Button>
         </div>
       </Modal>
 
-      <Modal open={payoutOpen} onClose={() => setPayoutOpen(false)} title="Trigger payout">
+      <Modal open={payoutOpen} onClose={() => setPayoutOpen(false)} title={t('manage.payout_title')}>
         <p className="text-sm text-muted">
           {user.stripe_account_id
-            ? `Funds will be transferred to your connected bank account. Net after 2.5% fee: ${formatAUD(fee.net, { withCents: true })}.`
-            : "You don't have a bank account connected yet. Connect one from your profile first."}
+            ? `${t('manage.payout_ready')} ${formatAUD(fee.net, { withCents: true })}.`
+            : t('manage.payout_not_connected')}
         </p>
         <div className="flex gap-2 mt-5 justify-end">
           <Button variant="ghost" onClick={() => setPayoutOpen(false)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           {user.stripe_account_id ? (
             <Button
               onClick={() => {
-                toast.success("Payout initiated", `${formatAUD(fee.net)} on its way to your bank (mock)`);
+                toast.success(t('manage.payout_initiated'), `${formatAUD(fee.net)} ${t('manage.payout_mock')}`);
                 setPayoutOpen(false);
               }}
             >
               <Wallet size={14} />
-              Send payout
+              {t('manage.send_payout')}
             </Button>
           ) : (
             <Button
@@ -532,7 +536,7 @@ function ManagePageInner() {
                 router.push("/profile");
               }}
             >
-              Go to profile
+              {t('manage.go_profile')}
             </Button>
           )}
         </div>
@@ -542,6 +546,7 @@ function ManagePageInner() {
         open={reactivateOpen}
         onClose={() => setReactivateOpen(false)}
         title={campaign.title}
+        t={t}
         onConfirm={async (endDate) => {
           setIsUpdating(true);
           try {
@@ -610,6 +615,7 @@ function EditModal({
   open,
   onClose,
   campaign,
+  t,
   onSave,
 }: {
   open: boolean;
@@ -623,6 +629,7 @@ function EditModal({
     hide_until_birthday?: boolean;
     show_on_search?: boolean;
   };
+  t: ReturnType<typeof useTranslation>;
   onSave: (patch: {
     title: string;
     description: string;
@@ -662,18 +669,18 @@ function EditModal({
   }, [open, campaign]);
 
   return (
-    <Modal open={open} onClose={onClose} title="Edit campaign" size="lg">
+    <Modal open={open} onClose={onClose} title={t('manage.edit_campaign')} size="lg">
       <div className="space-y-5">
         <div className="space-y-3">
-          <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Input label={t('manage.edit_title')} value={title} onChange={(e) => setTitle(e.target.value)} />
           <Textarea
-            label="Description"
+            label={t('manage.edit_description')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
           />
           <Input
-            label="Goal (optional)"
+            label={t('manage.edit_goal')}
             type="number"
             min={0}
             value={goal}
@@ -684,7 +691,7 @@ function EditModal({
 
         <div className="border-t pt-4">
           <label className="text-sm font-medium text-foreground block mb-3">
-            Gift ideas / Contribution items (optional)
+            {t('manage.edit_items')}
           </label>
           <ItemEditor
             items={items}
@@ -702,9 +709,9 @@ function EditModal({
                 className="mt-1"
               />
               <div>
-                <p className="text-sm font-medium">Hide contributions until the end date</p>
+                <p className="text-sm font-medium">{t('manage.edit_hide_until')}</p>
                 <p className="text-xs text-muted mt-0.5">
-                  Keep the gift wall, names, photos and messages hidden until the event
+                  {t('manage.edit_hide_desc')}
                 </p>
               </div>
             </label>
@@ -720,9 +727,9 @@ function EditModal({
               className="mt-1"
             />
             <div>
-              <p className="text-sm font-medium">Show on Public Search</p>
+              <p className="text-sm font-medium">{t('manage.edit_show_search')}</p>
               <p className="text-xs text-muted mt-0.5">
-                Allow others to find this campaign when searching on the homepage
+                {t('manage.edit_show_search_desc')}
               </p>
             </div>
           </label>
@@ -731,7 +738,7 @@ function EditModal({
 
       <div className="flex justify-end gap-2 mt-6">
         <Button variant="ghost" onClick={onClose}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button
           onClick={() =>
@@ -747,7 +754,7 @@ function EditModal({
             })
           }
         >
-          Save changes
+          {t('manage.edit_save')}
         </Button>
       </div>
     </Modal>
@@ -759,22 +766,24 @@ function ExtendModal({
   open,
   onClose,
   currentEnd,
+  t,
   onSave,
 }: {
   open: boolean;
   onClose: () => void;
   currentEnd: string;
+  t: ReturnType<typeof useTranslation>;
   onSave: (newEnd: string) => void;
 }) {
   const [date, setDate] = useState(currentEnd.slice(0, 10));
   return (
-    <Modal open={open} onClose={onClose} title="Extend end date">
-      <Input label="New end date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+    <Modal open={open} onClose={onClose} title={t('manage.extend_title')}>
+      <Input label={t('manage.extend_new_date')} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
       <div className="flex justify-end gap-2 mt-5">
         <Button variant="ghost" onClick={onClose}>
-          Cancel
+          {t('common.cancel')}
         </Button>
-        <Button onClick={() => onSave(date)}>Update date</Button>
+        <Button onClick={() => onSave(date)}>{t('common.confirm')}</Button>
       </div>
     </Modal>
   );
@@ -784,11 +793,13 @@ function ReactivateModal({
   open,
   onClose,
   title,
+  t,
   onConfirm,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
+  t: ReturnType<typeof useTranslation>;
   onConfirm: (endDate: string) => void;
 }) {
   const today = new Date().toISOString().slice(0, 10);
@@ -800,7 +811,7 @@ function ReactivateModal({
   const [date, setDate] = useState(twoWeeks());
 
   return (
-    <Modal open={open} onClose={onClose} title="Reactivate pool">
+    <Modal open={open} onClose={onClose} title={t('manage.reactivate_title')}>
       <p className="text-sm text-muted">
         We&apos;ll clone <span className="font-medium text-foreground">{title}</span> into a fresh
         active pool — same description, recipient, mode and tiers — with a new link and a reset
@@ -808,7 +819,7 @@ function ReactivateModal({
       </p>
       <div className="mt-4">
         <Input
-          label="New end date"
+          label={t('manage.extend_new_date')}
           type="date"
           min={today}
           value={date}
@@ -817,11 +828,11 @@ function ReactivateModal({
       </div>
       <div className="flex justify-end gap-2 mt-5">
         <Button variant="ghost" onClick={onClose}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button onClick={() => onConfirm(date)} disabled={!date}>
           <RotateCcw size={14} />
-          Reactivate
+          {t('manage.reactivate_button')}
         </Button>
       </div>
     </Modal>

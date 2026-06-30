@@ -3,16 +3,18 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/stores/auth";
+import { useTranslation } from "@/lib/useTranslation";
 import { AuthCheck } from "@/components/AuthCheck";
 import { useWizard } from "@/stores/wizard";
 import { useCampaigns } from "@/stores/campaigns";
 import { formatAUD } from "@/lib/money";
+import { usePoolModes } from "@/lib/usePoolModes";
 import {
   CAMPAIGN_TYPE_LABELS,
   type CampaignType,
   type PoolMode,
 } from "@/lib/types";
-import { POOL_MODE_LABELS, POOL_MODE_DESCRIPTIONS, POOL_MODES } from "@/lib/pool";
+import { POOL_MODES } from "@/lib/pool";
 import { cn } from "@/lib/cn";
 import { toast } from "@/stores/toast";
 import { WizardShell } from "@/components/wizard/WizardShell";
@@ -27,6 +29,7 @@ import { Progress } from "@/components/ui/Progress";
 import { ChevronLeft, ChevronRight, Sparkles, EyeOff, Lock, Layers, Eye, ChevronDown } from "lucide-react";
 
 function CreatePageInner() {
+  const t = useTranslation();
   const user = useAuth((s) => s.user);
   const router = useRouter();
   const { step, data, setStep, patch, reset } = useWizard();
@@ -106,6 +109,7 @@ function CreatePageInner() {
     <WizardShell step={step}>
       {step === 1 && (
         <Step1
+          t={t}
           data={data}
           patch={patch}
           onNext={goNext}
@@ -115,9 +119,10 @@ function CreatePageInner() {
           }}
         />
       )}
-      {step === 2 && <Step2 data={data} patch={patch} onNext={goNext} onBack={goBack} />}
+      {step === 2 && <Step2 t={t} data={data} patch={patch} onNext={goNext} onBack={goBack} />}
       {step === 3 && (
         <Step3
+          t={t}
           data={data}
           patch={patch}
           organiserName={user.name}
@@ -143,11 +148,13 @@ export default function CreatePage() {
 // ──────────────────────────────────────────────────────────
 
 function Step1({
+  t,
   data,
   patch,
   onNext,
   onCancel,
 }: {
+  t: ReturnType<typeof useTranslation>;
   data: ReturnType<typeof useWizard.getState>["data"];
   patch: (p: Partial<typeof data>) => void;
   onNext: () => void;
@@ -163,23 +170,32 @@ function Step1({
       />
 
       <Input
-        label="Campaign title"
-        placeholder="Sarah's 30th birthday Bali fund"
+        label={t("create.campaign_name")}
+        placeholder={t("create.campaign_name.placeholder")}
         value={data.title}
         onChange={(e) => patch({ title: e.target.value })}
         hint="Keep it short and warm — this is the first thing contributors see."
       />
 
       <Input
-        label="Who's it for? (optional)"
+        label={t("create.recipient_name")}
         placeholder="Sarah"
         value={data.recipient_name ?? ""}
         onChange={(e) => patch({ recipient_name: e.target.value })}
         hint="The recipient — used for tipping and their video highlight reel."
       />
 
+      <Textarea
+        label={t("create.description")}
+        placeholder={t("create.description.placeholder")}
+        value={data.description}
+        onChange={(e) => patch({ description: e.target.value })}
+        rows={5}
+        hint={t("create.description.hint")}
+      />
+
       <div className="space-y-1.5">
-        <label className="block text-sm font-medium">Type</label>
+        <label className="block text-sm font-medium">{t("create.campaign_type")}</label>
         <select
           value={data.type}
           onChange={(e) => patch({ type: e.target.value as CampaignType })}
@@ -193,21 +209,12 @@ function Step1({
         </select>
       </div>
 
-      <Textarea
-        label="What's it for?"
-        placeholder="A few lines on what you're collecting for, and why it matters."
-        value={data.description}
-        onChange={(e) => patch({ description: e.target.value })}
-        rows={5}
-        hint="Markdown not supported — keep it plain text."
-      />
-
       <div className="flex justify-between pt-4">
         <Button variant="ghost" onClick={onCancel}>
-          Cancel
+          {t("common.cancel")}
         </Button>
         <Button onClick={onNext} disabled={!canNext}>
-          Next
+          {t("create.button_next")}
           <ChevronRight size={16} />
         </Button>
       </div>
@@ -227,16 +234,19 @@ const MODE_ICONS: Record<PoolMode, React.ReactNode> = {
 };
 
 function Step2({
+  t,
   data,
   patch,
   onNext,
   onBack,
 }: {
+  t: ReturnType<typeof useTranslation>;
   data: ReturnType<typeof useWizard.getState>["data"];
   patch: (p: Partial<typeof data>) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
+  const { labels: poolModeLabels, descriptions: poolModeDescriptions } = usePoolModes();
   const today = new Date().toISOString().slice(0, 10);
   const isTiers = data.pool_mode === "tiers";
   const validTiers = data.tiers.filter((t) => t > 0);
@@ -270,10 +280,10 @@ function Step2({
                   )}
                 >
                   {MODE_ICONS[mode]}
-                  {POOL_MODE_LABELS[mode]}
+                  {poolModeLabels[mode]}
                 </span>
                 <p className="text-xs text-muted mt-1 leading-snug">
-                  {POOL_MODE_DESCRIPTIONS[mode]}
+                  {poolModeDescriptions[mode]}
                 </p>
               </button>
             );
@@ -282,7 +292,7 @@ function Step2({
       </div>
 
       <Input
-        label={data.pool_mode === "mystery" ? "Goal amount (hidden from contributors)" : "Goal amount (optional)"}
+        label={data.pool_mode === "mystery" ? t('create.goal_amount_mystery') : t('create.goal_amount')}
         type="number"
         min={0}
         step={50}
@@ -294,18 +304,18 @@ function Step2({
         placeholder="2000"
         hint={
           data.pool_mode === "mystery"
-            ? "Only you'll see this — contributors see just the occasion."
-            : "Skip this to run an open-ended pool."
+            ? t('create.goal_amount_mystery_hint')
+            : t('create.goal_amount.hint')
         }
       />
 
       <Input
-        label="End date"
+        label={t('create.end_date')}
         type="date"
         min={today}
         value={data.end_date}
         onChange={(e) => patch({ end_date: e.target.value })}
-        hint="When this date hits, funds are released to your bank."
+        hint={t('create.end_date.hint')}
       />
 
       {isTiers ? (
@@ -313,7 +323,7 @@ function Step2({
       ) : (
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="Min contribution"
+            label={t('create.min_contribution')}
             type="number"
             min={0}
             step={5}
@@ -325,7 +335,7 @@ function Step2({
             placeholder="—"
           />
           <Input
-            label="Max contribution"
+            label={t('create.max_contribution')}
             type="number"
             min={0}
             step={5}
@@ -345,7 +355,7 @@ function Step2({
           onClick={() => setItemsExpanded(!itemsExpanded)}
           className="w-full flex items-center justify-between px-3.5 py-3 rounded-2xl border border-border hover:bg-foreground/5 text-sm font-medium"
         >
-          <span>Add contribution items (optional)</span>
+          <span>{t('create.add_items')}</span>
           <ChevronDown
             size={16}
             className={cn("transition-transform", itemsExpanded && "rotate-180")}
@@ -358,7 +368,7 @@ function Step2({
               onChange={(items) => patch({ contribution_items: items })}
             />
             <p className="text-xs text-muted mt-3">
-              Named options contributors can pick from. Replaces the freeform amount field.
+              {t('create.add_items.hint')}
             </p>
           </div>
         )}
@@ -373,9 +383,9 @@ function Step2({
             className="mt-1"
           />
           <div>
-            <p className="text-sm font-medium">Hide contributions until the end date</p>
+            <p className="text-sm font-medium">{t('create.hide_until_end')}</p>
             <p className="text-xs text-muted mt-0.5">
-              Keep it a surprise — gifts, photos, and videos stay hidden until the birthday.
+              {t('create.hide_until_end.hint')}
             </p>
           </div>
         </label>
@@ -383,10 +393,10 @@ function Step2({
 
       <div className="flex justify-between pt-4">
         <Button variant="ghost" onClick={onBack}>
-          <ChevronLeft size={16} /> Back
+          <ChevronLeft size={16} /> {t("create.button_prev")}
         </Button>
         <Button onClick={onNext} disabled={!canNext}>
-          Next
+          {t("create.button_next")}
           <ChevronRight size={16} />
         </Button>
       </div>
@@ -399,6 +409,7 @@ function Step2({
 // ──────────────────────────────────────────────────────────
 
 function Step3({
+  t,
   data,
   patch,
   organiserName,
@@ -406,6 +417,7 @@ function Step3({
   onPublish,
   isPublishing,
 }: {
+  t: ReturnType<typeof useTranslation>;
   data: ReturnType<typeof useWizard.getState>["data"];
   patch: (p: Partial<typeof data>) => void;
   organiserName: string;
@@ -413,6 +425,7 @@ function Step3({
   onPublish: () => Promise<void>;
   isPublishing: boolean;
 }) {
+  const { labels: poolModeLabels } = usePoolModes();
   return (
     <div>
       <p className="text-sm text-muted mb-4">
@@ -438,7 +451,7 @@ function Step3({
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <p className="text-sm text-muted">by {organiserName}</p>
             {data.pool_mode !== "standard" && (
-              <Badge tone="accent">{POOL_MODE_LABELS[data.pool_mode]}</Badge>
+              <Badge tone="accent">{poolModeLabels[data.pool_mode]}</Badge>
             )}
             {data.hide_until_birthday && (
               <Badge tone="accent">🎂 Birthday surprise</Badge>
@@ -474,7 +487,7 @@ function Step3({
             <dt className="text-muted">Type</dt>
             <dd className="text-right capitalize">{data.type.replace("_", " ")}</dd>
             <dt className="text-muted">Pool mode</dt>
-            <dd className="text-right">{POOL_MODE_LABELS[data.pool_mode]}</dd>
+            <dd className="text-right">{poolModeLabels[data.pool_mode]}</dd>
             <dt className="text-muted">Ends</dt>
             <dd className="text-right">
               {new Date(data.end_date).toLocaleDateString("en-AU", {
@@ -532,18 +545,18 @@ function Step3({
           className="mt-1"
         />
         <div>
-          <p className="text-sm font-medium">Show on Public Search</p>
-          <p className="text-xs text-muted mt-0.5">Allow others to find this campaign when searching on the homepage</p>
+          <p className="text-sm font-medium">{t('create.show_search')}</p>
+          <p className="text-xs text-muted mt-0.5">{t('create.show_search.hint')}</p>
         </div>
       </label>
 
       <div className="flex justify-between pt-6">
         <Button variant="ghost" onClick={onBack} disabled={isPublishing}>
-          <ChevronLeft size={16} /> Back
+          <ChevronLeft size={16} /> {t("create.button_prev")}
         </Button>
         <Button onClick={onPublish} size="lg" disabled={isPublishing}>
           <Sparkles size={16} />
-          {isPublishing ? "Publishing..." : "Publish"}
+          {isPublishing ? `${t("common.loading")}...` : t("create.button_publish")}
         </Button>
       </div>
     </div>

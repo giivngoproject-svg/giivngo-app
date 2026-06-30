@@ -6,6 +6,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { CheckCircle2, Building2, Banknote, Clock } from "lucide-react";
 import { useAuth } from "@/stores/auth";
 import { useCampaigns } from "@/stores/campaigns";
+import { useTranslation } from "@/lib/useTranslation";
 import { AuthCheck } from "@/components/AuthCheck";
 import { storageApi, profileApi } from "@/lib/api";
 import { formatAUD } from "@/lib/money";
@@ -16,6 +17,7 @@ import { Avatar } from "@/components/nav/TopNav";
 import { StatusBadge } from "@/components/ui/Badge";
 
 function ProfilePageInner() {
+  const t = useTranslation();
   const user = useAuth((s) => s.user);
   const updateUser = useAuth((s) => s.updateUser);
   const campaigns = useCampaigns((s) => s.campaigns);
@@ -137,9 +139,9 @@ function ProfilePageInner() {
   return (
     <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Your profile</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("profile.title")}</h1>
         <Button onClick={handleSaveProfile} disabled={isUpdating} size="sm">
-          {isUpdating ? "Saving..." : "Save changes"}
+          {isUpdating ? `${t("common.loading")}...` : t("profile.save")}
         </Button>
       </div>
 
@@ -170,24 +172,24 @@ function ProfilePageInner() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
           <Input
-            label="Full name"
+            label={t("profile.name")}
             value={user.name}
             onChange={(e) => updateUser({ name: e.target.value })}
           />
           <Input
-            label="Display name"
+            label={t("profile.display_name")}
             value={user.display_name || ""}
             onChange={(e) => updateUser({ display_name: e.target.value })}
             hint="Shown on the public campaign pages."
           />
           <Input
-            label="Email"
+            label={t("profile.email")}
             type="email"
             value={user.email}
             onChange={(e) => updateUser({ email: e.target.value })}
           />
           <Input
-            label="Mobile"
+            label={t("profile.phone")}
             type="tel"
             value={user.phone || ""}
             onChange={(e) => updateUser({ phone: e.target.value })}
