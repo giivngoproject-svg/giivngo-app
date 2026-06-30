@@ -38,46 +38,11 @@ const BENEFITS = [
 export function HowItWorks() {
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
-      <div className="grid items-stretch gap-10 lg:grid-cols-2">
-        {/* left: title + steps */}
-        <div className="flex flex-col">
-          <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground`}>
-            How It Works
-          </h2>
-          <div className="flex flex-1 items-center">
-            <div className="flex w-full justify-between gap-1.5">
-            {STEPS.map((step, i) => (
-              <div
-                key={step.num}
-                className="relative flex flex-1 flex-col items-center text-center"
-              >
-                {i < STEPS.length - 1 && (
-                  // lavender-grey step connector — no clean token, kept inline
-                  <div className="absolute left-1/2 top-[27px] z-0 h-0 w-full border-t-2 border-dashed border-[#D6D3E0]" />
-                )}
-                <div
-                  className="relative z-[2] flex h-[54px] w-[54px] items-center justify-center rounded-full text-white"
-                  style={{ background: step.color, boxShadow: `0 8px 20px ${step.color.replace(/\)$/, " / 0.4)")}` }}
-                >
-                  <step.Icon size={22} />
-                </div>
-                <div
-                  className="absolute left-[calc(50%-30px)] top-10 z-[3] flex h-5 w-5 items-center justify-center rounded-full border-2 bg-white text-[10px] font-bold"
-                  style={{ borderColor: step.color, color: step.color }}
-                >
-                  {step.num}
-                </div>
-                <h4 className={`${heading} mb-1 mt-3.5 text-[14.5px] font-semibold text-foreground`}>
-                  {step.title}
-                </h4>
-                <p className="text-[12.5px] leading-snug text-muted">
-                  {step.cap}
-                </p>
-              </div>
-            ))}
-            </div>
-          </div>
-        </div>
+      {/* top: title + phone/benefits */}
+      <div className="grid items-start gap-10 lg:grid-cols-2">
+        <h2 className={`${heading} text-5xl md:text-6xl font-extrabold text-foreground`}>
+          How It Works
+        </h2>
 
         {/* right: phone + benefits */}
         <div className="flex flex-col items-center gap-7 rounded-[22px] bg-brand/10 p-8 sm:flex-row">
@@ -135,6 +100,39 @@ export function HowItWorks() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* steps: full width, spanning the whole block */}
+      <div className="mt-14 flex w-full justify-between gap-1.5">
+        {STEPS.map((step, i) => (
+          <div
+            key={step.num}
+            className="relative flex flex-1 flex-col items-center text-center"
+          >
+            {i < STEPS.length - 1 && (
+              // lavender-grey step connector — no clean token, kept inline
+              <div className="absolute left-1/2 top-[27px] z-0 h-0 w-full border-t-2 border-dashed border-[#D6D3E0]" />
+            )}
+            <div
+              className="relative z-[2] flex h-[54px] w-[54px] items-center justify-center rounded-full text-white"
+              style={{ background: step.color, boxShadow: `0 8px 20px ${step.color.replace(/\)$/, " / 0.4)")}` }}
+            >
+              <step.Icon size={22} />
+            </div>
+            <div
+              className="absolute left-[calc(50%-30px)] top-10 z-[3] flex h-5 w-5 items-center justify-center rounded-full border-2 bg-white text-[10px] font-bold"
+              style={{ borderColor: step.color, color: step.color }}
+            >
+              {step.num}
+            </div>
+            <h4 className={`${heading} mb-1 mt-3.5 text-[14.5px] font-semibold text-foreground`}>
+              {step.title}
+            </h4>
+            <p className="text-[12.5px] leading-snug text-muted">
+              {step.cap}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );
