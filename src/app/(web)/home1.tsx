@@ -210,10 +210,10 @@ export default function Home1() {
       </section>
 
       {/* What People Are Making Possible */}
-      <section className="py-24 bg-gray-50">
+      <section className={`${poppins.variable} py-24 bg-gray-50`}>
         <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
+            <h2 className="font-[family-name:var(--font-poppins)] text-5xl md:text-6xl font-extrabold text-gray-900 mb-4">
               What people are making{' '}
               <span className="text-[#7C5CFF]">possible</span>
             </h2>
