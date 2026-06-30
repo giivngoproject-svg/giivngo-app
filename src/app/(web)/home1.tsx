@@ -234,7 +234,7 @@ export default function Home1() {
                       className="w-full h-full object-cover"
                     />
                     <div
-                      className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg border-4 border-white"
+                      className="absolute -bottom-5 left-6 w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg border-4 border-white"
                       style={{ backgroundColor: card.badgeColor }}
                     >
                       {card.icon}
