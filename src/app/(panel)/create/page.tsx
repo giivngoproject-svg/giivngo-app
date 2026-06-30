@@ -69,6 +69,7 @@ function CreatePageInner() {
           : undefined,
         organiserName: user.name,
         showOnSearch: data.show_on_search,
+        hideUntilBirthday: data.hide_until_birthday || undefined,
       });
 
       if (campaign) {
@@ -542,7 +543,7 @@ function Step3({
         </Button>
         <Button onClick={onPublish} size="lg" disabled={isPublishing}>
           <Sparkles size={16} />
-          {isPublishing ? "Publishing..." : "Publish campaign"}
+          {isPublishing ? "Publishing..." : "Publish"}
         </Button>
       </div>
     </div>

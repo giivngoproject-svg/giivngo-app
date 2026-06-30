@@ -41,7 +41,7 @@ export function ItemEditor({
   return (
     <div className="space-y-3">
       {items.map((item, idx) => (
-        <div key={item.id} className="flex gap-2 items-end">
+        <div key={item.id} className="grid grid-cols-1 md:flex gap-2 items-end">
           <Input
             label={idx === 0 ? "Item name" : undefined}
             placeholder="e.g. Gift Fund"

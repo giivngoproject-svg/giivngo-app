@@ -5,8 +5,9 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { Users } from "lucide-react";
 import type { Campaign, Contribution } from "@/lib/types";
 import { formatAUD } from "@/lib/money";
+import { poolMode, POOL_MODE_LABELS } from "@/lib/pool";
 import { Progress } from "@/components/ui/Progress";
-import { StatusBadge } from "@/components/ui/Badge";
+import { StatusBadge, Badge } from "@/components/ui/Badge";
 
 export function CampaignCard({
   campaign,
@@ -17,7 +18,7 @@ export function CampaignCard({
   contributions: Contribution[];
   href: string;
 }) {
-  const cs = contributions.filter((c) => c.campaign_id === campaign.id);
+  const cs = contributions;
   const ending = new Date(campaign.end_date);
   const isFuture = ending.getTime() > Date.now();
   const timeLabel = isFuture
@@ -46,7 +47,14 @@ export function CampaignCard({
       </div>
 
       <div className="p-5">
-        <h3 className="font-semibold text-base truncate">{campaign.title}</h3>
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="font-semibold text-base truncate flex-1">{campaign.title}</h3>
+          {poolMode(campaign) !== "standard" && (
+            <Badge tone="accent" className="text-xs shrink-0">
+              {POOL_MODE_LABELS[poolMode(campaign)]}
+            </Badge>
+          )}
+        </div>
 
         <div className="mt-3 flex items-baseline justify-between">
           <p className="text-xl font-semibold">{formatAUD(campaign.raised_amount)}</p>

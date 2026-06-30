@@ -54,13 +54,17 @@ export function VideoDrop({
       return;
     }
     try {
+      setRecording(true);
+      setElapsed(0);
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       streamRef.current = stream;
+      chunksRef.current = [];
+
       if (previewRef.current) {
         previewRef.current.srcObject = stream;
-        await previewRef.current.play().catch(() => {});
+        previewRef.current.play().catch(() => {});
       }
-      chunksRef.current = [];
+
       const recorder = new MediaRecorder(stream);
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
@@ -78,8 +82,7 @@ export function VideoDrop({
       };
       recorderRef.current = recorder;
       recorder.start();
-      setRecording(true);
-      setElapsed(0);
+
       timerRef.current = setInterval(() => {
         setElapsed((s) => {
           if (s + 1 >= MAX_SECONDS) stopRecording();
@@ -87,6 +90,7 @@ export function VideoDrop({
         });
       }, 1000);
     } catch {
+      setRecording(false);
       toast.error("Camera blocked", "Allow camera access or upload a video instead");
       stopStream();
     }
@@ -123,7 +127,7 @@ export function VideoDrop({
 
       {recording ? (
         <div className="rounded-2xl border border-border overflow-hidden">
-          <video ref={previewRef} muted playsInline className="w-full max-h-56 object-cover bg-black" />
+          <video ref={previewRef} autoPlay muted playsInline className="w-full max-h-56 object-contain bg-black" />
           <div className="flex items-center justify-between p-2.5">
             <span className="text-sm text-red-600 inline-flex items-center gap-1.5">
               <Circle size={10} className="fill-red-600 animate-pulse" />

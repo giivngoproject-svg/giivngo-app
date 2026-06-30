@@ -3,7 +3,7 @@ import process from 'process';
 //import next .env NEXT_PUBLIC_API_URL
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-console.log("API WORK IN : ",API_URL)
+// console.log("API WORK IN : ",API_URL)
 /**
  * Transform API response from backend (camelCase) to frontend (snake_case)
  */

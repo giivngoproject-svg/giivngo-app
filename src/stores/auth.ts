@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User } from "@/lib/types";
 import { authApi } from "@/lib/api";
+import { supabase } from "@/lib/supabase-client";
 
 type AuthState = {
   user: User | null;
@@ -16,6 +17,7 @@ type AuthState = {
 
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (email: string, password: string, name: string) => Promise<boolean>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => void;
   checkAuth: () => Promise<void>;
   updateUser: (patch: Partial<User>) => void;
@@ -118,6 +120,31 @@ export const useAuth = create<AuthState>()(
         }
       },
 
+      signInWithGoogle: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
+              skipBrowserRedirect: false,
+            },
+          });
+
+          if (error) {
+            throw error;
+          }
+          // Note: Supabase will handle the redirect automatically
+        } catch (error: any) {
+          const message = error.message || "Google sign in failed";
+          // console.error("[Auth] Google sign in error:", message);
+          set({
+            error: message,
+            isLoading: false,
+          });
+        }
+      },
+
       signOut: () => {
         if (typeof window !== "undefined") {
           localStorage.removeItem("auth_token");
@@ -133,12 +160,27 @@ export const useAuth = create<AuthState>()(
 
       checkAuth: async () => {
         set({ isLoading: true, hasCheckedAuth: false });
-        const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+
+        // First try to get Supabase session
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        // Fall back to localStorage token
+        const token =
+          session?.access_token ||
+          (typeof window !== "undefined" ? localStorage.getItem("auth_token") : null);
 
         if (!token) {
-          console.log("[Auth] No token found in sessionStorage");
+          // console.log("[Auth] No token found");
           set({ isAuthenticated: false, user: null, token: null, isLoading: false, hasCheckedAuth: true });
           return;
+        }
+
+        // Save token to localStorage FIRST (before calling API)
+        // This is critical for Google OAuth callback flow
+        if (typeof window !== "undefined") {
+          localStorage.setItem("auth_token", token);
         }
 
         // Check if token is expired
@@ -146,46 +188,49 @@ export const useAuth = create<AuthState>()(
         const expiryTime = payload?.exp ? payload.exp * 1000 : null;
         const isExpired = expiryTime && expiryTime < Date.now();
 
-        console.log("[Auth] Token check:", {
-          hasToken: !!token,
-          tokenLength: token.length,
-          expiresAt: expiryTime ? new Date(expiryTime).toISOString() : "unknown",
-          isExpired,
-          nowMs: Date.now(),
-        });
+        // console.log("[Auth] Token check:", {
+        //   hasToken: !!token,
+        //   tokenLength: token.length,
+        //   expiresAt: expiryTime ? new Date(expiryTime).toISOString() : "unknown",
+        //   isExpired,
+        //   nowMs: Date.now(),
+        // });
 
         if (isExpired) {
-          console.log("[Auth] Token expired, signing out");
+          // console.log("[Auth] Token expired, signing out");
           get().signOut();
           set({ isLoading: false, hasCheckedAuth: true });
           return;
         }
 
         // Token exists and is not expired, assume session is active
-        console.log("[Auth] Token is valid, session is active");
+        // console.log("[Auth] Token is valid, session is active");
 
         try {
-          console.log("[Auth] Fetching user data from server...");
+          // console.log("[Auth] Fetching user data from server...");
           const user = await authApi.getMe();
-          console.log("[Auth] User data fetched successfully", { userId: user.id, email: user.email });
+          // console.log("[Auth] User data fetched successfully", { userId: user.id, email: user.email });
+
           set({
             user,
             token,
+            tokenExpiry: expiryTime,
             isAuthenticated: true,
             isLoading: false,
             hasCheckedAuth: true,
           });
         } catch (error: any) {
-          console.error("[Auth] Failed to fetch user data from server:", {
-            status: error.response?.status,
-            message: error.response?.data?.message || error.message,
-          });
+          // console.error("[Auth] Failed to fetch user data from server:", {
+          //   status: error.response?.status,
+          //   message: error.response?.data?.message || error.message,
+          // });
 
           // Server error but token is valid → keep user authenticated
           // This allows the app to work even if the backend is temporarily unavailable
-          console.log("[Auth] Keeping session active despite server error");
+          // console.log("[Auth] Keeping session active despite server error");
           set({
             token,
+            tokenExpiry: expiryTime,
             isAuthenticated: true,
             isLoading: false,
             hasCheckedAuth: true,

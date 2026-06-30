@@ -197,7 +197,7 @@ function ProfilePageInner() {
 
       {/* Bank account */}
       <div className="rounded-3xl border border-border bg-background p-6 mt-5">
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col md:flex-row items-start gap-4">
           <div className="w-10 h-10 rounded-2xl bg-accent/15 text-accent flex items-center justify-center shrink-0">
             <Banknote size={18} />
           </div>
@@ -343,9 +343,8 @@ function TabBtn({
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
-        active ? "border-accent text-foreground" : "border-transparent text-muted hover:text-foreground"
-      }`}
+      className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${active ? "border-accent text-foreground" : "border-transparent text-muted hover:text-foreground"
+        }`}
     >
       {children}
     </button>

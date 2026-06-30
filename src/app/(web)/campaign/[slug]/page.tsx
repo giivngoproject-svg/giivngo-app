@@ -365,8 +365,8 @@ export default function PublicCampaignPage() {
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
 
 
-      {/* Live activity ticker */}
-      {!closed && (
+      {/* Live activity ticker (hidden if birthday surprise) */}
+      {!closed && !birthdayHidden && (
         <div className="mt-4 flex justify-center">
           <ActivityFeed contributions={contributions} hideIdentities={contributorsHidden} />
         </div>
@@ -405,7 +405,8 @@ export default function PublicCampaignPage() {
             </p>
           </div>
 
-          {/* Gift wall / privacy panel / birthday surprise */}
+          {/* Gift wall based on Pool Mode */}
+          {/* Birthday Surprise: hide everything until end date */}
           {birthdayHidden ? (
             <div className="rounded-3xl border border-border bg-background p-6 text-center">
               <div className="mx-auto w-11 h-11 rounded-full bg-foreground/5 flex items-center justify-center mb-3">
@@ -421,7 +422,9 @@ export default function PublicCampaignPage() {
                 .
               </p>
             </div>
-          ) : contributorsHidden ? (
+          ) :
+          /* Blind Pool: show progress only, hide names & amounts */
+          contributorsHidden ? (
             <div className="rounded-3xl border border-border bg-background p-6 text-center">
               <div className="mx-auto w-11 h-11 rounded-full bg-foreground/5 flex items-center justify-center mb-3">
                 <Lock size={18} className="text-muted" />
@@ -433,13 +436,27 @@ export default function PublicCampaignPage() {
                 contributed so far.
               </p>
             </div>
-          ) : (
+          ) :
+          /* Mystery Mode: hide gift wall */
+          goalHidden ? (
+            <div className="rounded-3xl border border-border bg-background p-6 text-center">
+              <div className="mx-auto w-11 h-11 rounded-full bg-foreground/5 flex items-center justify-center mb-3">
+                <span className="text-2xl">🎁</span>
+              </div>
+              <h2 className="font-semibold">It's a mystery</h2>
+              <p className="text-sm text-muted mt-1 max-w-sm mx-auto">
+                The gifts stay hidden until the end. Keep the surprise alive!
+              </p>
+            </div>
+          ) :
+          /* Standard: show public gift wall */
+          (
             <div>
               <h2 className="font-semibold mb-2 inline-flex items-center gap-1.5">
                 <Gift size={16} className="text-accent" />
                 Gift wall ({contributions.length})
               </h2>
-              <GiftWall contributions={contributions} showAmounts={!goalHidden} />
+              <GiftWall contributions={contributions} showAmounts={true} />
             </div>
           )}
         </div>
@@ -447,7 +464,23 @@ export default function PublicCampaignPage() {
         {/* Right: contribute */}
         <aside className="lg:sticky lg:top-20 self-start space-y-4">
           <div className="rounded-3xl border border-border bg-background p-5">
-            {goalHidden ? (
+            {/* Birthday Surprise: hide everything */}
+            {birthdayHidden ? (
+              <div className="text-center py-1">
+                <p className="text-2xl">🎂</p>
+                <p className="font-semibold mt-1">The surprise is being kept secret</p>
+                <p className="text-sm text-muted mt-1">
+                  Gifts, photos, and messages stay hidden until{" "}
+                  {new Date(campaign.end_date).toLocaleDateString("en-AU", {
+                    day: "numeric",
+                    month: "long",
+                  })}
+                  .
+                </p>
+              </div>
+            ) :
+            /* Mystery Mode: hide goal */
+            goalHidden ? (
               <div className="text-center py-1">
                 <p className="text-2xl">🎁</p>
                 <p className="font-semibold mt-1">It&apos;s a mystery</p>
@@ -457,7 +490,9 @@ export default function PublicCampaignPage() {
                     : `The goal is hidden. Chip in to be part of the surprise${recipient ? ` for ${recipient}` : ""}.`}
                 </p>
               </div>
-            ) : (
+            ) :
+            /* Standard & Blind & Tiers: show goal & progress */
+            (
               <>
                 <div className="flex items-baseline justify-between">
                   <p className="text-2xl font-bold">{formatAUD(campaign.raised_amount)}</p>

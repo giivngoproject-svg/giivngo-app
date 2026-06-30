@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { Loader } from "lucide-react";
 
 const EMPTY_CONTRIBUTIONS: any[] = [];
 import {
@@ -17,6 +18,9 @@ import {
   Wallet,
   ArrowLeft,
   RotateCcw,
+  Image,
+  Video,
+  X,
 } from "lucide-react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useAuth } from "@/stores/auth";
@@ -56,6 +60,7 @@ function ManagePageInner() {
   const [payoutOpen, setPayoutOpen] = useState(false);
   const [reactivateOpen, setReactivateOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [mediaModal, setMediaModal] = useState<{ type: 'photo' | 'video'; url: string } | null>(null);
 
   // Load campaign and contributions on mount - use inline callbacks to avoid dependency issues
   useEffect(() => {
@@ -76,53 +81,53 @@ function ManagePageInner() {
   if (!user) return null;
 
   // Show loading skeleton while fetching campaign
-  if (isLoading || !campaign) {
-    if (isLoading && !campaign) {
-      return (
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10">
-          <div className="mb-2">
-            <Skeleton className="h-6 w-32" />
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10">
+        <div className="mb-2">
+          <Skeleton className="h-6 w-32" />
+        </div>
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
+          <div className="min-w-0 flex-1">
+            <Skeleton className="h-12 w-2/3 mb-3" />
+            <Skeleton className="h-5 w-1/2" />
           </div>
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
-            <div className="min-w-0 flex-1">
-              <Skeleton className="h-12 w-2/3 mb-3" />
-              <Skeleton className="h-5 w-1/2" />
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <Skeleton className="h-10 w-40" />
-              <Skeleton className="h-10 w-20" />
-            </div>
+          <div className="flex gap-2 shrink-0">
+            <Skeleton className="h-10 w-40" />
+            <Skeleton className="h-10 w-20" />
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="p-4 rounded-2xl border border-border bg-background">
-                <Skeleton className="h-4 w-20 mb-3" />
-                <Skeleton className="h-8 w-32" />
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="rounded-3xl border border-border bg-background p-5">
-                <Skeleton className="h-6 w-40" />
-              </div>
-              <div className="rounded-3xl border border-border bg-background p-5 h-64">
-                <Skeleton className="h-full" />
-              </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="p-4 rounded-2xl border border-border bg-background">
+              <Skeleton className="h-4 w-20 mb-3" />
+              <Skeleton className="h-8 w-32" />
             </div>
-            <div>
-              <div className="rounded-3xl border border-border bg-background p-5 h-64">
-                <Skeleton className="h-full" />
-              </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="rounded-3xl border border-border bg-background p-5">
+              <Skeleton className="h-6 w-40" />
+            </div>
+            <div className="rounded-3xl border border-border bg-background p-5 h-64">
+              <Skeleton className="h-full" />
+            </div>
+          </div>
+          <div>
+            <div className="rounded-3xl border border-border bg-background p-5 h-64">
+              <Skeleton className="h-full" />
             </div>
           </div>
         </div>
-      );
-    }
+      </div>
+    );
+  }
 
-    // Campaign not found after loading
+  // Campaign not found after loading
+  if (!campaign) {
     return (
       <div className="max-w-md mx-auto px-5 py-20 text-center">
         <h1 className="text-2xl font-semibold">Campaign not found</h1>
@@ -263,10 +268,12 @@ function ManagePageInner() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-xs text-muted border-b border-border">
-                    <th className="font-medium px-5 py-2">Name</th>
+                    <th className="font-medium px-5 py-2">Contributor</th>
                     <th className="font-medium px-5 py-2 text-right">Amount</th>
                     <th className="font-medium px-5 py-2">Date</th>
                     <th className="font-medium px-5 py-2">Message</th>
+                    <th className="font-medium px-5 py-2">Media</th>
+                    <th className="font-medium px-5 py-2 text-center">Private</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -274,19 +281,21 @@ function ManagePageInner() {
                     <tr key={c.id} className="border-b border-border last:border-0">
                       <td className="px-5 py-3 font-medium">
                         <div className="flex items-center gap-2">
-                          {c.photo_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={c.photo_url}
-                              alt=""
-                              className="w-7 h-7 rounded-full object-cover"
-                            />
-                          ) : (
-                            <span className="w-7 h-7 rounded-full bg-foreground/10" />
-                          )}
-                          <span>{c.contributor_name || "Anonymous"}</span>
-                          {c.emoji && <span>{c.emoji}</span>}
-                          {c.video_url && <span title="Left a video">🎬</span>}
+                          <div className="w-8 h-8 rounded-full bg-foreground/10 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                            {c.anonymous_avatar?.imageUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={c.anonymous_avatar.imageUrl}
+                                alt={c.anonymous_avatar.name || "Avatar"}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : c.emoji ? (
+                              <span className="text-base">{c.emoji}</span>
+                            ) : null}
+                          </div>
+                          <div>
+                            <div className="text-sm">{c.contributor_name || "Anonymous"}</div>
+                          </div>
                         </div>
                       </td>
                       <td className="px-5 py-3 text-right font-semibold tabular-nums">
@@ -297,11 +306,32 @@ function ManagePageInner() {
                           </span>
                         ) : null}
                       </td>
-                      <td className="px-5 py-3 text-muted">
+                      <td className="px-5 py-3 text-muted text-xs">
                         {formatDistanceToNowStrict(new Date(c.created_at))} ago
                       </td>
-                      <td className="px-5 py-3 text-muted max-w-[20ch] truncate">
+                      <td className="px-5 py-3 text-muted max-w-[20ch] truncate text-xs">
                         {c.message || "—"}
+                      </td>
+                      <td className="px-5 py-3 flex gap-2">
+                        <button
+                          onClick={() => c.photo_url && setMediaModal({ type: 'photo', url: c.photo_url })}
+                          disabled={!c.photo_url}
+                          className="p-1.5 rounded-lg hover:bg-foreground/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          title={c.photo_url ? "View photo" : "No photo"}
+                        >
+                          <Image size={16} />
+                        </button>
+                        <button
+                          onClick={() => c.video_url && setMediaModal({ type: 'video', url: c.video_url })}
+                          disabled={!c.video_url}
+                          className="p-1.5 rounded-lg hover:bg-foreground/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          title={c.video_url ? "View video" : "No video"}
+                        >
+                          <Video size={16} />
+                        </button>
+                      </td>
+                      <td className="px-5 py-3 text-center">
+                        {c.is_private && <span title="Private contribution">🔒</span>}
                       </td>
                     </tr>
                   ))}
@@ -528,6 +558,27 @@ function ManagePageInner() {
           }
         }}
       />
+
+      {/* Media viewer modal */}
+      <Modal open={!!mediaModal} onClose={() => setMediaModal(null)}>
+        <div className="w-full max-w-2xl">
+          {mediaModal?.type === 'photo' && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={mediaModal.url}
+              alt="Contribution photo"
+              className="w-full rounded-lg"
+            />
+          )}
+          {mediaModal?.type === 'video' && (
+            <video
+              src={mediaModal.url}
+              controls
+              className="w-full rounded-lg"
+            />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
@@ -781,7 +832,9 @@ function ReactivateModal({
 export default function ManagePage() {
   return (
     <AuthCheck requireAuth={true}>
-      <ManagePageInner />
+      <Suspense fallback={null}>
+        <ManagePageInner />
+      </Suspense>
     </AuthCheck>
   );
 }
