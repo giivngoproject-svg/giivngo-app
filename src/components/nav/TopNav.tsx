@@ -110,7 +110,7 @@ export function TopNav() {
               }}
               variant="outline"
               size="sm"
-              className="md:hidden inline-flex items-center bg-white hover:bg-slate-200"
+              className="hidden items-center bg-white hover:bg-slate-200"
               title="Open or Close Menu"
             >
               <MenuIcon size={14} />
