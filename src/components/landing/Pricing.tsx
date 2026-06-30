@@ -13,7 +13,7 @@ export function Pricing() {
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
       {/* mobile-only title (shown above the fee panel); the desktop title lives in the right column */}
-      <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground lg:hidden`}>
+      <h2 className={`${heading} mb-8 text-4xl sm:text-5xl md:text-6xl font-extrabold text-foreground lg:hidden`}>
         Simple <span className="text-brand">pricing</span>
       </h2>
       <div className="grid items-stretch gap-10 lg:grid-cols-2">
