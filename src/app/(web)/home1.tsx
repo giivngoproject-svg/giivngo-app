@@ -120,10 +120,13 @@ export default function Home1() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <button className="bg-[#7C5CFF] hover:bg-[#6b4ce8] text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors">
+              <Link
+                href="/sign-up"
+                className="bg-[#7C5CFF] hover:bg-[#6b4ce8] text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors"
+              >
                 Start a pool – it's free
                 <ArrowRight size={18} />
-              </button>
+              </Link>
               <Link
                 href="/#how-it-works"
                 className="border-2 border-white/80 hover:border-white text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors bg-white/10 hover:bg-white/20"
@@ -298,10 +301,13 @@ export default function Home1() {
                 turn meaningful moments into lasting memories.
               </p>
 
-              <button className="bg-[#7C5CFF] hover:bg-[#6b4ce8] text-white px-8 py-4 rounded-full font-semibold flex items-center gap-2 transition-colors mb-8">
+              <Link
+                href="/sign-up"
+                className="bg-[#7C5CFF] hover:bg-[#6b4ce8] text-white px-8 py-4 rounded-full font-semibold inline-flex items-center gap-2 transition-colors mb-8"
+              >
                 Start your pool today – it's free
                 <ArrowRight size={18} />
-              </button>
+              </Link>
 
               {/* <div className="flex gap-4">
                 <div className="bg-black/30 backdrop-blur px-4 py-2 rounded-lg text-white text-sm font-medium">
