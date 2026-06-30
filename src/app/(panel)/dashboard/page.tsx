@@ -19,10 +19,6 @@ function DashboardInner() {
   const loadCampaigns = useCampaigns((s) => s.loadCampaigns);
   const loadContributions = useCampaigns((s) => s.loadContributions);
 
-  if (!user) return null;
-
-  const mine = campaigns.filter((c) => c.user_id === user.id);
-
   useEffect(() => {
     const fetchData = async () => {
       await loadCampaigns();
@@ -31,12 +27,16 @@ function DashboardInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const mine = campaigns.filter((c) => c.user_id === user?.id);
+
   useEffect(() => {
     mine.forEach((c) => {
       loadContributions(c.slug);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mine.length]);
+
+  if (!user) return null;
 
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10">

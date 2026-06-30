@@ -40,7 +40,7 @@ export function GiftWall({
           const isAnonymous = c.is_private;
           const hasAnonymousAvatar = isAnonymous && c.anonymous_avatar;
           const displayName = hasAnonymousAvatar
-            ? c.anonymous_avatar.name
+            ? c.anonymous_avatar!.name
             : isAnonymous
               ? "Anonymous"
               : c.contributor_name || "Anonymous";
@@ -53,8 +53,8 @@ export function GiftWall({
               return (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={c.anonymous_avatar.imageUrl}
-                  alt={c.anonymous_avatar.name}
+                  src={c.anonymous_avatar!.imageUrl}
+                  alt={c.anonymous_avatar!.name}
                   className="shrink-0 w-12 h-12 rounded-full object-cover border-2 border-purple-200"
                 />
               );

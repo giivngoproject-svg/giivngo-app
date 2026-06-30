@@ -18,7 +18,7 @@ import {
   Wallet,
   ArrowLeft,
   RotateCcw,
-  Image,
+  Image as ImageIcon,
   Video,
   X,
 } from "lucide-react";
@@ -319,7 +319,7 @@ function ManagePageInner() {
                           className="p-1.5 rounded-lg hover:bg-foreground/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                           title={c.photo_url ? "View photo" : "No photo"}
                         >
-                          <Image size={16} />
+                          <ImageIcon size={16} />
                         </button>
                         <button
                           onClick={() => c.video_url && setMediaModal({ type: 'video', url: c.video_url })}
