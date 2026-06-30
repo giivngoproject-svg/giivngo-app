@@ -12,11 +12,12 @@ import { Button } from "@/components/ui/Button";
 
 
 const desktopLinks: { href: string, label: string, icon: React.ReactNode }[] = [
-  { href: "#how-it-works", label: "How it works", icon: <LayoutDashboard size={15} /> },
-  { href: "/use-cases", label: "Use Cases", icon: <ToolCase size={15} /> },
-  { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
-  { href: "/pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
-  { href: "/about", label: "About Us", icon: <Building2 size={15} /> }
+  { href: "/#how-it-works", label: "How it works", icon: <LayoutDashboard size={15} /> },
+  { href: "/#use-cases", label: "Use Cases", icon: <ToolCase size={15} /> },
+  // Hidden for now — re-enable once these pages/sections exist:
+  // { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
+  { href: "/#pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
+  // { href: "/about", label: "About Us", icon: <Building2 size={15} /> },
 ];
 
 export function TopNav() {

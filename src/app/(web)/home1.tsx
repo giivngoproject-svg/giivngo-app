@@ -210,7 +210,7 @@ export default function Home1() {
       </section>
 
       {/* What People Are Making Possible */}
-      <section className={`${poppins.variable} py-24 bg-gray-50`}>
+      <section id="use-cases" className={`${poppins.variable} scroll-mt-20 py-24 bg-gray-50`}>
         <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="text-center mb-16">
             <h2 className="font-[family-name:var(--font-poppins)] text-5xl md:text-6xl font-extrabold text-gray-900 mb-4">
@@ -261,8 +261,12 @@ export default function Home1() {
 
       {/* Redesigned landing sections (Poppins-scoped) */}
       <div className={poppins.variable}>
-        <HowItWorks />
-        <Pricing />
+        <div id="how-it-works" className="scroll-mt-20">
+          <HowItWorks />
+        </div>
+        <div id="pricing" className="scroll-mt-20">
+          <Pricing />
+        </div>
         <Testimonials />
       </div>
 
