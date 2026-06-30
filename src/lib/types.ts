@@ -60,6 +60,37 @@ export type Campaign = {
   created_at: string;
 };
 
+// Backend API response (camelCase)
+export type CampaignResponseDto = {
+  id: string;
+  userId: string;
+  title: string;
+  description: string;
+  type: CampaignType;
+  status: CampaignStatus;
+  slug: string;
+  organiserName: string;
+  recipientName?: string;
+  goalAmount?: number;
+  raisedAmount: number;
+  coverPhotoUrl?: string;
+  endDate: string;
+  minContribution?: number;
+  maxContribution?: number;
+  poolMode?: PoolMode;
+  tiers?: number[];
+  hideUntilBirthday?: boolean;
+  showOnSearch?: boolean;
+  creatorStripeAccountId?: string;
+  contributionItems?: Array<{
+    id: string;
+    label: string;
+    amount: number;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AnonymousAvatar = {
   id: string;
   name: string;

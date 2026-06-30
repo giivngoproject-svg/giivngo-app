@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, LogOut, User as UserIcon, LayoutDashboard, RotateCcw, MenuIcon, LogIn, SignalIcon, UserPen, ToolCase, FolderTree, CircleDollarSign, Building2 } from "lucide-react";
 import { useAuth } from "@/stores/auth";
@@ -17,26 +17,38 @@ const desktopLinks: { href: string, label: string, icon: React.ReactNode }[] = [
   // Hidden for now — re-enable once these pages/sections exist:
   // { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
   { href: "/#pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
+  { href: "/search/all", label: "Search a Pool", icon: <CircleDollarSign size={15} /> },
   // { href: "/about", label: "About Us", icon: <Building2 size={15} /> },
 ];
 
 export function TopNav() {
   const router = useRouter();
+  const pathname = usePathname();
   const user = useAuth((s) => s.user);
   const signOut = useAuth((s) => s.signOut);
   const reset = useCampaigns((s) => s.reset);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isTop, setIsTop] = useState(true);
+
+  // Only apply scroll effect on homepage
+  const isHomepage = pathname === "/";
+
   useEffect(() => {
     const handleScroll = () => {
       setIsTop(window.scrollY < 100);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+
+    if (isHomepage) {
+      window.addEventListener("scroll", handleScroll);
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+      };
+    } else {
+      // On other pages, always keep text black
+      setIsTop(false);
+    }
+  }, [isHomepage]);
 
 
   return (
