@@ -40,7 +40,7 @@ export function TopNav() {
 
   return (
     <header className={`fixed w-full top-0 z-50  backdrop-blur bg-transparent ${isTop ? "bg-black/20  " : "bg-white text-black"}`}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-">
           <Logo />
           {/* <span className="hidden sm:inline text-xs text-muted px-1.5 py-0.5 rounded-md bg-foreground/5">
