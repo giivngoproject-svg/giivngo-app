@@ -272,7 +272,7 @@ export default function Home1() {
           className="relative overflow-hidden rounded-3xl px-8 py-16 sm:px-12 lg:px-20"
           style={{
             backgroundImage:
-              'linear-gradient(135deg, #1E1B4B 0%, #1E1B4B 40%, rgba(30, 27, 75, 0.8) 100%), url(/giivngo-footer.png)',
+              'linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(30, 27, 75, 0.65) 45%, rgba(30, 27, 75, 0.3) 100%), url(/giivngo-footer.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'right center',
           }}
