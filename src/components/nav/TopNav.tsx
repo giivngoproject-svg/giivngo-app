@@ -182,7 +182,7 @@ export function Avatar({ name, url, size = 28 }: { name: string; url?: string; s
 export function Logo() {
   return (
     <Image
-      src="/logo.png"
+      src="/logo.webp"
       alt="giivngo"
       width={1951}
       height={541}

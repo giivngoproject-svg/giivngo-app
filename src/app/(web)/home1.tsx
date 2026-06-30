@@ -23,7 +23,7 @@ const FEATURED_CARDS = [
   {
     id: 1,
     title: 'Weekend away',
-    image: '/weekend-away.png',
+    image: '/weekend-away.webp',
     icon: '🏖️',
     stats: '8 friends • $1,850 contributed',
     badge: 'Trip booked! ✈️',
@@ -32,7 +32,7 @@ const FEATURED_CARDS = [
   {
     id: 2,
     title: '30th birthday surprise',
-    image: '/birthday-surprise.png',
+    image: '/birthday-surprise.webp',
     icon: '🎂',
     stats: '18 friends • $1,200 contributed',
     badge: 'Gift delivered! 🎉',
@@ -41,7 +41,7 @@ const FEATURED_CARDS = [
   {
     id: 3,
     title: 'Footy tipping',
-    image: '/footy-tipping.png',
+    image: '/footy-tipping.webp',
     icon: '🏈',
     stats: '24 mates • $650 prize pool',
     badge: 'Season underway 🏈',
@@ -50,7 +50,7 @@ const FEATURED_CARDS = [
   {
     id: 4,
     title: 'Lotto syndicate',
-    image: '/lotto-syndicate.png',
+    image: '/lotto-syndicate.webp',
     icon: '🎰',
     stats: '14 members • Weekly pool ready',
     badge: 'Next draw Sat 🎰',
@@ -59,7 +59,7 @@ const FEATURED_CARDS = [
   {
     id: 5,
     title: 'Wedding gift',
-    image: '/wedding-gift.png',
+    image: '/wedding-gift.webp',
     icon: '💍',
     stats: '20 guests • $3,000 contributed',
     badge: 'Celebration sorted! 🥂',
@@ -77,7 +77,7 @@ export default function Home1() {
         className="relative pb-0 overflow-hidden min-h-screen  flex items-center py-14"
         style={{
           backgroundImage:
-            'url(/giivngo-hero.png)',
+            'url(/giivngo-hero.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -272,7 +272,7 @@ export default function Home1() {
           className="relative overflow-hidden rounded-3xl px-8 py-16 sm:px-12 lg:px-20"
           style={{
             backgroundImage:
-              'linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(30, 27, 75, 0.65) 45%, rgba(30, 27, 75, 0.3) 100%), url(/giivngo-footer.png)',
+              'linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(30, 27, 75, 0.65) 45%, rgba(30, 27, 75, 0.3) 100%), url(/giivngo-footer.webp)',
             backgroundSize: 'cover',
             backgroundPosition: 'right center',
           }}
