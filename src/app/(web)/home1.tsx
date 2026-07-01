@@ -91,15 +91,16 @@ export default function Home1() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#7C5CFF]/40 bg-[#7C5CFF]/20 mb-6">
               <Heart size={14} className="text-[#f01dc2]" />
               <span className="text-xs font-semibold text-white tracking-wider">
-                SOCIAL GIFTING FOR LIFE'S HAPPY MOMENTS
+                TURN DREAMS INTO REALITY, TOGETHER
               </span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
-              Turn dreams into reality.{' '}
+            <h1 className="text-5xl md:text-7xl lg:text-[5rem] font-bold text-white mb-6 leading-tight">
+              Social Gifting<br />
+              For Life's{' '}
               <span className="relative inline-block text-[#7C5CFF]">
-                Together.
+                Happy
                 <svg className="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 200 6">
                   <defs>
                     <linearGradient id="underline" x1="0%" y1="0%" x2="100%">
@@ -111,6 +112,8 @@ export default function Home1() {
                   <path d="M 0 3 Q 50 0 100 3 T 200 3" stroke="url(#underline)" strokeWidth="3" fill="none" />
                 </svg>
               </span>
+              <br />
+              Moments
             </h1>
 
             {/* Sub Headline */}
