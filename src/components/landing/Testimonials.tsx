@@ -35,7 +35,7 @@ export function Testimonials() {
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
       <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground`}>
-        Loved by real people
+        Loved by people everywhere
       </h2>
       <div className="grid gap-[22px] sm:grid-cols-2 lg:grid-cols-4">
         {TESTIMONIALS.map((t) => (
