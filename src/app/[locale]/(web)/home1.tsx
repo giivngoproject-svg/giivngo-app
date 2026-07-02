@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import {
   Play,
   Lock,
@@ -68,6 +69,9 @@ const FEATURED_CARDS = [
 ];
 
 export default function Home1() {
+  // Prueba de circuito i18n: solo el hero usa mensajes por ahora.
+  const t = useTranslations('HomePage');
+
   return (
     <div className="bg-white scroll-smooth">
 
@@ -97,28 +101,12 @@ export default function Home1() {
 
             {/* Main Headline */}
             <h1 className="text-5xl md:text-7xl lg:text-[5rem] font-bold text-white mb-6 leading-tight">
-              Social Gifting<br />
-              For Life's{' '}
-              <span className="relative inline-block text-[#7C5CFF]">
-                Happy
-                <svg className="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 200 6">
-                  <defs>
-                    <linearGradient id="underline" x1="0%" y1="0%" x2="100%">
-                      <stop offset="0%" stopColor="#7C5CFF" />
-                      <stop offset="50%" stopColor="#FF6B6B" />
-                      <stop offset="100%" stopColor="#FFC857" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M 0 3 Q 50 0 100 3 T 200 3" stroke="url(#underline)" strokeWidth="3" fill="none" />
-                </svg>
-              </span>
-              <br />
-              Moments
+              {t('title')}
             </h1>
 
             {/* Sub Headline */}
             <p className="text-xl text-white/90 mb-8 max-w-lg leading-relaxed">
-              Create a pool, invite your people, and make life's happiest moments happen.
+              {t('subtitle')}
             </p>
 
             {/* CTAs */}
@@ -127,7 +115,7 @@ export default function Home1() {
                 href="/sign-up"
                 className="bg-[#7C5CFF] hover:bg-[#6b4ce8] text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors"
               >
-                Start a pool – it's free
+                {t('cta')}
                 <ArrowRight size={18} />
               </Link>
               <Link
