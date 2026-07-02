@@ -10,8 +10,28 @@ import { Avatar, Logo } from '@/components/nav/TopNav';
 import { useAuth } from '@/stores/auth';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from '@/lib/useTranslation';
+import { NextIntlClientProvider } from 'next-intl';
+import { useLanguage } from '@/stores/language';
+
+// El panel NO está localizado por URL (excluido del middleware). Su idioma sale
+// del store (localStorage). Sembramos un NextIntlClientProvider con el locale
+// equivalente para que useTranslation() (que lee useLocale) funcione dentro del panel.
+const DICT_TO_LOCALE = { en: 'en-au', es: 'es-419', 'pt-br': 'pt-br' } as const;
 
 export default function PanelLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const language = useLanguage((s) => s.language);
+  return (
+    <NextIntlClientProvider locale={DICT_TO_LOCALE[language]}>
+      <PanelShell>{children}</PanelShell>
+    </NextIntlClientProvider>
+  );
+}
+
+function PanelShell({
   children,
 }: Readonly<{
   children: React.ReactNode;
