@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2 } from "lucide-react";
 import { useCampaigns } from "@/stores/campaigns";
+import { useTranslation } from "@/lib/useTranslation";
 import { contributionsApi, storageApi } from "@/lib/api";
 import { formatAUD } from "@/lib/money";
 import { AnonymousAvatarSelector } from "@/components/anonymous-avatar-selector";
@@ -38,6 +39,7 @@ const TIP_OPTIONS = [5, 10, 20];
 const EMPTY_CONTRIBUTIONS: never[] = [];
 
 export default function PublicCampaignPage() {
+  const t = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const campaign = useCampaigns((s) => s.campaigns.find((c) => c.slug === slug));
   const storeIsLoading = useCampaigns((s) => s.isLoading);
@@ -76,6 +78,7 @@ export default function PublicCampaignPage() {
   const [tip, setTip] = useState<number | "">("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [message, setMessage] = useState("");
   const [emoji, setEmoji] = useState<string | undefined>(undefined);
   const [photo, setPhoto] = useState<string | undefined>(undefined);
@@ -129,13 +132,13 @@ export default function PublicCampaignPage() {
   if (!storeIsLoading && !campaign) {
     return (
       <div className="max-w-md mx-auto px-5 py-20 text-center">
-        <h1 className="text-2xl font-semibold">Campaign not found</h1>
+        <h1 className="text-2xl font-semibold">{t("campaign.not_found")}</h1>
         <p className="text-muted mt-2">
-          The link may be wrong, or this campaign has been removed.
+          {t("campaign.not_found_description")}
         </p>
         <Link href="/">
           <Button variant="outline" className="mt-6">
-            Back to home
+            {t("campaign.back_home")}
           </Button>
         </Link>
       </div>
@@ -164,15 +167,15 @@ export default function PublicCampaignPage() {
 
   const handlePhoto = async (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("Image too large", "Use a file under 10 MB");
+      toast.error(t("common.error"));
       return;
     }
     try {
       const { url } = await storageApi.uploadImage(file);
       setPhoto(url);
-      toast.success("Photo uploaded");
+      toast.success(t("common.success"));
     } catch (error) {
-      toast.error("Upload failed", "Could not upload image");
+      toast.error(t("campaign.checkout_failed"));
     }
   };
 
@@ -182,7 +185,7 @@ export default function PublicCampaignPage() {
 
     if (hasItems) {
       if (selectedItemIds.size === 0) {
-        toast.error("Select at least one item");
+        toast.error(t("common.error"));
         return;
       }
       const filtered = items.filter((i) => selectedItemIds.has(i.id));
@@ -191,7 +194,7 @@ export default function PublicCampaignPage() {
     } else {
       amt = Number(amount);
       if (!amt || amt <= 0) {
-        toast.error("Enter an amount");
+        toast.error(t("common.error"));
         return;
       }
       if (!tiered) {
@@ -206,6 +209,28 @@ export default function PublicCampaignPage() {
       }
     }
 
+    // Validate date of birth (required)
+    if (!dateOfBirth.trim()) {
+      toast.error(t("common.error"));
+      setSubmitting(false);
+      return;
+    }
+
+    // Validate date format (basic check)
+    const dob = new Date(dateOfBirth);
+    if (isNaN(dob.getTime())) {
+      toast.error(t("campaign.validation_failed"));
+      setSubmitting(false);
+      return;
+    }
+
+    // Check if date is not in future
+    if (dob > new Date()) {
+      toast.error(t("common.error"));
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const response = await contributionsApi.checkout(campaign.slug, {
@@ -213,6 +238,7 @@ export default function PublicCampaignPage() {
         tipAmount: tip ? Number(tip) : undefined,
         contributorName: name.trim() || undefined,
         contributorEmail: email.trim() || undefined,
+        dateOfBirth: dateOfBirth.trim(),
         message: message.trim() || undefined,
         emoji,
         photoUrl: photo,
@@ -256,24 +282,24 @@ export default function PublicCampaignPage() {
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow-y: auto;
           ">
-            <h2 style="margin: 0 0 8px; font-size: 24px; font-weight: 700;">Complete Payment</h2>
-            <p style="color: #999; margin: 0 0 24px; font-size: 14px;">Enter your payment details</p>
+            <h2 style="margin: 0 0 8px; font-size: 24px; font-weight: 700;">${t("campaign.checkout_title")}</h2>
+            <p style="color: #999; margin: 0 0 24px; font-size: 14px;">${t("campaign.checkout_subtitle")}</p>
 
             <div style="background: #f0f7ff; border: 1px solid #cce5ff; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
               <p style="margin: 0 0 8px; font-size: 13px; color: #666; font-weight: 500;">
-                💳 Test Card (Stripe test mode):
+                ${t("campaign.test_card")}
               </p>
               <p style="margin: 0; font-family: monospace; font-size: 16px; color: #222; font-weight: 600;">
-                4242 4242 4242 4242
+                ${t("campaign.test_card_number")}
               </p>
-              <p style="margin: 8px 0 0; font-size: 13px; color: #666;">Any month/year, any 3-digit CVC</p>
+              <p style="margin: 8px 0 0; font-size: 13px; color: #666;">${t("campaign.test_card_hint")}</p>
             </div>
 
             <div id="payment-element" style="margin-bottom: 20px;"></div>
 
             <div style="display: flex; gap: 10px;">
-              <button id="submit-btn" style="flex: 1; padding: 12px; background: #0066cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">Pay A$${totalAmount}</button>
-              <button id="cancel-btn" style="flex: 1; padding: 12px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">Cancel</button>
+              <button id="submit-btn" style="flex: 1; padding: 12px; background: #0066cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">${t("campaign.pay_button", { amount: totalAmount })}</button>
+              <button id="cancel-btn" style="flex: 1; padding: 12px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">${t("common.cancel")}</button>
             </div>
           </div>
         </div>
@@ -294,7 +320,7 @@ export default function PublicCampaignPage() {
 
       submitBtn.addEventListener('click', async () => {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
+        submitBtn.textContent = '${t("campaign.processing")}';
 
         // Step 1: Submit the Payment Element form for validation
         console.log('🔵 [Payment] Submitting payment element for validation...');
@@ -304,9 +330,9 @@ export default function PublicCampaignPage() {
         if (submitError && submitError.error) {
           const errorMsg = submitError.error.message || JSON.stringify(submitError.error);
           console.error('❌ [Payment] Validation error:', submitError.error);
-          toast.error('Validation failed', errorMsg);
+          toast.error(t("campaign.validation_failed"), errorMsg);
           submitBtn.disabled = false;
-          submitBtn.textContent = `Pay A$${totalAmount}`;
+          submitBtn.textContent = `${t("campaign.pay_button", { amount: totalAmount })}`;
           return;
         }
 
@@ -324,20 +350,21 @@ export default function PublicCampaignPage() {
 
         if (error) {
           console.error('❌ [Payment] Payment error:', error);
-          toast.error('Payment failed', error.message);
+          toast.error(t("campaign.checkout_failed"), error.message);
           submitBtn.disabled = false;
-          submitBtn.textContent = `Pay A$${totalAmount}`;
+          submitBtn.textContent = `${t("campaign.pay_button", { amount: totalAmount })}`;
         } else if (paymentIntent?.status === 'succeeded') {
           console.log('✅ [Payment] Payment succeeded:', paymentIntent.id);
           modal.remove();
           paymentElement.destroy();
-          toast.success('Payment successful! ✅', 'Your contribution has been recorded.');
+          toast.success(t("campaign.payment_successful"));
 
           // Reset form
           setAmount('');
           setTip('');
           setName('');
           setEmail('');
+          setDateOfBirth('');
           setMessage('');
           setEmoji(undefined);
           setPhoto(undefined);
@@ -354,8 +381,8 @@ export default function PublicCampaignPage() {
     } catch (error: any) {
       console.error("Checkout error:", error);
       toast.error(
-        "Checkout failed",
-        error.message || error.response?.data?.message || "Could not process checkout"
+        t("campaign.checkout_failed"),
+        error.message || error.response?.data?.message || t("common.error")
       );
       setSubmitting(false);
     }
@@ -412,9 +439,9 @@ export default function PublicCampaignPage() {
               <div className="mx-auto w-11 h-11 rounded-full bg-foreground/5 flex items-center justify-center mb-3">
                 <span className="text-xl">🎂</span>
               </div>
-              <h2 className="font-semibold">The surprise is being kept secret</h2>
+              <h2 className="font-semibold">{t("campaign.surprise_hidden")}</h2>
               <p className="text-sm text-muted mt-1 max-w-sm mx-auto">
-                Gifts, photos, and messages stay hidden until{" "}
+                {t("campaign.surprise_description")}{" "}
                 {new Date(campaign.end_date).toLocaleDateString("en-AU", {
                   day: "numeric",
                   month: "long",
@@ -429,11 +456,9 @@ export default function PublicCampaignPage() {
               <div className="mx-auto w-11 h-11 rounded-full bg-foreground/5 flex items-center justify-center mb-3">
                 <Lock size={18} className="text-muted" />
               </div>
-              <h2 className="font-semibold">This is a blind pool</h2>
+              <h2 className="font-semibold">{t("campaign.blind_pool")}</h2>
               <p className="text-sm text-muted mt-1 max-w-sm mx-auto">
-                Contributor names and amounts stay private — only {campaign.organiser_name} can see
-                who chipped in. {contributions.length} {contributions.length === 1 ? "person has" : "people have"}{" "}
-                contributed so far.
+                {t("campaign.blind_description")}
               </p>
             </div>
           ) :
@@ -443,9 +468,9 @@ export default function PublicCampaignPage() {
               <div className="mx-auto w-11 h-11 rounded-full bg-foreground/5 flex items-center justify-center mb-3">
                 <span className="text-2xl">🎁</span>
               </div>
-              <h2 className="font-semibold">It's a mystery</h2>
+              <h2 className="font-semibold">{t("campaign.mystery_pool")}</h2>
               <p className="text-sm text-muted mt-1 max-w-sm mx-auto">
-                The gifts stay hidden until the end. Keep the surprise alive!
+                {t("campaign.mystery_description")}
               </p>
             </div>
           ) :
@@ -454,7 +479,7 @@ export default function PublicCampaignPage() {
             <div>
               <h2 className="font-semibold mb-2 inline-flex items-center gap-1.5">
                 <Gift size={16} className="text-accent" />
-                Gift wall ({contributions.length})
+                {t("campaign.gift_wall")} ({contributions.length})
               </h2>
               <GiftWall contributions={contributions} showAmounts={true} />
             </div>
@@ -468,9 +493,9 @@ export default function PublicCampaignPage() {
             {birthdayHidden ? (
               <div className="text-center py-1">
                 <p className="text-2xl">🎂</p>
-                <p className="font-semibold mt-1">The surprise is being kept secret</p>
+                <p className="font-semibold mt-1">{t("campaign.surprise_hidden")}</p>
                 <p className="text-sm text-muted mt-1">
-                  Gifts, photos, and messages stay hidden until{" "}
+                  {t("campaign.surprise_description")}{" "}
                   {new Date(campaign.end_date).toLocaleDateString("en-AU", {
                     day: "numeric",
                     month: "long",
@@ -483,11 +508,11 @@ export default function PublicCampaignPage() {
             goalHidden ? (
               <div className="text-center py-1">
                 <p className="text-2xl">🎁</p>
-                <p className="font-semibold mt-1">It&apos;s a mystery</p>
+                <p className="font-semibold mt-1">{t("campaign.mystery_pool")}</p>
                 <p className="text-sm text-muted mt-1">
                   {closed
-                    ? `The goal stayed a surprise${recipient ? ` for ${recipient}` : ""}.`
-                    : `The goal is hidden. Chip in to be part of the surprise${recipient ? ` for ${recipient}` : ""}.`}
+                    ? `${t("campaign.mystery_description")}${recipient ? ` for ${recipient}` : ""}.`
+                    : `${t("campaign.mystery_description")}${recipient ? ` for ${recipient}` : ""}.`}
                 </p>
               </div>
             ) :
@@ -497,9 +522,9 @@ export default function PublicCampaignPage() {
                 <div className="flex items-baseline justify-between">
                   <p className="text-2xl font-bold">{formatAUD(campaign.raised_amount)}</p>
                   {campaign.goal_amount ? (
-                    <p className="text-sm text-muted">of {formatAUD(campaign.goal_amount)}</p>
+                    <p className="text-sm text-muted">{t("manage.of")} {formatAUD(campaign.goal_amount)}</p>
                   ) : (
-                    <p className="text-sm text-muted">no goal</p>
+                    <p className="text-sm text-muted">{t("create.form.no_goal")}</p>
                   )}
                 </div>
                 <Progress
@@ -509,15 +534,14 @@ export default function PublicCampaignPage() {
                 />
                 <div className="mt-3 flex items-center justify-between text-xs text-muted">
                   <span className="inline-flex items-center gap-1">
-                    <Users size={12} /> {contributions.length} contributor
-                    {contributions.length === 1 ? "" : "s"}
+                    <Users size={12} /> {contributions.length} {t("campaign.contributors")}
                   </span>
                   {campaign.status === "active" ? (
                     <span>
-                      {daysLeft} day{daysLeft === 1 ? "" : "s"} left
+                      {daysLeft} day{daysLeft === 1 ? "" : "s"} {t("campaign.days_left")}
                     </span>
                   ) : (
-                    <span>Ended {formatDistanceToNowStrict(end)} ago</span>
+                    <span>{t("campaign.ended_ago", { time: formatDistanceToNowStrict(end) })}</span>
                   )}
                 </div>
                 {tips > 0 && (
@@ -530,13 +554,13 @@ export default function PublicCampaignPage() {
 
             {closed ? (
               <div className="mt-5 p-4 rounded-2xl bg-foreground/5 text-sm text-muted text-center">
-                This campaign has ended. Thanks to everyone who chipped in.
+                {t("campaign.closed")}
               </div>
             ) : (
               <div className="mt-5 space-y-3">
                 <div>
                   <label className="block text-sm font-medium mb-1.5">
-                    {hasItems ? "Contribution Options" : "Contribution Fixed Amount"}
+                    {hasItems ? t("campaign.contribution_options") : t("campaign.fixed_amount")}
                   </label>
                   {hasItems ? (
                     <div className="space-y-2">
@@ -564,7 +588,7 @@ export default function PublicCampaignPage() {
                       ))}
                       {selectedItemIds.size > 0 && (
                         <div className="mt-2 p-3 rounded-2xl bg-accent/5 text-sm font-medium">
-                          Selected:{" "}
+                          {t("campaign.selected")}{" "}
                           {Array.from(selectedItemIds)
                             .map((id) => items.find((i) => i.id === id)?.label)
                             .filter(Boolean)
@@ -677,6 +701,14 @@ export default function PublicCampaignPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                />
+
+                <Input
+                  label="Date of Birth (required)"
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  hint="We need this to process your contribution"
                 />
 
                 <Textarea

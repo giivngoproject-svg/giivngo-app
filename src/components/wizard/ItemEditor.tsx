@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
+import { useTranslation } from "@/lib/useTranslation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatAUD } from "@/lib/money";
@@ -16,6 +17,7 @@ export function ItemEditor({
   items: ContributionItem[];
   onChange: (items: ContributionItem[]) => void;
 }) {
+  const t = useTranslation();
   const addItem = () => {
     if (items.length >= MAX_ITEMS) return;
     const newItem: ContributionItem = {
@@ -43,13 +45,13 @@ export function ItemEditor({
       {items.map((item, idx) => (
         <div key={item.id} className="grid grid-cols-1 md:flex gap-2 items-end">
           <Input
-            label={idx === 0 ? "Item name" : undefined}
-            placeholder="e.g. Gift Fund"
+            label={idx === 0 ? t("wizard.item_name") : undefined}
+            placeholder={t("wizard.item_placeholder")}
             value={item.label}
             onChange={(e) => updateItem(idx, { label: e.target.value })}
           />
           <Input
-            label={idx === 0 ? "Price" : undefined}
+            label={idx === 0 ? t("wizard.price") : undefined}
             type="number"
             min={0}
             step={5}
@@ -77,12 +79,12 @@ export function ItemEditor({
         className="w-full h-11 rounded-2xl border border-dashed border-border text-sm font-medium text-muted hover:text-foreground hover:bg-foreground/5 disabled:opacity-50"
       >
         <Plus size={14} className="inline mr-1" />
-        Add another item
+        {t("wizard.add_item")}
       </button>
 
       {validItems.length > 0 && (
         <div className="pt-2">
-          <p className="text-xs text-muted mb-1.5">Preview</p>
+          <p className="text-xs text-muted mb-1.5">{t("wizard.preview")}</p>
           <div className="flex flex-wrap gap-2">
             {validItems.map((item) => (
               <div

@@ -8,20 +8,25 @@ import { ChevronDown, LogOut, User as UserIcon, LayoutDashboard, RotateCcw, Menu
 import { useAuth } from "@/stores/auth";
 import { useCampaigns } from "@/stores/campaigns";
 import { toast } from "@/stores/toast";
+import { useTranslation } from "@/lib/useTranslation";
 import { Button } from "@/components/ui/Button";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 
 
-const desktopLinks: { href: string, label: string, icon: React.ReactNode }[] = [
-  { href: "/#how-it-works", label: "How it works", icon: <LayoutDashboard size={15} /> },
-  { href: "/#use-cases", label: "Use Cases", icon: <ToolCase size={15} /> },
+type DesktopLink = { href: string, labelKey: string, icon: React.ReactNode };
+
+const desktopLinks: DesktopLink[] = [
+  { href: "/#how-it-works", labelKey: "landing.nav.how_it_works", icon: <LayoutDashboard size={15} /> },
+  { href: "/#use-cases", labelKey: "landing.nav.use_cases", icon: <ToolCase size={15} /> },
   // Hidden for now — re-enable once these pages/sections exist:
-  // { href: "/features", label: "Features", icon: <FolderTree size={15} /> },
-  { href: "/#pricing", label: "Pricing", icon: <CircleDollarSign size={15} /> },
-  { href: "/search/all", label: "Search a Pool", icon: <CircleDollarSign size={15} /> },
-  // { href: "/about", label: "About Us", icon: <Building2 size={15} /> },
+  // { href: "/features", labelKey: "landing.nav.features", icon: <FolderTree size={15} /> },
+  { href: "/#pricing", labelKey: "landing.nav.pricing", icon: <CircleDollarSign size={15} /> },
+  { href: "/search/all", labelKey: "nav.search_pool", icon: <CircleDollarSign size={15} /> },
+  // { href: "/about", labelKey: "landing.nav.about", icon: <Building2 size={15} /> },
 ];
 
 export function TopNav() {
+  const t = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const user = useAuth((s) => s.user);
@@ -62,10 +67,18 @@ export function TopNav() {
         </Link>
         <nav className="desktop-nav hidden sm:flex">
           {desktopLinks.map((link, index) => (
-            <MenuLink key={index} href={link.href} icon={null} onClick={() => setSidebarOpen(!sidebarOpen)}  > <span className={`${isTop ? "text-white" : "text-black"} text-pretty`}>{link.label}</span> </MenuLink>
+            <MenuLink key={index} href={link.href} icon={null} onClick={() => setSidebarOpen(!sidebarOpen)}  > <span className={`${isTop ? "text-white" : "text-black"} text-pretty`}>{t(link.labelKey as any)}</span> </MenuLink>
           ))}
         </nav>
-        <div className="flex items-center ">
+        <div className="flex items-center gap-4">
+          {/* Language Switcher */}
+          <LanguageSwitcher
+            compact
+            showLabel={false}
+            variant="ghost"
+            isTop={isTop}
+            className="hidden sm:flex"
+          />
 
           {user ? (
             <div className="relative">
@@ -84,8 +97,8 @@ export function TopNav() {
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                   <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-2xl shadow-lift overflow-hidden z-20">
-                    <MenuLink href="/dashboard" icon={<LayoutDashboard size={15} />} onClick={() => setMenuOpen(false)} > Dashboard </MenuLink>
-                    <MenuLink href="/profile" icon={<UserIcon size={15} />} onClick={() => setMenuOpen(false)}> Profile </MenuLink>
+                    <MenuLink href="/dashboard" icon={<LayoutDashboard size={15} />} onClick={() => setMenuOpen(false)} > {t("nav.dashboard")} </MenuLink>
+                    <MenuLink href="/profile" icon={<UserIcon size={15} />} onClick={() => setMenuOpen(false)}> {t("nav.profile")} </MenuLink>
                     <button
                       onClick={() => {
                         setMenuOpen(false);
@@ -95,7 +108,7 @@ export function TopNav() {
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-foreground/5 border-t border-border text-foreground/80"
                     >
                       <LogOut size={15} />
-                      Sign out
+                      {t("nav.logout")}
                     </button>
                   </div>
                 </>
@@ -107,10 +120,10 @@ export function TopNav() {
                 href="/sign-in"
                 className="text-sm font-medium  py-1.5 rounded-full hover:bg-foreground/5"
               >
-                <Button size="sm" variant="outline" className="flex flex-row gap-3 items-center"><LogIn size={14} className="inline-block md:hidden" /> <span className="hidden sm:inline">Log in</span></Button>
+                <Button size="sm" variant="outline" className="flex flex-row gap-3 items-center"><LogIn size={14} className="inline-block md:hidden" /> <span className="hidden sm:inline">{t("landing.nav.login")}</span></Button>
               </Link>
               <Link href="/sign-up">
-                <Button size="sm"><UserPen size={14} className="inline-block md:hidden" /> <span className="hidden sm:inline">Get started free</span></Button>
+                <Button size="sm"><UserPen size={14} className="inline-block md:hidden" /> <span className="hidden sm:inline">{t("landing.nav.signup")}</span></Button>
               </Link>
             </div>
 
@@ -123,17 +136,21 @@ export function TopNav() {
               variant="outline"
               size="sm"
               className="hidden items-center bg-white hover:bg-slate-200"
-              title="Open or Close Menu"
+              title={t("nav.menu_toggle")}
             >
               <MenuIcon size={14} />
             </Button>
           )}
         </div>
       </div>
-      <div className={`md:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "min-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
+      <div className={`sm:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "min-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
         {desktopLinks.map((link, index) => (
-          <MenuLink key={index} href={link.href} icon={link.icon} onClick={() => setSidebarOpen(false)}  > <span className="py-3 text-pretty text-slate-900  w-full block font-bold">{link.label}</span> </MenuLink>
+          <MenuLink key={index} href={link.href} icon={link.icon} onClick={() => setSidebarOpen(false)}  > <span className="py-3 text-pretty text-slate-900  w-full block font-bold">{t(link.labelKey as any)}</span> </MenuLink>
         ))}
+        {/* Language Switcher Mobile */}
+        <div className="px-4 py-4 border-t border-border">
+          <LanguageSwitcher compact showLabel variant="outline" />
+        </div>
       </div>
     </header>
   );

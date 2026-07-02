@@ -219,6 +219,328 @@ export const translations = {
     "common.close": "Close",
     "common.back": "Back",
     "common.confirm": "Confirm",
+
+    // Public Campaign Page
+    "campaign.contribute": "Contribute",
+    "campaign.name": "Name",
+    "campaign.name_optional": "Name (optional)",
+    "campaign.email": "Email for receipt",
+    "campaign.email_optional": "Email for receipt (optional)",
+    "campaign.date_of_birth": "Date of Birth",
+    "campaign.date_of_birth_required": "Date of Birth (required)",
+    "campaign.message": "Message",
+    "campaign.message_optional": "Message (optional)",
+    "campaign.days_left": "Days left",
+    "campaign.ended": "Ended",
+    "campaign.goal": "Goal",
+    "campaign.raised": "Raised",
+    "campaign.contributors": "Contributors",
+    "campaign.closed": "This campaign has ended. Thanks to everyone who chipped in.",
+    "campaign.gift_wall": "Gift wall",
+
+    // Landing Page - Hero
+    "landing.tagline": "TURN DREAMS INTO REALITY, TOGETHER",
+    "landing.hero.title": "Social Gifting",
+    "landing.hero.subtitle": "For Life's Happy Moments",
+    "landing.hero.description": "Create a pool, invite your people, and make life's happiest moments happen.",
+    "landing.hero.cta": "Start a pool – it's free",
+    "landing.hero.secondary_cta": "See how it works",
+
+    // Landing Page - Features
+    "landing.features.secure": "Safe & secure",
+    "landing.features.banking": "Bank-level security",
+    "landing.features.loved": "Loved by thousands",
+
+    // Landing Page - Social Proof
+    "landing.social.friends_joined": "friends joined in",
+    "landing.social.contributed": "contributed",
+    "landing.social.count": "happy groups making moments happen together",
+    "landing.social.stories": "See their stories",
+
+    // Landing Page - Showcase
+    "landing.showcase.title": "What people are making",
+    "landing.showcase.subtitle": "possible",
+    "landing.showcase.description": "Real moments. Real people.",
+
+    // Landing Page - CTA Section
+    "landing.cta.title": "Together, we go",
+    "landing.cta.subtitle": "further.",
+    "landing.cta.description": "From birthdays and weddings to dream vacations and big wins, Giivngo helps you turn meaningful moments into lasting memories.",
+    "landing.cta.button": "Start your pool today – it's free",
+
+    // Landing Page - Navigation
+    "landing.nav.how_it_works": "How it works",
+    "landing.nav.use_cases": "Use Cases",
+    "landing.nav.features": "Features",
+    "landing.nav.pricing": "Pricing",
+    "landing.nav.about": "About Us",
+    "landing.nav.login": "Log In",
+    "landing.nav.signup": "Sign Up Free",
+
+    // Landing - Hero Headline
+    "landing.hero.headline.line1": "For Life's",
+    "landing.hero.headline.line2": "Happy",
+    "landing.hero.headline.line3": "Moments",
+
+    // Landing - Featured Cards Section
+    "landing.showcase.cards.1.title": "Weekend away",
+    "landing.showcase.cards.1.stats": "8 friends • $1,850 contributed",
+    "landing.showcase.cards.1.badge": "Trip booked! ✈️",
+
+    "landing.showcase.cards.2.title": "30th birthday surprise",
+    "landing.showcase.cards.2.stats": "18 friends • $1,200 contributed",
+    "landing.showcase.cards.2.badge": "Gift delivered! 🎉",
+
+    "landing.showcase.cards.3.title": "Footy tipping",
+    "landing.showcase.cards.3.stats": "24 mates • $650 prize pool",
+    "landing.showcase.cards.3.badge": "Season underway 🏈",
+
+    "landing.showcase.cards.4.title": "Lotto syndicate",
+    "landing.showcase.cards.4.stats": "14 members • Weekly pool ready",
+    "landing.showcase.cards.4.badge": "Next draw Sat 🎰",
+
+    "landing.showcase.cards.5.title": "Wedding gift",
+    "landing.showcase.cards.5.stats": "20 guests • $3,000 contributed",
+    "landing.showcase.cards.5.badge": "Celebration sorted! 🥂",
+
+    // Landing - Floating Card Demo
+    "landing.example.floating_card.badge": "Trip ready! ✈️",
+    "landing.example.floating_card.friends": "friends joined in",
+    "landing.example.floating_card.amount": "contributed",
+
+    // Landing - Social Proof
+    "landing.social.total_users_count": "24K+",
+
+    // Landing Page - Home2
+    "landing.home2.title": "Turn dreams into reality. Together.",
+    "landing.home2.description": "Social gifting for life's happy moments. Create a pool, share a link, and bring friends, family, or communities together to celebrate, support, and make amazing things happen.",
+    "landing.home2.cta": "Create a Pool – It's Free",
+    "landing.home2.secondary_cta": "See How It Works",
+
+    // Landing Page - Security
+    "landing.security.payments": "Secure Payments",
+    "landing.security.bank": "Bank-Level Security",
+    "landing.security.trusted": "Trusted by Thousands",
+
+    // Landing Page - Examples
+    "landing.example.bali": "Trip to Bali",
+    "landing.example.percentage": "62% of $5,000",
+    "landing.example.paid": "paid",
+    "landing.example.birthday": "Sarah's 30th Birthday",
+    "landing.example.goal_reached": "Goal reached! 🎉",
+    "landing.example.total_raised": "Total raised",
+    "landing.example.contributors": "contributors",
+
+    // Landing Page - Social Proof Section
+    "landing.proof.title": "Join thousands of happy groups making moments happen",
+
+    // Landing Page - Use Cases
+    "landing.use_cases.title": "Perfect for life's happy moments",
+
+    // Landing Page - How Section
+    "landing.how.title": "How Giivngo works",
+    "landing.how.step1": "Create a Pool",
+    "landing.how.step2": "Share the Link",
+    "landing.how.step3": "Collect Money",
+    "landing.how.step4": "Reach Your Goal",
+
+    // Landing Page - Testimonials
+    "landing.testimonials.title": "Why people love Giivngo",
+    "landing.testimonials.trusted": "Trusted by thousands of happy groups",
+    "landing.testimonials.rating": "4.9/5 from 10,000+ reviews",
+
+    // Landing Page - Final CTA
+    "landing.final.dream": "Dream it.",
+    "landing.final.share": "Share it.",
+    "landing.final.achieve": "Achieve it.",
+    "landing.final.together": "Together.",
+    "landing.final.description": "Start your pool today and turn dreams into reality together.",
+    "landing.final.button": "Create Your Pool – It's Free",
+
+    // Landing Page - App Download
+    "landing.app.download": "Download the app",
+    "landing.app.store": "App Store",
+    "landing.app.google_play": "Google Play",
+
+    // Landing Page - Footer
+    "landing.footer.copyright": "© 2024 Giivngo. All rights reserved.",
+    "landing.footer.terms": "Terms of service",
+    "landing.footer.security": "Security & privacy",
+
+    // Navigation - Full
+    "nav.how_it_works": "How it works",
+    "nav.use_cases": "Use Cases",
+    "nav.search_pool": "Search a Pool",
+    "nav.menu_toggle": "Open or Close Menu",
+
+    // Campaign Creation - Steps
+    "create.step_indicator": "Step {step} of 3",
+    "create.recipient_hint": "The recipient — used for tipping and their video highlight reel.",
+    "create.description_hint": "Keep it short and warm — this is the first thing contributors see.",
+    "create.review_title": "Have a final look. You can edit any of this after publishing.",
+
+    // Campaign Creation - Form Hints
+    "create.pool_mode_section": "Pool mode",
+    "create.form.untitled": "Untitled",
+    "create.form.no_description": "No description yet.",
+    "create.form.no_goal": "no goal set",
+    "create.form.type": "Type",
+    "create.form.pool_mode": "Pool mode",
+    "create.form.ends": "Ends",
+    "create.form.tiers": "Tiers",
+    "create.form.min_contribution": "Min contribution",
+    "create.form.max_contribution": "Max contribution",
+    "create.form.items": "Items",
+
+    // Campaign Creation - Messages
+    "create.published": "Campaign published",
+    "create.publish_failed": "Failed to publish",
+    "create.error": "Error",
+    "create.goal_mystery_hint": "Goal stays a mystery — contributors see only the occasion.",
+
+    // Campaign Public Page
+    "campaign.not_found": "Campaign not found",
+    "campaign.not_found_description": "The link may be wrong, or this campaign has been removed.",
+    "campaign.back_home": "Back to home",
+    "campaign.checkout_title": "Complete Payment",
+    "campaign.checkout_subtitle": "Enter your payment details",
+    "campaign.test_card": "💳 Test Card (Stripe test mode):",
+    "campaign.test_card_number": "4242 4242 4242 4242",
+    "campaign.test_card_hint": "Any month/year, any 3-digit CVC",
+    "campaign.pay_button": "Pay A${amount}",
+    "campaign.processing": "Processing...",
+    "campaign.validation_failed": "Validation failed",
+    "campaign.payment_successful": "Payment successful! ✅",
+    "campaign.checkout_failed": "Checkout failed",
+    "campaign.surprise_hidden": "The surprise is being kept secret",
+    "campaign.surprise_description": "Gifts, photos, and messages stay hidden until...",
+    "campaign.blind_pool": "This is a blind pool",
+    "campaign.blind_description": "Contributor names and amounts stay private...",
+    "campaign.mystery_pool": "It's a mystery",
+    "campaign.mystery_description": "The gifts stay hidden until the end. Keep the surprise alive!",
+    "campaign.gift_count": "{count} gift{s}",
+    "campaign.ended_ago": "Ended {time} ago",
+    "campaign.contribution_options": "Contribution Options",
+    "campaign.fixed_amount": "Contribution Fixed Amount",
+    "campaign.selected": "Selected:",
+    "campaign.other_amount": "Other amount",
+    "campaign.add_tip": "Add a tip for {name}",
+    "campaign.tip_optional": "(optional)",
+    "campaign.tip_custom": "Custom tip",
+    "campaign.tip_description": "Goes straight to the recipient, on top of your contribution.",
+    "campaign.name_placeholder": "Or leave blank for anonymous",
+    "campaign.dob_required_hint": "We need this to process your contribution",
+    "campaign.message_placeholder": "A note for the gift wall…",
+    "campaign.private_contribution": "Make my contribution private",
+    "campaign.private_description": "Your name won't appear publicly...",
+    "campaign.anonymous_identity": "🎭 Choose Your Anonymous Identity",
+    "campaign.secure_checkout": "Secure checkout · Stripe (simulated)",
+    "campaign.escrow_description": "Funds are held in Stripe escrow and released to the organiser on the end date.",
+
+    // Authentication
+    "auth.loading": "Loading...",
+    "auth.signin.title": "Welcome back",
+    "auth.signin.subtitle": "Sign in to manage your campaigns",
+    "auth.signin.session_expired": "Your session has expired. Please sign in again.",
+    "auth.signin.password_label": "Password",
+    "auth.signin.signin_button": "Sign in",
+    "auth.signin.signing_button": "Signing in...",
+    "auth.signin.oauth": "Or continue with",
+    "auth.signin.google": "Google",
+    "auth.signin.no_account": "Don't have an account?",
+    "auth.signin.signup_link": "Sign up",
+
+    "auth.signup.title": "Create your account",
+    "auth.signup.subtitle": "Start your first campaign in two minutes",
+    "auth.signup.fullname_label": "Full name",
+    "auth.signup.email_label": "Email",
+    "auth.signup.email_placeholder": "newuser@example.com",
+    "auth.signup.password_label": "Password",
+    "auth.signup.create_button": "Create account",
+    "auth.signup.creating_button": "Creating account...",
+    "auth.signup.oauth": "Or continue with",
+    "auth.signup.google": "Google",
+    "auth.signup.have_account": "Already have an account?",
+    "auth.signup.signin_link": "Sign in",
+
+    // Profile
+    "profile.avatar_change": "Change",
+    "profile.display_name_hint": "Shown on the public campaign pages.",
+    "profile.bank_account": "Bank account for payouts",
+    "profile.stripe_connected": "✓ Connected to Stripe Connect",
+    "profile.stripe_ready": "✓ Ready to receive payments",
+    "profile.stripe_verifying": "⏳ Verification in progress (may take a few minutes)",
+    "profile.stripe_linked": "Your account is linked. Funds will be deposited to the associated bank account.",
+    "profile.stripe_not_linked": "You don't have a Stripe account linked yet. Connect one to receive payouts when your campaigns end.",
+    "profile.stripe_warning": "⚠️ No linking = no receiving funds",
+    "profile.no_campaigns": "No campaigns yet.",
+
+    // Forms & Validation
+    "form.loading_avatars": "Loading avatars...",
+    "form.avatar_error": "Error: {error}",
+    "form.avatar_choice": "Choose an Anonymous Identity",
+    "form.activity_live": "Live",
+    "form.emoji_optional": "Add an emoji (optional)",
+    "form.tip_badge": "· +{amount} tip",
+    "form.video_title": "Video message",
+    "form.video_optional": "Add a video (optional)",
+
+    // Checkout
+    "checkout.successful": "Payment successful",
+    "checkout.simulation": "Stripe checkout · simulated",
+    "checkout.platform_fee": "Platform fee (2.5%)",
+    "checkout.tip": "+ Tip",
+    "checkout.total": "Total to pay",
+    "checkout.contribution": "Contribution:",
+    "checkout.anonymous": "🎭 Stay Anonymous",
+    "checkout.card_number": "Card number",
+    "checkout.expiry": "Expiry",
+    "checkout.cvc": "CVC",
+    "checkout.mock_hint": "(mock — just click Pay)",
+
+    // Badge Status
+    "badge.active": "Active",
+    "badge.ended": "Ended · awaiting payout",
+    "badge.paid": "Paid out",
+
+    // Wizard & Items
+    "wizard.item_name": "Item name",
+    "wizard.item_placeholder": "e.g. Gift Fund",
+    "wizard.price": "Price",
+    "wizard.add_item": "Add another item",
+    "wizard.preview": "Preview",
+    "wizard.photo_hint": "JPG or PNG, up to 5 MB",
+    "wizard.contribution_tiers": "Contribution tiers",
+    "wizard.amount": "Amount",
+
+    // Invite Panel
+    "invite.email_placeholder": "alex@example.com",
+    "invite.phone_placeholder": "+61 400 111 222",
+
+    // Manage Campaign
+    "manage.data_type": "Type",
+    "manage.data_pool_mode": "Pool mode",
+
+    // Common/Miscellaneous
+    "common.more_items": "+{count} more",
+
+    // Landing - How It Works (additional)
+    "landing.how.step1_hint": "Set a goal and add the details",
+    "landing.how.step2_hint": "Invite your people in seconds",
+    "landing.how.step3_hint": "Contributions are safe and simple",
+    "landing.how.step4_hint": "Enjoy the moment together!",
+
+    // Landing - Benefits
+    "landing.benefit.no_asks": "No awkward asks",
+    "landing.benefit.no_asks_desc": "People chip in because they want to.",
+    "landing.benefit.transparent": "Transparent",
+    "landing.benefit.transparent_desc": "Everyone sees progress in real time.",
+    "landing.benefit.safe": "Safe & secure",
+    "landing.benefit.safe_desc": "Your money is protected always.",
+
+    // Additional UI
+    "ui.contributed": "contributed",
+    "ui.more": "+3 more",
   },
 
   es: {
@@ -439,6 +761,299 @@ export const translations = {
     "common.close": "Cerrar",
     "common.back": "Atrás",
     "common.confirm": "Confirmar",
+
+    // Public Campaign Page
+    "campaign.contribute": "Contribuir",
+    "campaign.name": "Nombre",
+    "campaign.name_optional": "Nombre (opcional)",
+    "campaign.email": "Email para recibo",
+    "campaign.email_optional": "Email para recibo (opcional)",
+    "campaign.date_of_birth": "Fecha de Nacimiento",
+    "campaign.date_of_birth_required": "Fecha de Nacimiento (requerido)",
+    "campaign.message": "Mensaje",
+    "campaign.message_optional": "Mensaje (opcional)",
+    "campaign.days_left": "Días restantes",
+    "campaign.ended": "Finalizado",
+    "campaign.goal": "Meta",
+    "campaign.raised": "Recaudado",
+    "campaign.contributors": "Contribuyentes",
+    "campaign.closed": "Esta campaña ha terminado. Gracias a todos los que contribuyeron.",
+    "campaign.gift_wall": "Muro de regalos",
+
+    // Landing Page - Hero
+    "landing.tagline": "TRANSFORMA LOS SUEÑOS EN REALIDAD, JUNTOS",
+    "landing.hero.title": "Social Gifting",
+    "landing.hero.subtitle": "Para los Momentos Felices de la Vida",
+    "landing.hero.description": "Crea un fondo, invita a tu gente y haz que suceda los momentos más felices de la vida.",
+    "landing.hero.cta": "Inicia un fondo – es gratis",
+    "landing.hero.secondary_cta": "Ver cómo funciona",
+
+    "landing.features.secure": "Seguro",
+    "landing.features.banking": "Seguridad a nivel bancario",
+    "landing.features.loved": "Amado por miles",
+
+    "landing.social.friends_joined": "amigos se unieron",
+    "landing.social.contributed": "contribuido",
+    "landing.social.count": "grupos felices haciendo que los momentos sucedan juntos",
+    "landing.social.stories": "Ver sus historias",
+
+    "landing.showcase.title": "Lo que la gente está haciendo",
+    "landing.showcase.subtitle": "posible",
+    "landing.showcase.description": "Momentos reales. Personas reales.",
+
+    "landing.cta.title": "Juntos, vamos",
+    "landing.cta.subtitle": "más lejos.",
+    "landing.cta.description": "Desde cumpleaños y bodas hasta vacaciones de ensueño y grandes victorias, Giivngo te ayuda a convertir momentos significativos en recuerdos duraderos.",
+    "landing.cta.button": "Inicia tu fondo hoy – es gratis",
+
+    "landing.nav.how_it_works": "Cómo funciona",
+    "landing.nav.use_cases": "Casos de Uso",
+    "landing.nav.features": "Características",
+    "landing.nav.pricing": "Precios",
+    "landing.nav.about": "Sobre Nosotros",
+    "landing.nav.login": "Iniciar Sesión",
+    "landing.nav.signup": "Registrarse Gratis",
+
+    // Landing - Hero Headline
+    "landing.hero.headline.line1": "Para la Vida",
+    "landing.hero.headline.line2": "Feliz",
+    "landing.hero.headline.line3": "Momentos",
+
+    // Landing - Featured Cards Section
+    "landing.showcase.cards.1.title": "Fin de semana fuera",
+    "landing.showcase.cards.1.stats": "8 amigos • $1.850 contribuidos",
+    "landing.showcase.cards.1.badge": "¡Viaje reservado! ✈️",
+
+    "landing.showcase.cards.2.title": "Sorpresa de cumpleaños 30",
+    "landing.showcase.cards.2.stats": "18 amigos • $1.200 contribuidos",
+    "landing.showcase.cards.2.badge": "¡Regalo entregado! 🎉",
+
+    "landing.showcase.cards.3.title": "Pronóstico de rugby",
+    "landing.showcase.cards.3.stats": "24 amigos • $650 fondo de premio",
+    "landing.showcase.cards.3.badge": "Temporada en curso 🏈",
+
+    "landing.showcase.cards.4.title": "Sindicato de lotería",
+    "landing.showcase.cards.4.stats": "14 miembros • Fondo semanal listo",
+    "landing.showcase.cards.4.badge": "Próximo sorteo sábado 🎰",
+
+    "landing.showcase.cards.5.title": "Regalo de boda",
+    "landing.showcase.cards.5.stats": "20 invitados • $3.000 contribuidos",
+    "landing.showcase.cards.5.badge": "¡Celebración organizada! 🥂",
+
+    // Landing - Floating Card Demo
+    "landing.example.floating_card.badge": "¡Viaje listo! ✈️",
+    "landing.example.floating_card.friends": "amigos se unieron",
+    "landing.example.floating_card.amount": "contribuido",
+
+    // Landing - Social Proof
+    "landing.social.total_users_count": "24K+",
+
+    "landing.home2.title": "Transforma los sueños en realidad. Juntos.",
+    "landing.home2.description": "Social gifting para los momentos felices de la vida. Crea un fondo, comparte un enlace y reúne amigos, familia o comunidades para celebrar, apoyar y lograr cosas increíbles.",
+    "landing.home2.cta": "Crea un Fondo – Es Gratis",
+    "landing.home2.secondary_cta": "Ver Cómo Funciona",
+
+    "landing.security.payments": "Pagos Seguros",
+    "landing.security.bank": "Seguridad a Nivel Bancario",
+    "landing.security.trusted": "De Confianza para Miles",
+
+    "landing.example.bali": "Viaje a Bali",
+    "landing.example.percentage": "62% de $5,000",
+    "landing.example.paid": "pagó",
+    "landing.example.birthday": "30 Cumpleaños de Sarah",
+    "landing.example.goal_reached": "¡Meta alcanzada! 🎉",
+    "landing.example.total_raised": "Total recaudado",
+    "landing.example.contributors": "contribuyentes",
+
+    "landing.proof.title": "Únete a miles de grupos felices haciendo que los momentos sucedan",
+
+    "landing.use_cases.title": "Perfecto para los momentos felices de la vida",
+
+    "landing.how.title": "Cómo funciona Giivngo",
+    "landing.how.step1": "Crea un Fondo",
+    "landing.how.step2": "Comparte el Enlace",
+    "landing.how.step3": "Recauda Dinero",
+    "landing.how.step4": "Alcanza tu Meta",
+
+    "landing.testimonials.title": "Por qué la gente ama Giivngo",
+    "landing.testimonials.trusted": "De confianza para miles de grupos felices",
+    "landing.testimonials.rating": "4.9/5 de más de 10,000 reseñas",
+
+    "landing.final.dream": "Sueña.",
+    "landing.final.share": "Comparte.",
+    "landing.final.achieve": "Logra.",
+    "landing.final.together": "Juntos.",
+    "landing.final.description": "Inicia tu fondo hoy y transforma los sueños en realidad juntos.",
+    "landing.final.button": "Crea Tu Fondo – Es Gratis",
+
+    "landing.app.download": "Descargar la aplicación",
+    "landing.app.store": "App Store",
+    "landing.app.google_play": "Google Play",
+
+    "landing.footer.copyright": "© 2024 Giivngo. Todos los derechos reservados.",
+    "landing.footer.terms": "Términos de servicio",
+    "landing.footer.security": "Seguridad y privacidad",
+
+    "nav.how_it_works": "Cómo funciona",
+    "nav.use_cases": "Casos de Uso",
+    "nav.search_pool": "Buscar Fondo",
+    "nav.menu_toggle": "Abrir o Cerrar Menú",
+
+    "create.step_indicator": "Paso {step} de 3",
+    "create.recipient_hint": "El beneficiario — usado para propinas y su carrete de video destacado.",
+    "create.description_hint": "Mantenlo corto y cálido — esto es lo primero que ven los contribuyentes.",
+    "create.review_title": "Echa un vistazo final. Puedes editar cualquiera de esto después de publicar.",
+
+    "create.pool_mode_section": "Modo de fondo",
+    "create.form.untitled": "Sin título",
+    "create.form.no_description": "Sin descripción aún.",
+    "create.form.no_goal": "sin meta establecida",
+    "create.form.type": "Tipo",
+    "create.form.pool_mode": "Modo de fondo",
+    "create.form.ends": "Termina",
+    "create.form.tiers": "Niveles",
+    "create.form.min_contribution": "Contribución mínima",
+    "create.form.max_contribution": "Contribución máxima",
+    "create.form.items": "Elementos",
+
+    "create.published": "Campaña publicada",
+    "create.publish_failed": "Falló la publicación",
+    "create.error": "Error",
+    "create.goal_mystery_hint": "La meta es un misterio — los contribuyentes ven solo la ocasión.",
+
+    "campaign.not_found": "Campaña no encontrada",
+    "campaign.not_found_description": "El enlace puede ser incorrecto o esta campaña ha sido eliminada.",
+    "campaign.back_home": "Volver a inicio",
+    "campaign.checkout_title": "Completar Pago",
+    "campaign.checkout_subtitle": "Ingresa tus detalles de pago",
+    "campaign.test_card": "💳 Tarjeta de Prueba (modo de prueba de Stripe):",
+    "campaign.test_card_number": "4242 4242 4242 4242",
+    "campaign.test_card_hint": "Cualquier mes/año, cualquier CVC de 3 dígitos",
+    "campaign.pay_button": "Pagar A${amount}",
+    "campaign.processing": "Procesando...",
+    "campaign.validation_failed": "Validación fallida",
+    "campaign.payment_successful": "¡Pago exitoso! ✅",
+    "campaign.checkout_failed": "Falló el pago",
+    "campaign.surprise_hidden": "La sorpresa se mantiene en secreto",
+    "campaign.surprise_description": "Los regalos, fotos y mensajes se ocultan hasta...",
+    "campaign.blind_pool": "Este es un fondo ciego",
+    "campaign.blind_description": "Los nombres y montos de los contribuyentes permanecen privados...",
+    "campaign.mystery_pool": "Es un misterio",
+    "campaign.mystery_description": "Los regalos se ocultan hasta el final. ¡Mantén la sorpresa viva!",
+    "campaign.gift_count": "{count} regalo{s}",
+    "campaign.ended_ago": "Terminado hace {time}",
+    "campaign.contribution_options": "Opciones de Contribución",
+    "campaign.fixed_amount": "Monto de Contribución Fijo",
+    "campaign.selected": "Seleccionado:",
+    "campaign.other_amount": "Otro monto",
+    "campaign.add_tip": "Agregar propina para {name}",
+    "campaign.tip_optional": "(opcional)",
+    "campaign.tip_custom": "Propina personalizada",
+    "campaign.tip_description": "Va directamente al beneficiario, además de tu contribución.",
+    "campaign.name_placeholder": "O deja en blanco para anónimo",
+    "campaign.dob_required_hint": "Lo necesitamos para procesar tu contribución",
+    "campaign.message_placeholder": "Una nota para el muro de regalos…",
+    "campaign.private_contribution": "Hacer mi contribución privada",
+    "campaign.private_description": "Tu nombre no aparecerá públicamente...",
+    "campaign.anonymous_identity": "🎭 Elige tu Identidad Anónima",
+    "campaign.secure_checkout": "Pago seguro · Stripe (simulado)",
+    "campaign.escrow_description": "Los fondos se mantienen en depósito de Stripe y se liberan al organizador en la fecha de finalización.",
+
+    "auth.loading": "Cargando...",
+    "auth.signin.title": "Bienvenido de vuelta",
+    "auth.signin.subtitle": "Inicia sesión para gestionar tus campañas",
+    "auth.signin.session_expired": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+    "auth.signin.password_label": "Contraseña",
+    "auth.signin.signin_button": "Iniciar sesión",
+    "auth.signin.signing_button": "Iniciando sesión...",
+    "auth.signin.oauth": "O continúa con",
+    "auth.signin.google": "Google",
+    "auth.signin.no_account": "¿No tienes cuenta?",
+    "auth.signin.signup_link": "Registrarse",
+
+    "auth.signup.title": "Crea tu cuenta",
+    "auth.signup.subtitle": "Inicia tu primera campaña en dos minutos",
+    "auth.signup.fullname_label": "Nombre completo",
+    "auth.signup.email_label": "Correo electrónico",
+    "auth.signup.email_placeholder": "newuser@example.com",
+    "auth.signup.password_label": "Contraseña",
+    "auth.signup.create_button": "Crear cuenta",
+    "auth.signup.creating_button": "Creando cuenta...",
+    "auth.signup.oauth": "O continúa con",
+    "auth.signup.google": "Google",
+    "auth.signup.have_account": "¿Ya tienes una cuenta?",
+    "auth.signup.signin_link": "Inicia sesión",
+
+    "profile.avatar_change": "Cambiar",
+    "profile.display_name_hint": "Mostrado en las páginas de campaña pública.",
+    "profile.bank_account": "Cuenta bancaria para pagos",
+    "profile.stripe_connected": "✓ Vinculado a Stripe Connect",
+    "profile.stripe_ready": "✓ Listo para recibir pagos",
+    "profile.stripe_verifying": "⏳ En proceso de verificación (puede tomar unos minutos)",
+    "profile.stripe_linked": "Tu cuenta está vinculada. Los fondos se depositarán en la cuenta bancaria asociada.",
+    "profile.stripe_not_linked": "No tienes una cuenta de Stripe vinculada. Conecta una para recibir pagos cuando tus campañas terminen.",
+    "profile.stripe_warning": "⚠️ Sin vinculación = sin recibir fondos",
+    "profile.no_campaigns": "Sin campañas aún.",
+
+    "form.loading_avatars": "Cargando avatares...",
+    "form.avatar_error": "Error: {error}",
+    "form.avatar_choice": "Elige tu Identidad Anónima",
+    "form.activity_live": "En vivo",
+    "form.emoji_optional": "Agregar emoji (opcional)",
+    "form.tip_badge": "· +{amount} propina",
+    "form.video_title": "Mensaje de video",
+    "form.video_optional": "Agregar video (opcional)",
+
+    "checkout.successful": "Pago exitoso",
+    "checkout.simulation": "Pago de Stripe · simulado",
+    "checkout.platform_fee": "Tarifa de plataforma (2.5%)",
+    "checkout.tip": "+ Propina",
+    "checkout.total": "Total a pagar",
+    "checkout.contribution": "Contribución:",
+    "checkout.anonymous": "🎭 Permanece Anónimo",
+    "checkout.card_number": "Número de tarjeta",
+    "checkout.expiry": "Caducidad",
+    "checkout.cvc": "CVC",
+    "checkout.mock_hint": "(simulado — solo haz clic en Pagar)",
+
+    "badge.active": "Activo",
+    "badge.ended": "Finalizado · esperando pago",
+    "badge.paid": "Pagado",
+
+    "wizard.item_name": "Nombre del elemento",
+    "wizard.item_placeholder": "p. ej. Fondo de Regalos",
+    "wizard.price": "Precio",
+    "wizard.add_item": "Agregar otro elemento",
+    "wizard.preview": "Vista previa",
+    "wizard.photo_hint": "JPG o PNG, hasta 5 MB",
+    "wizard.contribution_tiers": "Niveles de contribución",
+    "wizard.amount": "Monto",
+
+    "invite.email_placeholder": "alex@example.com",
+    "invite.phone_placeholder": "+61 400 111 222",
+
+    "manage.data_type": "Tipo",
+    "manage.data_pool_mode": "Modo de fondo",
+
+    // Landing - How It Works (additional)
+    "landing.how.step1_hint": "Establece una meta y agrega los detalles",
+    "landing.how.step2_hint": "Invita a tu gente en segundos",
+    "landing.how.step3_hint": "Las contribuciones son seguras y simples",
+    "landing.how.step4_hint": "¡Disfruta el momento juntos!",
+
+    // Landing - Benefits
+    "landing.benefit.no_asks": "Sin solicitudes incómodas",
+    "landing.benefit.no_asks_desc": "La gente contribuye porque quiere.",
+    "landing.benefit.transparent": "Transparente",
+    "landing.benefit.transparent_desc": "Todos ven el progreso en tiempo real.",
+    "landing.benefit.safe": "Seguro",
+    "landing.benefit.safe_desc": "Tu dinero está siempre protegido.",
+
+    // Additional UI
+    "ui.contributed": "contribuido",
+    "ui.more": "+3 más",
+
+    "common.more_items": "+{count} más",
   },
 
   "pt-br": {
@@ -659,6 +1274,299 @@ export const translations = {
     "common.close": "Fechar",
     "common.back": "Voltar",
     "common.confirm": "Confirmar",
+
+    // Public Campaign Page
+    "campaign.contribute": "Contribuir",
+    "campaign.name": "Nome",
+    "campaign.name_optional": "Nome (opcional)",
+    "campaign.email": "Email para recibo",
+    "campaign.email_optional": "Email para recibo (opcional)",
+    "campaign.date_of_birth": "Data de Nascimento",
+    "campaign.date_of_birth_required": "Data de Nascimento (requerido)",
+    "campaign.message": "Mensagem",
+    "campaign.message_optional": "Mensagem (opcional)",
+    "campaign.days_left": "Dias restantes",
+    "campaign.ended": "Finalizado",
+    "campaign.goal": "Meta",
+    "campaign.raised": "Recaudado",
+    "campaign.contributors": "Contribuintes",
+    "campaign.closed": "Esta campanha terminou. Obrigado a todos que contribuíram.",
+    "campaign.gift_wall": "Muro de presentes",
+
+    // Landing Page - Hero
+    "landing.tagline": "TRANSFORME SONHOS EM REALIDADE, JUNTOS",
+    "landing.hero.title": "Social Gifting",
+    "landing.hero.subtitle": "Para os Momentos Felizes da Vida",
+    "landing.hero.description": "Crie um fundo, convide seu povo e faça acontecer os momentos mais felizes da vida.",
+    "landing.hero.cta": "Comece um fundo – é grátis",
+    "landing.hero.secondary_cta": "Veja como funciona",
+
+    "landing.features.secure": "Seguro",
+    "landing.features.banking": "Segurança em nível bancário",
+    "landing.features.loved": "Amado por milhares",
+
+    "landing.social.friends_joined": "amigos se juntaram",
+    "landing.social.contributed": "contribuído",
+    "landing.social.count": "grupos felizes fazendo momentos acontecerem juntos",
+    "landing.social.stories": "Veja suas histórias",
+
+    "landing.showcase.title": "O que as pessoas estão fazendo",
+    "landing.showcase.subtitle": "possível",
+    "landing.showcase.description": "Momentos reais. Pessoas reais.",
+
+    "landing.cta.title": "Juntos, vamos",
+    "landing.cta.subtitle": "mais longe.",
+    "landing.cta.description": "De aniversários e casamentos a férias de sonho e grandes vitórias, o Giivngo ajuda você a transformar momentos significativos em memórias duradouras.",
+    "landing.cta.button": "Comece seu fundo hoje – é grátis",
+
+    "landing.nav.how_it_works": "Como funciona",
+    "landing.nav.use_cases": "Casos de Uso",
+    "landing.nav.features": "Características",
+    "landing.nav.pricing": "Preços",
+    "landing.nav.about": "Sobre Nós",
+    "landing.nav.login": "Entrar",
+    "landing.nav.signup": "Registre-se Grátis",
+
+    // Landing - Hero Headline
+    "landing.hero.headline.line1": "Para a Vida",
+    "landing.hero.headline.line2": "Feliz",
+    "landing.hero.headline.line3": "Momentos",
+
+    // Landing - Featured Cards Section
+    "landing.showcase.cards.1.title": "Fim de semana fora",
+    "landing.showcase.cards.1.stats": "8 amigos • $1.850 contribuído",
+    "landing.showcase.cards.1.badge": "Viagem reservada! ✈️",
+
+    "landing.showcase.cards.2.title": "Surpresa de 30º aniversário",
+    "landing.showcase.cards.2.stats": "18 amigos • $1.850 contribuído",
+    "landing.showcase.cards.2.badge": "Presente entregue! 🎉",
+
+    "landing.showcase.cards.3.title": "Palpites de futebol",
+    "landing.showcase.cards.3.stats": "24 amigos • $650 prêmio total",
+    "landing.showcase.cards.3.badge": "Temporada em andamento 🏈",
+
+    "landing.showcase.cards.4.title": "Sindicato de loteria",
+    "landing.showcase.cards.4.stats": "14 membros • Fundo semanal pronto",
+    "landing.showcase.cards.4.badge": "Próximo sorteio sábado 🎰",
+
+    "landing.showcase.cards.5.title": "Presente de casamento",
+    "landing.showcase.cards.5.stats": "20 convidados • $3.000 contribuído",
+    "landing.showcase.cards.5.badge": "Celebração organizada! 🥂",
+
+    // Landing - Floating Card Demo
+    "landing.example.floating_card.badge": "Viagem pronta! ✈️",
+    "landing.example.floating_card.friends": "amigos se juntaram",
+    "landing.example.floating_card.amount": "contribuído",
+
+    // Landing - Social Proof
+    "landing.social.total_users_count": "24K+",
+
+    "landing.home2.title": "Transforme sonhos em realidade. Juntos.",
+    "landing.home2.description": "Social gifting para os momentos felizes da vida. Crie um fundo, compartilhe um link e reúna amigos, família ou comunidades para celebrar, apoiar e fazer coisas incríveis acontecerem.",
+    "landing.home2.cta": "Crie um Fundo – É Grátis",
+    "landing.home2.secondary_cta": "Veja Como Funciona",
+
+    "landing.security.payments": "Pagamentos Seguros",
+    "landing.security.bank": "Segurança em Nível Bancário",
+    "landing.security.trusted": "Confiável para Milhares",
+
+    "landing.example.bali": "Viagem para Bali",
+    "landing.example.percentage": "62% de $5.000",
+    "landing.example.paid": "pagou",
+    "landing.example.birthday": "30º Aniversário da Sarah",
+    "landing.example.goal_reached": "Meta atingida! 🎉",
+    "landing.example.total_raised": "Total arrecadado",
+    "landing.example.contributors": "contribuintes",
+
+    "landing.proof.title": "Junte-se a milhares de grupos felizes fazendo momentos acontecerem",
+
+    "landing.use_cases.title": "Perfeito para os momentos felizes da vida",
+
+    "landing.how.title": "Como funciona o Giivngo",
+    "landing.how.step1": "Crie um Fundo",
+    "landing.how.step2": "Compartilhe o Link",
+    "landing.how.step3": "Arrecade Dinheiro",
+    "landing.how.step4": "Atinja sua Meta",
+
+    "landing.testimonials.title": "Por que as pessoas amam o Giivngo",
+    "landing.testimonials.trusted": "Confiável para milhares de grupos felizes",
+    "landing.testimonials.rating": "4,9/5 de mais de 10.000 avaliações",
+
+    "landing.final.dream": "Sonhe.",
+    "landing.final.share": "Compartilhe.",
+    "landing.final.achieve": "Realize.",
+    "landing.final.together": "Juntos.",
+    "landing.final.description": "Comece seu fundo hoje e transforme sonhos em realidade juntos.",
+    "landing.final.button": "Crie Seu Fundo – É Grátis",
+
+    "landing.app.download": "Baixe o aplicativo",
+    "landing.app.store": "App Store",
+    "landing.app.google_play": "Google Play",
+
+    "landing.footer.copyright": "© 2024 Giivngo. Todos os direitos reservados.",
+    "landing.footer.terms": "Termos de serviço",
+    "landing.footer.security": "Segurança e privacidade",
+
+    "nav.how_it_works": "Como funciona",
+    "nav.use_cases": "Casos de Uso",
+    "nav.search_pool": "Pesquisar Fundo",
+    "nav.menu_toggle": "Abrir ou Fechar Menu",
+
+    "create.step_indicator": "Passo {step} de 3",
+    "create.recipient_hint": "O beneficiário — usado para gorjetas e seu reel de vídeo em destaque.",
+    "create.description_hint": "Mantenha curto e caloroso — isto é o primeiro que os contribuintes veem.",
+    "create.review_title": "Dê uma última olhada. Você pode editar qualquer um desses itens após publicar.",
+
+    "create.pool_mode_section": "Modo de fundo",
+    "create.form.untitled": "Sem título",
+    "create.form.no_description": "Sem descrição ainda.",
+    "create.form.no_goal": "nenhuma meta estabelecida",
+    "create.form.type": "Tipo",
+    "create.form.pool_mode": "Modo de fundo",
+    "create.form.ends": "Termina",
+    "create.form.tiers": "Níveis",
+    "create.form.min_contribution": "Contribuição mínima",
+    "create.form.max_contribution": "Contribuição máxima",
+    "create.form.items": "Itens",
+
+    "create.published": "Campanha publicada",
+    "create.publish_failed": "Falha ao publicar",
+    "create.error": "Erro",
+    "create.goal_mystery_hint": "A meta é um mistério — os contribuintes veem apenas a ocasião.",
+
+    "campaign.not_found": "Campanha não encontrada",
+    "campaign.not_found_description": "O link pode estar incorreto ou esta campanha foi removida.",
+    "campaign.back_home": "Voltar para casa",
+    "campaign.checkout_title": "Concluir Pagamento",
+    "campaign.checkout_subtitle": "Digite seus detalhes de pagamento",
+    "campaign.test_card": "💳 Cartão de Teste (modo de teste do Stripe):",
+    "campaign.test_card_number": "4242 4242 4242 4242",
+    "campaign.test_card_hint": "Qualquer mês/ano, qualquer CVC de 3 dígitos",
+    "campaign.pay_button": "Pagar A${amount}",
+    "campaign.processing": "Processando...",
+    "campaign.validation_failed": "Validação falhou",
+    "campaign.payment_successful": "Pagamento bem-sucedido! ✅",
+    "campaign.checkout_failed": "Falha no pagamento",
+    "campaign.surprise_hidden": "A surpresa está sendo mantida em segredo",
+    "campaign.surprise_description": "Presentes, fotos e mensagens ficam ocultos até...",
+    "campaign.blind_pool": "Este é um fundo anônimo",
+    "campaign.blind_description": "Nomes e valores dos contribuintes permanecem privados...",
+    "campaign.mystery_pool": "É um mistério",
+    "campaign.mystery_description": "Os presentes ficam ocultos até o final. Mantenha a surpresa viva!",
+    "campaign.gift_count": "{count} presente{s}",
+    "campaign.ended_ago": "Encerrado há {time}",
+    "campaign.contribution_options": "Opções de Contribuição",
+    "campaign.fixed_amount": "Valor de Contribuição Fixo",
+    "campaign.selected": "Selecionado:",
+    "campaign.other_amount": "Outro valor",
+    "campaign.add_tip": "Adicionar gorjeta para {name}",
+    "campaign.tip_optional": "(opcional)",
+    "campaign.tip_custom": "Gorjeta personalizada",
+    "campaign.tip_description": "Vai direto para o beneficiário, além de sua contribuição.",
+    "campaign.name_placeholder": "Ou deixe em branco para anônimo",
+    "campaign.dob_required_hint": "Precisamos disso para processar sua contribuição",
+    "campaign.message_placeholder": "Uma nota para o mural de presentes…",
+    "campaign.private_contribution": "Tornar minha contribuição privada",
+    "campaign.private_description": "Seu nome não aparecerá publicamente...",
+    "campaign.anonymous_identity": "🎭 Escolha sua Identidade Anônima",
+    "campaign.secure_checkout": "Checkout seguro · Stripe (simulado)",
+    "campaign.escrow_description": "Os fundos são mantidos em depósito do Stripe e liberados para o organizador na data de término.",
+
+    "auth.loading": "Carregando...",
+    "auth.signin.title": "Bem-vindo de volta",
+    "auth.signin.subtitle": "Entrar para gerenciar suas campanhas",
+    "auth.signin.session_expired": "Sua sessão expirou. Por favor, entre novamente.",
+    "auth.signin.password_label": "Senha",
+    "auth.signin.signin_button": "Entrar",
+    "auth.signin.signing_button": "Entrando...",
+    "auth.signin.oauth": "Ou continue com",
+    "auth.signin.google": "Google",
+    "auth.signin.no_account": "Não tem uma conta?",
+    "auth.signin.signup_link": "Registre-se",
+
+    "auth.signup.title": "Crie sua conta",
+    "auth.signup.subtitle": "Comece sua primeira campanha em dois minutos",
+    "auth.signup.fullname_label": "Nome completo",
+    "auth.signup.email_label": "Email",
+    "auth.signup.email_placeholder": "newuser@example.com",
+    "auth.signup.password_label": "Senha",
+    "auth.signup.create_button": "Criar conta",
+    "auth.signup.creating_button": "Criando conta...",
+    "auth.signup.oauth": "Ou continue com",
+    "auth.signup.google": "Google",
+    "auth.signup.have_account": "Já tem uma conta?",
+    "auth.signup.signin_link": "Entrar",
+
+    "profile.avatar_change": "Mudar",
+    "profile.display_name_hint": "Exibido nas páginas de campanha pública.",
+    "profile.bank_account": "Conta bancária para pagamentos",
+    "profile.stripe_connected": "✓ Conectado ao Stripe Connect",
+    "profile.stripe_ready": "✓ Pronto para receber pagamentos",
+    "profile.stripe_verifying": "⏳ Em processo de verificação (pode levar alguns minutos)",
+    "profile.stripe_linked": "Sua conta está vinculada. Os fundos serão depositados na conta bancária associada.",
+    "profile.stripe_not_linked": "Você ainda não tem uma conta Stripe vinculada. Conecte uma para receber pagamentos quando suas campanhas terminarem.",
+    "profile.stripe_warning": "⚠️ Sem vinculação = sem receber fundos",
+    "profile.no_campaigns": "Nenhuma campanha ainda.",
+
+    "form.loading_avatars": "Carregando avatares...",
+    "form.avatar_error": "Erro: {error}",
+    "form.avatar_choice": "Escolha sua Identidade Anônima",
+    "form.activity_live": "Ao vivo",
+    "form.emoji_optional": "Adicionar emoji (opcional)",
+    "form.tip_badge": "· +{amount} gorjeta",
+    "form.video_title": "Mensagem de vídeo",
+    "form.video_optional": "Adicionar vídeo (opcional)",
+
+    "checkout.successful": "Pagamento bem-sucedido",
+    "checkout.simulation": "Checkout do Stripe · simulado",
+    "checkout.platform_fee": "Taxa de plataforma (2,5%)",
+    "checkout.tip": "+ Gorjeta",
+    "checkout.total": "Total a pagar",
+    "checkout.contribution": "Contribuição:",
+    "checkout.anonymous": "🎭 Mantenha-se Anônimo",
+    "checkout.card_number": "Número do cartão",
+    "checkout.expiry": "Validade",
+    "checkout.cvc": "CVC",
+    "checkout.mock_hint": "(simulado — apenas clique em Pagar)",
+
+    "badge.active": "Ativo",
+    "badge.ended": "Encerrado · aguardando pagamento",
+    "badge.paid": "Pago",
+
+    "wizard.item_name": "Nome do item",
+    "wizard.item_placeholder": "ex: Fundo de Presentes",
+    "wizard.price": "Preço",
+    "wizard.add_item": "Adicionar outro item",
+    "wizard.preview": "Visualização",
+    "wizard.photo_hint": "JPG ou PNG, até 5 MB",
+    "wizard.contribution_tiers": "Níveis de contribuição",
+    "wizard.amount": "Valor",
+
+    "invite.email_placeholder": "alex@example.com",
+    "invite.phone_placeholder": "+61 400 111 222",
+
+    "manage.data_type": "Tipo",
+    "manage.data_pool_mode": "Modo de fundo",
+
+    // Landing - How It Works (additional)
+    "landing.how.step1_hint": "Defina uma meta e adicione os detalhes",
+    "landing.how.step2_hint": "Convide seu povo em segundos",
+    "landing.how.step3_hint": "As contribuições são seguras e simples",
+    "landing.how.step4_hint": "Aproveite o momento juntos!",
+
+    // Landing - Benefits
+    "landing.benefit.no_asks": "Sem pedidos desconfortáveis",
+    "landing.benefit.no_asks_desc": "As pessoas contribuem porque querem.",
+    "landing.benefit.transparent": "Transparente",
+    "landing.benefit.transparent_desc": "Todos veem o progresso em tempo real.",
+    "landing.benefit.safe": "Seguro",
+    "landing.benefit.safe_desc": "Seu dinheiro está sempre protegido.",
+
+    // Additional UI
+    "ui.contributed": "contribuído",
+    "ui.more": "+3 mais",
+
+    "common.more_items": "+{count} mais",
   },
 };
 

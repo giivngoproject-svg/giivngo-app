@@ -52,6 +52,7 @@ export function MockStripeCheckout() {
         contributor_name: detail.request.is_private ? undefined : detail.request.contributor_name?.trim() || undefined,
         contributor_email: detail.request.is_private ? undefined : detail.request.contributor_email?.trim() || undefined,
         amount: detail.request.amount,
+        fee_amount: feeAmount,
         tip_amount: detail.request.tip_amount || undefined,
         message: detail.request.message?.trim() || undefined,
         emoji: detail.request.emoji || undefined,
@@ -81,8 +82,11 @@ export function MockStripeCheckout() {
 
   if (!detail) return null;
   const { request } = detail;
+
+  // Calculate platform fee (2.5% on contribution amount only, not tip)
+  const feeAmount = Math.round(request.amount * 0.025 * 100) / 100;
   const tip = request.tip_amount || 0;
-  const total = request.amount + tip;
+  const total = request.amount + feeAmount + tip;
 
   if (done) {
     return (
@@ -124,27 +128,46 @@ export function MockStripeCheckout() {
                 <span className="font-medium">{formatAUD(item.amount)}</span>
               </div>
             ))}
-            {tip > 0 && (
-              <div className="flex justify-between text-muted">
-                <span>+ Tip</span>
-                <span>{formatAUD(tip)}</span>
+            <div className="border-t border-border pt-1.5 space-y-1.5">
+              {feeAmount > 0 && (
+                <div className="flex justify-between text-muted text-xs">
+                  <span>Platform fee (2.5%)</span>
+                  <span>{formatAUD(feeAmount)}</span>
+                </div>
+              )}
+              {tip > 0 && (
+                <div className="flex justify-between text-muted text-xs">
+                  <span>+ Tip</span>
+                  <span>{formatAUD(tip)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-semibold">
+                <span>Total to pay</span>
+                <span>{formatAUD(total, { withCents: true })}</span>
               </div>
-            )}
-            <div className="border-t border-border pt-1.5 flex justify-between font-semibold">
-              <span>Total</span>
-              <span>{formatAUD(total, { withCents: true })}</span>
             </div>
           </div>
         ) : (
           <>
             <p className="text-2xl font-semibold mt-2">{formatAUD(total, { withCents: true })}</p>
-            {tip > 0 ? (
-              <p className="text-sm text-muted">
-                {formatAUD(request.amount)} contribution + {formatAUD(tip)} tip
-              </p>
-            ) : (
-              <p className="text-sm text-muted">Contribution to campaign</p>
-            )}
+            <div className="text-sm text-muted space-y-1 mt-1">
+              <div className="flex justify-between">
+                <span>Contribution:</span>
+                <span>{formatAUD(request.amount)}</span>
+              </div>
+              {feeAmount > 0 && (
+                <div className="flex justify-between">
+                  <span>Platform fee (2.5%):</span>
+                  <span>{formatAUD(feeAmount)}</span>
+                </div>
+              )}
+              {tip > 0 && (
+                <div className="flex justify-between">
+                  <span>Tip:</span>
+                  <span>{formatAUD(tip)}</span>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>

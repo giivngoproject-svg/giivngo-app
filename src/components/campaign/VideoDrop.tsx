@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Video, Upload, Square, X, Circle } from "lucide-react";
+import { useTranslation } from "@/lib/useTranslation";
 import { uploadVideo } from "@/lib/mock/storage";
 import { toast } from "@/stores/toast";
 
@@ -16,6 +17,7 @@ export function VideoDrop({
   value?: string;
   onChange: (url?: string) => void;
 }) {
+  const t = useTranslation();
   const [recording, setRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -37,7 +39,7 @@ export function VideoDrop({
 
   const handleUpload = async (file: File) => {
     if (file.size > MAX_BYTES) {
-      toast.error("Video too large", "Keep it under 25 MB");
+      toast.error(t("common.error"));
       return;
     }
     setBusy(true);
@@ -50,7 +52,7 @@ export function VideoDrop({
 
   const startRecording = async () => {
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-      toast.error("Recording unavailable", "Upload a video instead");
+      toast.error(t("common.error"));
       return;
     }
     try {
@@ -91,7 +93,7 @@ export function VideoDrop({
       }, 1000);
     } catch {
       setRecording(false);
-      toast.error("Camera blocked", "Allow camera access or upload a video instead");
+      toast.error(t("common.error"));
       stopStream();
     }
   };
@@ -105,7 +107,7 @@ export function VideoDrop({
   if (value) {
     return (
       <div>
-        <label className="block text-sm font-medium mb-1.5">Video message</label>
+        <label className="block text-sm font-medium mb-1.5">{t("form.video_title")}</label>
         <div className="relative rounded-2xl overflow-hidden border border-border">
           <video src={value} controls playsInline className="w-full max-h-56 object-cover bg-black" />
           <button
@@ -123,7 +125,7 @@ export function VideoDrop({
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-1.5">Add a video (optional)</label>
+      <label className="block text-sm font-medium mb-1.5">{t("form.video_optional")}</label>
 
       {recording ? (
         <div className="rounded-2xl border border-border overflow-hidden">
@@ -138,7 +140,7 @@ export function VideoDrop({
               onClick={stopRecording}
               className="inline-flex items-center gap-1.5 text-sm font-medium px-3 h-9 rounded-xl bg-foreground text-background"
             >
-              <Square size={13} /> Stop
+              <Square size={13} /> {t("common.close")}
             </button>
           </div>
         </div>
@@ -150,11 +152,11 @@ export function VideoDrop({
             disabled={busy}
             className="flex items-center justify-center gap-2 h-11 rounded-2xl border border-border text-sm text-muted hover:text-foreground hover:bg-foreground/[.02] disabled:opacity-50"
           >
-            <Video size={15} /> Record
+            <Video size={15} /> {t("common.edit")}
           </button>
           <label className="flex items-center justify-center gap-2 h-11 rounded-2xl border border-dashed border-border text-sm text-muted hover:text-foreground hover:bg-foreground/[.02] cursor-pointer">
             <Upload size={15} />
-            {busy ? "Uploading…" : "Upload"}
+            {busy ? t("common.loading") : t("common.edit")}
             <input
               type="file"
               accept="video/*"

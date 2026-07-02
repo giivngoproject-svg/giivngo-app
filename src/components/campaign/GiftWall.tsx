@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { PlayCircle, Image as ImageIcon, X } from "lucide-react";
+import { useTranslation } from "@/lib/useTranslation";
 import { Avatar } from "@/components/nav/TopNav";
 import { formatAUD } from "@/lib/money";
 import type { Contribution } from "@/lib/types";
@@ -18,12 +19,13 @@ export function GiftWall({
   contributions: Contribution[];
   showAmounts?: boolean;
 }) {
+  const t = useTranslation();
   const [mediaModal, setMediaModal] = useState<{ type: 'image' | 'video'; url: string } | null>(null);
 
   if (contributions.length === 0) {
     return (
       <div className="rounded-3xl border border-dashed border-border bg-surface/40 text-center py-12 text-sm text-muted">
-        No notes on the wall yet — be the first to leave one ✨
+        {t("campaign.gift_wall")} (0)
       </div>
     );
   }
@@ -42,8 +44,8 @@ export function GiftWall({
           const displayName = hasAnonymousAvatar
             ? c.anonymous_avatar!.name
             : isAnonymous
-              ? "Anonymous"
-              : c.contributor_name || "Anonymous";
+              ? t("manage.anonymous")
+              : c.contributor_name || t("manage.anonymous");
 
           // Determine what to show as avatar (left side)
           // Priority: Anonymous Avatar > Emoji > Placeholder > Generated Avatar
@@ -109,7 +111,7 @@ export function GiftWall({
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-xs font-medium transition-colors"
                     >
                       <ImageIcon size={12} />
-                      Photo
+                      {t("form.video_title")}
                     </button>
                   )}
                   {c.video_url && (
@@ -118,7 +120,7 @@ export function GiftWall({
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-xs font-medium transition-colors"
                     >
                       <PlayCircle size={12} />
-                      Video
+                      {t("form.video_title")}
                     </button>
                   )}
                 </div>
@@ -135,10 +137,10 @@ export function GiftWall({
               <p className="text-xs text-muted inline-flex items-center gap-1">
                 {c.created_at ? (
                   <>
-                    {formatDistanceToNowStrict(new Date(c.created_at))} ago
+                    {formatDistanceToNowStrict(new Date(c.created_at))} {t("manage.ago")}
                   </>
                 ) : null}
-                {c.tip_amount ? <span className="text-accent">· +{formatAUD(c.tip_amount)} tip</span> : null}
+                {c.tip_amount ? <span className="text-accent">· +{formatAUD(c.tip_amount)} {t("manage.tip")}</span> : null}
               </p>
             </div>
           );

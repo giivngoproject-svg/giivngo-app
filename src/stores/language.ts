@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { getInitialLanguage } from "@/lib/detectLanguage";
 
 type Language = "en" | "es" | "pt-br";
 
@@ -13,7 +14,7 @@ type LanguageState = {
 export const useLanguage = create<LanguageState>()(
   persist(
     (set) => ({
-      language: "en" as Language,
+      language: getInitialLanguage(),
       setLanguage: (language: Language) => set({ language }),
     }),
     { name: "giivngo.language" }
