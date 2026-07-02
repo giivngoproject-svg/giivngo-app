@@ -18,56 +18,59 @@ import { poppins } from '@/components/landing/fonts';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { Pricing } from '@/components/landing/Pricing';
 import { Testimonials } from '@/components/landing/Testimonials';
+import { useTranslation } from '@/lib/useTranslation';
 
 const FEATURED_CARDS = [
   {
     id: 1,
-    title: 'Weekend away',
+    titleKey: 'landing.showcase.cards.1.title',
     image: '/weekend-away.webp',
     icon: '🏖️',
-    stats: '8 friends • $1,850 contributed',
-    badge: 'Trip booked! ✈️',
+    statsKey: 'landing.showcase.cards.1.stats',
+    badgeKey: 'landing.showcase.cards.1.badge',
     badgeColor: '#00C29A',
   },
   {
     id: 2,
-    title: '30th birthday surprise',
+    titleKey: 'landing.showcase.cards.2.title',
     image: '/birthday-surprise.webp',
     icon: '🎂',
-    stats: '18 friends • $1,200 contributed',
-    badge: 'Gift delivered! 🎉',
+    statsKey: 'landing.showcase.cards.2.stats',
+    badgeKey: 'landing.showcase.cards.2.badge',
     badgeColor: '#FF6B6B',
   },
   {
     id: 3,
-    title: 'Footy tipping',
+    titleKey: 'landing.showcase.cards.3.title',
     image: '/footy-tipping.webp',
     icon: '🏈',
-    stats: '24 mates • $650 prize pool',
-    badge: 'Season underway 🏈',
+    statsKey: 'landing.showcase.cards.3.stats',
+    badgeKey: 'landing.showcase.cards.3.badge',
     badgeColor: '#7C5CFF',
   },
   {
     id: 4,
-    title: 'Lotto syndicate',
+    titleKey: 'landing.showcase.cards.4.title',
     image: '/lotto-syndicate.webp',
     icon: '🎰',
-    stats: '14 members • Weekly pool ready',
-    badge: 'Next draw Sat 🎰',
+    statsKey: 'landing.showcase.cards.4.stats',
+    badgeKey: 'landing.showcase.cards.4.badge',
     badgeColor: '#FFC857',
   },
   {
     id: 5,
-    title: 'Wedding gift',
+    titleKey: 'landing.showcase.cards.5.title',
     image: '/wedding-gift.webp',
     icon: '💍',
-    stats: '20 guests • $3,000 contributed',
-    badge: 'Celebration sorted! 🥂',
+    statsKey: 'landing.showcase.cards.5.stats',
+    badgeKey: 'landing.showcase.cards.5.badge',
     badgeColor: '#00C29A',
   },
 ];
 
 export default function Home1() {
+  const t = useTranslation();
+
   return (
     <div className="bg-white scroll-smooth">
 
@@ -91,16 +94,16 @@ export default function Home1() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#7C5CFF]/40 bg-[#7C5CFF]/20 mb-6">
               <Heart size={14} className="text-[#f01dc2]" />
               <span className="text-xs font-semibold text-white tracking-wider">
-                TURN DREAMS INTO REALITY, TOGETHER
+                {t('landing.tagline')}
               </span>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-5xl md:text-7xl lg:text-[5rem] font-bold text-white mb-6 leading-tight">
-              Social Gifting<br />
-              For Life's{' '}
+              {t('landing.hero.title')}<br />
+              {t('landing.hero.headline.line1')}{' '}
               <span className="relative inline-block text-[#7C5CFF]">
-                Happy
+                {t('landing.hero.headline.line2')}
                 <svg className="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 200 6">
                   <defs>
                     <linearGradient id="underline" x1="0%" y1="0%" x2="100%">
@@ -113,12 +116,12 @@ export default function Home1() {
                 </svg>
               </span>
               <br />
-              Moments
+              {t('landing.hero.headline.line3')}
             </h1>
 
             {/* Sub Headline */}
             <p className="text-xl text-white/90 mb-8 max-w-lg leading-relaxed">
-              Create a pool, invite your people, and make life's happiest moments happen.
+              {t('landing.hero.description')}
             </p>
 
             {/* CTAs */}
@@ -127,7 +130,7 @@ export default function Home1() {
                 href="/sign-up"
                 className="bg-[#7C5CFF] hover:bg-[#6b4ce8] text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors"
               >
-                Start a pool – it's free
+                {t('landing.hero.cta')}
                 <ArrowRight size={18} />
               </Link>
               <Link
@@ -135,7 +138,7 @@ export default function Home1() {
                 className="border-2 border-white/80 hover:border-white text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors bg-white/10 hover:bg-white/20"
               >
                 <Play size={18} />
-                See how it works
+                {t('landing.hero.secondary_cta')}
               </Link>
             </div>
 
@@ -143,15 +146,15 @@ export default function Home1() {
             <div className="flex items-center gap-6 text-xs text-center md:text-sm md:text-left text-white ">
               <span className="flex items-center gap-2">
                 <Lock size={16} />
-                Safe & secure
+                {t('landing.features.secure')}
               </span>
               <span className="flex items-center gap-2">
                 <Shield size={16} />
-                Bank-level security
+                {t('landing.features.banking')}
               </span>
               <span className="flex items-center gap-2">
                 <Users size={16} />
-                Loved by thousands
+                {t('landing.features.loved')}
               </span>
             </div>
           </div>
@@ -159,7 +162,7 @@ export default function Home1() {
           <div className="hidden lg:block">
             <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-xs">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Bali group trip 🌴</h3>
+                <h3 className="text-lg font-bold text-gray-900">🌴 {t('landing.example.bali')}</h3>
               </div>
               <div className="space-y-4">
                 <div className="flex -space-x-3">
@@ -173,14 +176,14 @@ export default function Home1() {
                   ))}
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">12 friends joined in</span>
+                  <span className="text-gray-600">12 {t('landing.example.floating_card.friends')}</span>
                   <TrendingUp size={18} className="text-[#00C29A]" />
                 </div>
                 <div className="bg-gradient-to-r from-[#00C29A] to-teal-400 rounded-full px-4 py-2 text-white font-semibold text-sm">
-                  $2,400 contributed
+                  $2,400 {t('landing.example.floating_card.amount')}
                 </div>
                 <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#00C29A]/10 border border-[#00C29A]/20">
-                  <span className="text-xs font-semibold text-[#00C29A]">Trip ready! ✈️</span>
+                  <span className="text-xs font-semibold text-[#00C29A]">{t('landing.example.floating_card.badge')}</span>
                 </div>
               </div>
             </div>
@@ -204,15 +207,15 @@ export default function Home1() {
                 />
               ))}
               <div className="w-10 h-10 rounded-full bg-[#7C5CFF] text-white flex items-center justify-center text-xs font-bold border-2 border-white">
-                24K+
+                {t('landing.social.total_users_count')}
               </div>
             </div>
             <span className="font-semibold text-gray-900 text-xs md:text-inherit">
-              24,000+ happy groups making moments happen together
+              {t('landing.social.count')}
             </span>
           </div>
           <a href="#" className="text-[#7C5CFF] font-semibold whitespace-nowrap hover:underline flex items-center gap-1">
-            See their stories
+            {t('landing.social.stories')}
             <ChevronRight size={16} />
           </a>
         </div>
@@ -223,10 +226,10 @@ export default function Home1() {
         <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="text-center mb-16">
             <h2 className="font-[family-name:var(--font-poppins)] text-5xl md:text-6xl font-extrabold text-gray-900 mb-4">
-              What people are making{' '}
-              <span className="text-[#7C5CFF]">possible</span>
+              {t('landing.showcase.title')}{' '}
+              <span className="text-[#7C5CFF]">{t('landing.showcase.subtitle')}</span>
             </h2>
-            <p className="text-gray-600 text-lg">Real moments. Real people.</p>
+            <p className="text-gray-600 text-lg">{t('landing.showcase.description')}</p>
           </div>
 
           <div className="overflow-x-auto pb-4">
@@ -239,7 +242,7 @@ export default function Home1() {
                   <div className="relative h-64">
                     <img
                       src={card.image}
-                      alt={card.title}
+                      alt={t(card.titleKey as any)}
                       className="w-full h-full object-cover"
                     />
                     <div
@@ -251,14 +254,14 @@ export default function Home1() {
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-lg text-gray-900 mb-2">
-                      {card.title}
+                      {t(card.titleKey as any)}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4">{card.stats}</p>
+                    <p className="text-sm text-gray-600 mb-4">{t(card.statsKey as any)}</p>
                     <div
                       className="inline-flex px-3 py-1 rounded-full text-xs font-semibold text-white"
                       style={{ backgroundColor: card.badgeColor }}
                     >
-                      {card.badge}
+                      {t(card.badgeKey as any)}
                     </div>
                   </div>
                 </div>
@@ -293,31 +296,30 @@ export default function Home1() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                Together, we go{' '}
+                {t('landing.cta.title')}{' '}
                 <span className="relative">
-                  further.
+                  {t('landing.cta.subtitle')}
                   <span className="text-[#FFC857] ml-2">💛</span>
                 </span>
               </h2>
               <p className="text-xl text-white/80 mb-8">
-                From birthdays and weddings to dream vacations and big wins, Giivngo helps you
-                turn meaningful moments into lasting memories.
+                {t('landing.cta.description')}
               </p>
 
               <Link
                 href="/sign-up"
                 className="bg-[#7C5CFF] hover:bg-[#6b4ce8] text-white px-8 py-4 rounded-full font-semibold inline-flex items-center gap-2 transition-colors mb-8"
               >
-                Start your pool today – it's free
+                {t('landing.cta.button')}
                 <ArrowRight size={18} />
               </Link>
 
               {/* <div className="flex gap-4">
                 <div className="bg-black/30 backdrop-blur px-4 py-2 rounded-lg text-white text-sm font-medium">
-                  App Store
+                  {t('landing.app.store')}
                 </div>
                 <div className="bg-black/30 backdrop-blur px-4 py-2 rounded-lg text-white text-sm font-medium">
-                  Google Play
+                  {t('landing.app.google_play')}
                 </div>
               </div> */}
             </div>

@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslation } from "@/lib/useTranslation";
+
 const heading = "font-[family-name:var(--font-poppins)]";
 
 const TESTIMONIALS = [
@@ -32,10 +36,12 @@ const TESTIMONIALS = [
 ];
 
 export function Testimonials() {
+  const t = useTranslation();
+
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
       <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground`}>
-        Loved by people everywhere
+        {t("landing.testimonials.title")}
       </h2>
       <div className="grid gap-[22px] sm:grid-cols-2 lg:grid-cols-4">
         {TESTIMONIALS.map((t) => (

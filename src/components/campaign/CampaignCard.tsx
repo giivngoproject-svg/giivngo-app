@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Users } from "lucide-react";
+import { useTranslation } from "@/lib/useTranslation";
 import type { Campaign, Contribution } from "@/lib/types";
 import { formatAUD } from "@/lib/money";
 import { poolMode, POOL_MODE_LABELS } from "@/lib/pool";
@@ -18,12 +19,13 @@ export function CampaignCard({
   contributions: Contribution[];
   href: string;
 }) {
+  const t = useTranslation();
   const cs = contributions;
   const ending = new Date(campaign.end_date);
   const isFuture = ending.getTime() > Date.now();
   const timeLabel = isFuture
-    ? `${formatDistanceToNowStrict(ending)} left`
-    : `Ended ${formatDistanceToNowStrict(ending)} ago`;
+    ? `${formatDistanceToNowStrict(ending)} ${t("campaign.days_left")}`
+    : `${t("campaign.ended_ago", { time: formatDistanceToNowStrict(ending) })}`;
 
   return (
     <Link
@@ -59,9 +61,9 @@ export function CampaignCard({
         <div className="mt-3 flex items-baseline justify-between">
           <p className="text-xl font-semibold">{formatAUD(campaign.raised_amount)}</p>
           {campaign.goal_amount ? (
-            <p className="text-sm text-muted">of {formatAUD(campaign.goal_amount)}</p>
+            <p className="text-sm text-muted">{t("manage.of")} {formatAUD(campaign.goal_amount)}</p>
           ) : (
-            <p className="text-sm text-muted">no goal</p>
+            <p className="text-sm text-muted">{t("create.form.no_goal")}</p>
           )}
         </div>
 
@@ -74,7 +76,7 @@ export function CampaignCard({
         <div className="mt-3 flex items-center justify-between text-xs text-muted">
           <span className="inline-flex items-center gap-1">
             <Users size={12} />
-            {cs.length} contributor{cs.length === 1 ? "" : "s"}
+            {cs.length} {t("campaign.contributors")}
           </span>
           <span>{timeLabel}</span>
         </div>

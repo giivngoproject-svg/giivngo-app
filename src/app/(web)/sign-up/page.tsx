@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, User, AlertCircle } from "lucide-react";
 import { useAuth } from "@/stores/auth";
+import { useTranslation } from "@/lib/useTranslation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -20,6 +21,7 @@ function GoogleIcon() {
 }
 
 export default function SignUpPage() {
+  const t = useTranslation();
   const router = useRouter();
   const { signUp, signInWithGoogle, isLoading, error } = useAuth();
 
@@ -50,8 +52,8 @@ export default function SignUpPage() {
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
 
       <div className="w-full relative z-10 text-center mb-8 text-white">
-        <h1 className="text-4xl font-bold tracking-tight">Create your account</h1>
-        <p className="text-blue-200 mt-1.5 font-bold bg-black/50 rounded-lg inline-block px-4 mx-auto">Start your first campaign in two minutes</p>
+        <h1 className="text-4xl font-bold tracking-tight">{t("auth.signup.title")}</h1>
+        <p className="text-blue-200 mt-1.5 font-bold bg-black/50 rounded-lg inline-block px-4 mx-auto">{t("auth.signup.subtitle")}</p>
       </div>
 
 
@@ -69,7 +71,7 @@ export default function SignUpPage() {
 
       <form onSubmit={submit} className="space-y-4" autoComplete="Off">
         <Input
-          label="Full name"
+          label={t("auth.signup.fullname_label")}
           value={name}
           onChange={(e) => setName(e.target.value)}
           prefix={<User size={16} />}
@@ -78,7 +80,7 @@ export default function SignUpPage() {
           disabled={isLoading}
         />
         <Input
-          label="Email"
+          label={t("auth.signup.email_label")}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -86,10 +88,10 @@ export default function SignUpPage() {
           required
           name="email_"
           disabled={isLoading}
-          placeholder="newuser@example.com"
+          placeholder={t("auth.signup.email_placeholder")}
         />
         <Input
-          label="Password"
+          label={t("auth.signup.password_label")}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -99,7 +101,7 @@ export default function SignUpPage() {
           minLength={6}
         />
         <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-          {isLoading ? "Creating account..." : "Create account"}
+          {isLoading ? t("auth.signup.creating_button") : t("auth.signup.create_button")}
         </Button>
       </form>
 
@@ -108,7 +110,7 @@ export default function SignUpPage() {
           <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-background text-muted">Or continue with</span>
+          <span className="px-2 bg-background text-muted">{t("auth.signup.oauth")}</span>
         </div>
       </div>
 
@@ -121,13 +123,13 @@ export default function SignUpPage() {
         disabled={isLoading}
       >
         <GoogleIcon />
-        Google
+        {t("auth.signup.google")}
       </Button>
 
       <p className="text-center text-sm text-muted mt-6">
-        Already have an account?{" "}
+        {t("auth.signup.have_account")}{" "}
         <Link href="/sign-in" className="text-accent font-medium hover:underline">
-          Sign in
+          {t("auth.signup.signin_link")}
         </Link>
       </p>
     </div>

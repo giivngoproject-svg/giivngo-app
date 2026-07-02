@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Camera, X } from "lucide-react";
+import { useTranslation } from "@/lib/useTranslation";
 import { uploadImage } from "@/lib/mock/storage";
 import { toast } from "@/stores/toast";
 
@@ -18,12 +19,13 @@ export function PhotoUpload({
   aspect?: "16/9" | "1/1";
   className?: string;
 }) {
+  const t = useTranslation();
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
   const pick = async (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image too large", "Please use a file under 5 MB");
+      toast.error(t("common.error"));
       return;
     }
     setBusy(true);
@@ -65,9 +67,9 @@ export function PhotoUpload({
           >
             <Camera size={28} />
             <span className="text-sm font-medium">
-              {busy ? "Uploading…" : "Upload a photo"}
+              {busy ? t("common.loading") : t("wizard.preview")}
             </span>
-            <span className="text-xs">JPG or PNG, up to 5 MB</span>
+            <span className="text-xs">{t("wizard.photo_hint")}</span>
           </button>
         )}
         <input

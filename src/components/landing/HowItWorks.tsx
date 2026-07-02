@@ -1,24 +1,16 @@
+"use client";
+
+import { useTranslation } from "@/lib/useTranslation";
 import { Pencil, Link2, Users, CheckCircle2, Eye, Lock } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const heading = "font-[family-name:var(--font-poppins)]";
 
-type Step = {
-  num: number;
-  title: string;
-  cap: string;
-  color: string;
-  Icon: LucideIcon;
-};
-
-// NOTE: step.color is consumed inside an inline style={{}} (runtime value).
-// Your CSS variables store bare RGB triplets, so they must be wrapped in
-// rgb(...) here — rgb(var(--brand-strong)), NOT var(--brand-strong).
-const STEPS: Step[] = [
-  { num: 1, title: "Create your pool", cap: "Set a goal and add the details", color: "rgb(var(--brand-strong))", Icon: Pencil },
-  { num: 2, title: "Share your link", cap: "Invite your people in seconds", color: "rgb(var(--accent-teal))", Icon: Link2 },
-  { num: 3, title: "Everyone chips in", cap: "Contributions are safe and simple", color: "rgb(var(--accent-amber))", Icon: Users },
-  { num: 4, title: "Goal reached", cap: "Enjoy the moment together!", color: "rgb(var(--accent-blue))", Icon: CheckCircle2 },
+const STEPS = [
+  { num: 1, titleKey: "landing.how.step1" as const, capKey: "landing.how.step1_hint" as const, color: "rgb(var(--brand-strong))", Icon: Pencil },
+  { num: 2, titleKey: "landing.how.step2" as const, capKey: "landing.how.step2_hint" as const, color: "rgb(var(--accent-teal))", Icon: Link2 },
+  { num: 3, titleKey: "landing.how.step3" as const, capKey: "landing.how.step3_hint" as const, color: "rgb(var(--accent-amber))", Icon: Users },
+  { num: 4, titleKey: "landing.how.step4" as const, capKey: "landing.how.step4_hint" as const, color: "rgb(var(--accent-blue))", Icon: CheckCircle2 },
 ];
 
 const CONTRIBUTORS = [
@@ -30,19 +22,21 @@ const CONTRIBUTORS = [
 ];
 
 const BENEFITS = [
-  { title: "No awkward asks", cap: "People chip in because they want to.", Icon: Users },
-  { title: "Transparent", cap: "Everyone sees progress in real time.", Icon: Eye },
-  { title: "Safe & secure", cap: "Your money is protected always.", Icon: Lock },
+  { titleKey: "landing.benefit.no_asks" as const, capKey: "landing.benefit.no_asks_desc" as const, Icon: Users },
+  { titleKey: "landing.benefit.transparent" as const, capKey: "landing.benefit.transparent_desc" as const, Icon: Eye },
+  { titleKey: "landing.benefit.safe" as const, capKey: "landing.benefit.safe_desc" as const, Icon: Lock },
 ];
 
 export function HowItWorks() {
+  const t = useTranslation();
+
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-12 sm:px-10 lg:px-16">
       <div className="grid items-stretch gap-10 lg:grid-cols-2">
         {/* left: title + steps */}
         <div className="flex flex-col">
           <h2 className={`${heading} mb-8 text-5xl md:text-6xl font-extrabold text-foreground`}>
-            How It Works
+            {t('landing.how.title')}
           </h2>
           <div className="flex flex-1 items-center">
             <div className="flex w-full justify-between gap-1.5">
@@ -68,10 +62,10 @@ export function HowItWorks() {
                   {step.num}
                 </div>
                 <h4 className={`${heading} mb-1 mt-3.5 text-[14.5px] font-semibold text-foreground`}>
-                  {step.title}
+                  {t(step.titleKey)}
                 </h4>
                 <p className="text-[12.5px] leading-snug text-muted">
-                  {step.cap}
+                  {t(step.capKey)}
                 </p>
               </div>
             ))}
@@ -121,15 +115,15 @@ export function HowItWorks() {
           {/* benefits */}
           <div className="flex flex-1 flex-col gap-[22px]">
             {BENEFITS.map((b) => (
-              <div key={b.title} className="flex items-start gap-3">
+              <div key={b.titleKey} className="flex items-start gap-3">
                 <div className="flex h-[38px] w-[38px] flex-[0_0_38px] items-center justify-center rounded-full bg-white shadow-[0_4px_12px_rgba(15,23,42,0.08)]">
                   <b.Icon size={18} className="text-muted" />
                 </div>
                 <div>
                   <h4 className={`${heading} mb-0.5 text-[15px] font-semibold text-foreground`}>
-                    {b.title}
+                    {t(b.titleKey)}
                   </h4>
-                  <p className="text-[13px] leading-snug text-muted">{b.cap}</p>
+                  <p className="text-[13px] leading-snug text-muted">{t(b.capKey)}</p>
                 </div>
               </div>
             ))}

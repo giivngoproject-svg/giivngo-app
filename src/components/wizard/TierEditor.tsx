@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
+import { useTranslation } from "@/lib/useTranslation";
 import { Input } from "@/components/ui/Input";
 import { formatAUD } from "@/lib/money";
 
@@ -14,8 +15,9 @@ export function TierEditor({
   tiers: number[];
   onChange: (tiers: number[]) => void;
 }) {
+  const t = useTranslation();
   const setAt = (i: number, value: number) =>
-    onChange(tiers.map((t, idx) => (idx === i ? value : t)));
+    onChange(tiers.map((tier, idx) => (idx === i ? value : tier)));
   const removeAt = (i: number) => onChange(tiers.filter((_, idx) => idx !== i));
   const add = () => {
     if (tiers.length >= MAX_TIERS) return;
@@ -25,12 +27,12 @@ export function TierEditor({
 
   return (
     <div className="space-y-2.5">
-      <label className="block text-sm font-medium">Contribution tiers</label>
+      <label className="block text-sm font-medium">{t("wizard.contribution_tiers")}</label>
       <p className="text-xs text-muted -mt-1">
-        Contributors choose one of these — no freeform amount.
+        {t("create.mode.tiers.description")}
       </p>
       <div className="space-y-2">
-        {tiers.map((t, i) => (
+        {tiers.map((tier, i) => (
           <div key={i} className="flex items-center gap-2">
             <div className="flex-1">
               <Input
@@ -38,9 +40,9 @@ export function TierEditor({
                 min={1}
                 step={5}
                 prefix="A$"
-                value={Number.isFinite(t) && t > 0 ? t : ""}
+                value={Number.isFinite(tier) && tier > 0 ? tier : ""}
                 onChange={(e) => setAt(i, e.target.value ? Number(e.target.value) : 0)}
-                placeholder="Amount"
+                placeholder={t("wizard.amount")}
               />
             </div>
             <button
@@ -61,7 +63,7 @@ export function TierEditor({
           onClick={add}
           className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
         >
-          <Plus size={14} /> Add tier
+          <Plus size={14} /> {t("common.edit")}
         </button>
       )}
       <div className="flex flex-wrap gap-1.5 pt-1">
