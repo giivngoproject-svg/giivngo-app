@@ -194,7 +194,7 @@ export default function Home1() {
       </section>
 
       {/* Social Proof Banner */}
-      <section className="relative -mt-12 z-30 mb-24 w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
+      {/* <section className="relative -mt-12 z-30 mb-24 w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="bg-white rounded-3xl shadow-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
             <div className="flex -space-x-3 shrink-0">
@@ -219,7 +219,7 @@ export default function Home1() {
             <ChevronRight size={16} />
           </a>
         </div>
-      </section>
+      </section> */}
 
       {/* What People Are Making Possible */}
       <section id="use-cases" className={`${poppins.variable} scroll-mt-20 py-24 bg-gray-50`}>
