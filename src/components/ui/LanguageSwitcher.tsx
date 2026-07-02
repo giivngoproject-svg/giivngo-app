@@ -1,14 +1,16 @@
 "use client";
 
-import { useLanguage } from "@/stores/language";
+import { useLocale } from "next-intl";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslation } from "@/lib/useTranslation";
+import { routing } from "@/i18n/routing";
 import { Globe } from "lucide-react";
 
-type Language = "en" | "es" | "pt-br";
+type Locale = (typeof routing.locales)[number];
 
-const LANGUAGE_OPTIONS: { value: Language; label: string; flag: string }[] = [
-  { value: "en", label: "English", flag: "🇬🇧" },
-  { value: "es", label: "Español", flag: "🇪🇸" },
+const LANGUAGE_OPTIONS: { value: Locale; label: string; flag: string }[] = [
+  { value: "en-au", label: "English", flag: "🇦🇺" },
+  { value: "es-419", label: "Español", flag: "🌎" },
   { value: "pt-br", label: "Português", flag: "🇧🇷" },
 ];
 
@@ -36,11 +38,15 @@ export function LanguageSwitcher({
   variant = "outline",
   isTop = false,
 }: LanguageSwitcherProps) {
-  const language = useLanguage((s) => s.language);
-  const setLanguage = useLanguage((s) => s.setLanguage);
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslation();
 
-  const currentLang = LANGUAGE_OPTIONS.find((opt) => opt.value === language);
+  // Cambiar idioma = navegar a la misma ruta bajo otro locale (cambia la URL).
+  const changeLocale = (next: Locale) => {
+    router.replace(pathname, { locale: next });
+  };
 
   // Variant styles - adapt colors based on isTop
   const variantStyles = {
@@ -71,8 +77,8 @@ export function LanguageSwitcher({
 
       <div className="relative inline-block">
         <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value as Language)}
+          value={locale}
+          onChange={(e) => changeLocale(e.target.value as Locale)}
           className={`
             appearance-none cursor-pointer
             flex items-center gap-2

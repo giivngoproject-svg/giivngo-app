@@ -30,7 +30,7 @@ export default async function WebLayout({
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="min-h-screen flex flex-col">
         <TopNav />
         <main className="flex-1">{children}</main>
