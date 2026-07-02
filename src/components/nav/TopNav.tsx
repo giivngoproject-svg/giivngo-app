@@ -9,6 +9,7 @@ import { useAuth } from "@/stores/auth";
 import { useCampaigns } from "@/stores/campaigns";
 import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 
 
 const desktopLinks: { href: string, label: string, icon: React.ReactNode }[] = [
@@ -65,7 +66,15 @@ export function TopNav() {
             <MenuLink key={index} href={link.href} icon={null} onClick={() => setSidebarOpen(!sidebarOpen)}  > <span className={`${isTop ? "text-white" : "text-black"} text-pretty`}>{link.label}</span> </MenuLink>
           ))}
         </nav>
-        <div className="flex items-center ">
+        <div className="flex items-center gap-4">
+          {/* Language Switcher */}
+          <LanguageSwitcher
+            compact
+            showLabel={false}
+            variant="ghost"
+            isTop={isTop}
+            className="hidden sm:flex"
+          />
 
           {user ? (
             <div className="relative">
@@ -130,10 +139,14 @@ export function TopNav() {
           )}
         </div>
       </div>
-      <div className={`md:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "min-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
+      <div className={`sm:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "min-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
         {desktopLinks.map((link, index) => (
           <MenuLink key={index} href={link.href} icon={link.icon} onClick={() => setSidebarOpen(false)}  > <span className="py-3 text-pretty text-slate-900  w-full block font-bold">{link.label}</span> </MenuLink>
         ))}
+        {/* Language Switcher Mobile */}
+        <div className="px-4 py-4 border-t border-border">
+          <LanguageSwitcher compact showLabel variant="outline" />
+        </div>
       </div>
     </header>
   );

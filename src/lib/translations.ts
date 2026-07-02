@@ -219,6 +219,24 @@ export const translations = {
     "common.close": "Close",
     "common.back": "Back",
     "common.confirm": "Confirm",
+
+    // Public Campaign Page
+    "campaign.contribute": "Contribute",
+    "campaign.name": "Name",
+    "campaign.name_optional": "Name (optional)",
+    "campaign.email": "Email for receipt",
+    "campaign.email_optional": "Email for receipt (optional)",
+    "campaign.date_of_birth": "Date of Birth",
+    "campaign.date_of_birth_required": "Date of Birth (required)",
+    "campaign.message": "Message",
+    "campaign.message_optional": "Message (optional)",
+    "campaign.days_left": "Days left",
+    "campaign.ended": "Ended",
+    "campaign.goal": "Goal",
+    "campaign.raised": "Raised",
+    "campaign.contributors": "Contributors",
+    "campaign.closed": "This campaign has ended. Thanks to everyone who chipped in.",
+    "campaign.gift_wall": "Gift wall",
   },
 
   es: {
@@ -439,6 +457,24 @@ export const translations = {
     "common.close": "Cerrar",
     "common.back": "Atrás",
     "common.confirm": "Confirmar",
+
+    // Public Campaign Page
+    "campaign.contribute": "Contribuir",
+    "campaign.name": "Nombre",
+    "campaign.name_optional": "Nombre (opcional)",
+    "campaign.email": "Email para recibo",
+    "campaign.email_optional": "Email para recibo (opcional)",
+    "campaign.date_of_birth": "Fecha de Nacimiento",
+    "campaign.date_of_birth_required": "Fecha de Nacimiento (requerido)",
+    "campaign.message": "Mensaje",
+    "campaign.message_optional": "Mensaje (opcional)",
+    "campaign.days_left": "Días restantes",
+    "campaign.ended": "Finalizado",
+    "campaign.goal": "Meta",
+    "campaign.raised": "Recaudado",
+    "campaign.contributors": "Contribuyentes",
+    "campaign.closed": "Esta campaña ha terminado. Gracias a todos los que contribuyeron.",
+    "campaign.gift_wall": "Muro de regalos",
   },
 
   "pt-br": {
@@ -659,6 +695,24 @@ export const translations = {
     "common.close": "Fechar",
     "common.back": "Voltar",
     "common.confirm": "Confirmar",
+
+    // Public Campaign Page
+    "campaign.contribute": "Contribuir",
+    "campaign.name": "Nome",
+    "campaign.name_optional": "Nome (opcional)",
+    "campaign.email": "Email para recibo",
+    "campaign.email_optional": "Email para recibo (opcional)",
+    "campaign.date_of_birth": "Data de Nascimento",
+    "campaign.date_of_birth_required": "Data de Nascimento (requerido)",
+    "campaign.message": "Mensagem",
+    "campaign.message_optional": "Mensagem (opcional)",
+    "campaign.days_left": "Dias restantes",
+    "campaign.ended": "Finalizado",
+    "campaign.goal": "Meta",
+    "campaign.raised": "Recaudado",
+    "campaign.contributors": "Contribuintes",
+    "campaign.closed": "Esta campanha terminou. Obrigado a todos que contribuíram.",
+    "campaign.gift_wall": "Muro de presentes",
   },
 };
 

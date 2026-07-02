@@ -106,7 +106,10 @@ export type Contribution = {
   anonymous_avatar?: AnonymousAvatar;
   contributor_name?: string;
   contributor_email?: string;
+  date_of_birth?: string; // ISO 8601 date (YYYY-MM-DD)
   amount: number;
+  // Platform fee (2.5%) charged at checkout, added to total charged.
+  fee_amount?: number;
   // Optional gratuity for the recipient, charged on top of `amount` but kept out
   // of the pool's raised total / goal progress.
   tip_amount?: number;

@@ -76,6 +76,7 @@ export default function PublicCampaignPage() {
   const [tip, setTip] = useState<number | "">("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [message, setMessage] = useState("");
   const [emoji, setEmoji] = useState<string | undefined>(undefined);
   const [photo, setPhoto] = useState<string | undefined>(undefined);
@@ -206,6 +207,28 @@ export default function PublicCampaignPage() {
       }
     }
 
+    // Validate date of birth (required)
+    if (!dateOfBirth.trim()) {
+      toast.error("Date of birth required", "Please enter your birth date");
+      setSubmitting(false);
+      return;
+    }
+
+    // Validate date format (basic check)
+    const dob = new Date(dateOfBirth);
+    if (isNaN(dob.getTime())) {
+      toast.error("Invalid date format", "Please enter a valid date (YYYY-MM-DD)");
+      setSubmitting(false);
+      return;
+    }
+
+    // Check if date is not in future
+    if (dob > new Date()) {
+      toast.error("Invalid birth date", "Birth date cannot be in the future");
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const response = await contributionsApi.checkout(campaign.slug, {
@@ -213,6 +236,7 @@ export default function PublicCampaignPage() {
         tipAmount: tip ? Number(tip) : undefined,
         contributorName: name.trim() || undefined,
         contributorEmail: email.trim() || undefined,
+        dateOfBirth: dateOfBirth.trim(),
         message: message.trim() || undefined,
         emoji,
         photoUrl: photo,
@@ -338,6 +362,7 @@ export default function PublicCampaignPage() {
           setTip('');
           setName('');
           setEmail('');
+          setDateOfBirth('');
           setMessage('');
           setEmoji(undefined);
           setPhoto(undefined);
@@ -677,6 +702,14 @@ export default function PublicCampaignPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                />
+
+                <Input
+                  label="Date of Birth (required)"
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  hint="We need this to process your contribution"
                 />
 
                 <Textarea
