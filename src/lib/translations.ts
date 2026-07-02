@@ -254,7 +254,7 @@ export const translations = {
     // Landing Page - Social Proof
     "landing.social.friends_joined": "friends joined in",
     "landing.social.contributed": "contributed",
-    "landing.social.count": "24,000+ happy groups making moments happen together",
+    "landing.social.count": "happy groups making moments happen together",
     "landing.social.stories": "See their stories",
 
     // Landing Page - Showcase
@@ -794,7 +794,7 @@ export const translations = {
 
     "landing.social.friends_joined": "amigos se unieron",
     "landing.social.contributed": "contribuido",
-    "landing.social.count": "24,000+ grupos felices haciendo que los momentos sucedan juntos",
+    "landing.social.count": "grupos felices haciendo que los momentos sucedan juntos",
     "landing.social.stories": "Ver sus historias",
 
     "landing.showcase.title": "Lo que la gente está haciendo",
@@ -1307,7 +1307,7 @@ export const translations = {
 
     "landing.social.friends_joined": "amigos se juntaram",
     "landing.social.contributed": "contribuído",
-    "landing.social.count": "24.000+ grupos felizes fazendo momentos acontecerem juntos",
+    "landing.social.count": "grupos felizes fazendo momentos acontecerem juntos",
     "landing.social.stories": "Veja suas histórias",
 
     "landing.showcase.title": "O que as pessoas estão fazendo",

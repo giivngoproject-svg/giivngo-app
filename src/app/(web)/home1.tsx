@@ -194,7 +194,7 @@ export default function Home1() {
       </section>
 
       {/* Social Proof Banner */}
-      {/* <section className="relative -mt-12 z-30 mb-24 w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
+      <section className="relative -mt-12 z-30 mb-24 w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="bg-white rounded-3xl shadow-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
             <div className="flex -space-x-3 shrink-0">
@@ -206,20 +206,20 @@ export default function Home1() {
                   className="w-10 h-10 rounded-full border-2 border-white"
                 />
               ))}
-              <div className="w-10 h-10 rounded-full bg-[#7C5CFF] text-white flex items-center justify-center text-xs font-bold border-2 border-white">
+              {/* <div className="w-10 h-10 rounded-full bg-[#7C5CFF] text-white flex items-center justify-center text-xs font-bold border-2 border-white">
                 {t('landing.social.total_users_count')}
-              </div>
+              </div> */}
             </div>
             <span className="font-semibold text-gray-900 text-xs md:text-inherit">
               {t('landing.social.count')}
             </span>
           </div>
-          <a href="#" className="text-[#7C5CFF] font-semibold whitespace-nowrap hover:underline flex items-center gap-1">
+          {/* <a href="#" className="text-[#7C5CFF] font-semibold whitespace-nowrap hover:underline flex items-center gap-1">
             {t('landing.social.stories')}
             <ChevronRight size={16} />
-          </a>
+          </a> */}
         </div>
-      </section> */}
+      </section>
 
       {/* What People Are Making Possible */}
       <section id="use-cases" className={`${poppins.variable} scroll-mt-20 py-24 bg-gray-50`}>
