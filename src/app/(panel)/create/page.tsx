@@ -160,7 +160,7 @@ function Step1({
   onNext: () => void;
   onCancel: () => void;
 }) {
-  const canNext = data.title.trim().length >= 3 && data.description.trim().length >= 10;
+  const canNext = data.title.trim().length >= 3 && data.description.trim().length >= 100;
 
   return (
     <div className="space-y-5">
