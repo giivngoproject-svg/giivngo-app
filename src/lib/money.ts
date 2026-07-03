@@ -19,7 +19,9 @@ export function calculateCheckoutTotal(montoNeto: number): {
   checkoutTotal: number;
   stripeFee: number;
   fixedFee: number;
+  totalFees: number;
   neto: number;
+  netAmount: number;
 } {
   const FIXED_FEE = 0.60;
   const STRIPE_FACTOR = 0.96;
@@ -32,6 +34,8 @@ export function calculateCheckoutTotal(montoNeto: number): {
     checkoutTotal,
     stripeFee,
     fixedFee: FIXED_FEE,
+    totalFees,
     neto: montoNeto,
+    netAmount: montoNeto,
   };
 }

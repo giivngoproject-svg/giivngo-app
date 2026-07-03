@@ -786,15 +786,22 @@ export default function PublicCampaignPage() {
                   <Heart size={16} />
                   {hasItems
                     ? selectedItemIds.size > 0
-                      ? `Contribute ${formatAUD(
-                        Array.from(selectedItemIds).reduce(
-                          (sum, id) => sum + (items.find((i) => i.id === id)?.amount || 0),
-                          0,
-                        ) + (Number(tip) || 0),
-                      )}`
+                      ? (() => {
+                          const itemsTotal = Array.from(selectedItemIds).reduce(
+                            (sum, id) => sum + (items.find((i) => i.id === id)?.amount || 0),
+                            0,
+                          );
+                          const netAmount = itemsTotal + (Number(tip) || 0);
+                          const checkout = calculateCheckoutTotal(netAmount);
+                          return `Contribute ${formatAUD(checkout.checkoutTotal)}`;
+                        })()
                       : "Select items"
                     : amount
-                      ? `Contribute ${formatAUD(Number(amount) + (Number(tip) || 0))}`
+                      ? (() => {
+                          const netAmount = Number(amount) + (Number(tip) || 0);
+                          const checkout = calculateCheckoutTotal(netAmount);
+                          return `Contribute ${formatAUD(checkout.checkoutTotal)}`;
+                        })()
                       : "Contribute"}
                 </Button>
                 <p className="text-xs text-muted text-center inline-flex items-center justify-center gap-1 w-full">
