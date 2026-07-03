@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { getLocale } from "next-intl/server";
+import { SITE_DESCRIPTION } from "@/i18n/metadata";
 import "./globals.css";
 import { SeedBootstrap } from "@/components/SeedBootstrap";
 import { TokenExpiryMonitor } from "@/components/TokenExpiryMonitor";
@@ -15,8 +16,8 @@ export const metadata: Metadata = {
     //   title: "Sign in"  ->  "Sign in · giivngo"
     template: "%s · giivngo",
   },
-  description:
-    "Social gifting for life's happy moments. Create a pool, invite your people, and make amazing things happen together.",
+  // Fuente única compartida con el JSON-LD (Organization.description).
+  description: SITE_DESCRIPTION,
 };
 
 export default async function RootLayout({

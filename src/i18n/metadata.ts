@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { routing } from "./routing";
 
 // Fuente única de la URL canónica del sitio (sin www).
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://giivngo.com";
+export const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://giivngo.com";
+
+// Constantes de marca (fuente única, reutilizadas por el metadata del root y el JSON-LD).
+export const SITE_NAME = "giivngo";
+export const SITE_DESCRIPTION =
+  "Social gifting for life's happy moments. Create a pool, invite your people, and make amazing things happen together.";
 
 type Locale = (typeof routing.locales)[number];
 
@@ -109,5 +114,34 @@ export function buildSocial(
       card: "summary_large_image",
       images: [imageUrl],
     },
+  };
+}
+
+/**
+ * JSON-LD del sitio (Organization + WebSite) combinado en un @graph.
+ * Es el mismo para todas las páginas públicas (no varía por página ni por locale).
+ */
+export function getSiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: SITE_NAME,
+        url: SITE_URL,
+        description: SITE_DESCRIPTION,
+        // TODO: añadir `logo` (URL absoluta a un PNG/SVG cuadrado en public/) y
+        // `sameAs` (array de URLs de redes sociales) cuando estén disponibles.
+      },
+      {
+        "@type": "WebSite",
+        name: SITE_NAME,
+        url: SITE_URL,
+        // Idiomas del sitio en formato BCP-47 (reutiliza el mapa de hreflang).
+        inLanguage: routing.locales.map((loc) => LOCALE_TO_HREFLANG[loc]),
+        // TODO: añadir `potentialAction` (SearchAction) cuando el formato de query
+        // de /search esté validado; declararlo roto genera errores en Search Console.
+      },
+    ],
   };
 }

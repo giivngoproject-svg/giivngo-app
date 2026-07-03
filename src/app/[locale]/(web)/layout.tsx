@@ -2,6 +2,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { getSiteJsonLd } from "@/i18n/metadata";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { TopNav } from "@/components/nav/TopNav";
 import { Footer } from "@/components/nav/Footer";
 import { Toaster } from "@/components/ui/Toaster";
@@ -30,14 +32,18 @@ export default async function WebLayout({
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <div className="min-h-screen flex flex-col">
-        <TopNav />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <Toaster />
-        <MockStripeCheckout />
-      </div>
-    </NextIntlClientProvider>
+    <>
+      {/* JSON-LD del sitio (Organization + WebSite): igual en todas las páginas públicas. */}
+      <JsonLd data={getSiteJsonLd()} />
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <div className="min-h-screen flex flex-col">
+          <TopNav />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Toaster />
+          <MockStripeCheckout />
+        </div>
+      </NextIntlClientProvider>
+    </>
   );
 }
