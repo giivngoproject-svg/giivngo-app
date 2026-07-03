@@ -8,7 +8,7 @@ import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2 } 
 import { useCampaigns } from "@/stores/campaigns";
 import { useTranslation } from "@/lib/useTranslation";
 import { contributionsApi, storageApi } from "@/lib/api";
-import { formatAUD } from "@/lib/money";
+import { formatAUD, calculateCheckoutTotal } from "@/lib/money";
 import { AnonymousAvatarSelector } from "@/components/anonymous-avatar-selector";
 import {
   isGoalHidden,
@@ -233,9 +233,18 @@ export default function PublicCampaignPage() {
 
     setSubmitting(true);
     try {
+      // Calculate fee breakdown
+      const tipAmount = tip ? Number(tip) : 0;
+      const montoNeto = amt + tipAmount;
+      const feeBreakdown = calculateCheckoutTotal(montoNeto);
+
       const response = await contributionsApi.checkout(campaign.slug, {
         amount: amt,
-        tipAmount: tip ? Number(tip) : undefined,
+        tipAmount: tipAmount || undefined,
+        netAmount: feeBreakdown.neto,
+        totalFees: feeBreakdown.totalFees,
+        stripeFee: feeBreakdown.stripeFee,
+        checkoutTotal: feeBreakdown.checkoutTotal,
         contributorName: name.trim() || undefined,
         contributorEmail: email.trim() || undefined,
         dateOfBirth: dateOfBirth.trim(),
@@ -251,7 +260,7 @@ export default function PublicCampaignPage() {
 
       // Initialize Stripe
       const stripe = (window as any).Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-      const totalAmount = (amt + (tip ? Number(tip) : 0)).toFixed(2);
+      const totalAmount = feeBreakdown.checkoutTotal.toFixed(2);
 
       // Use Payment Element (modern approach)
       const elements = stripe.elements({ clientSecret: response.clientSecret });
@@ -293,6 +302,29 @@ export default function PublicCampaignPage() {
                 ${t("campaign.test_card_number")}
               </p>
               <p style="margin: 8px 0 0; font-size: 13px; color: #666;">${t("campaign.test_card_hint")}</p>
+            </div>
+
+            <!-- Fee Breakdown -->
+            <div style="background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+              <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #333;">Payment breakdown</h3>
+              <div style="space-y: 8px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                  <span style="color: #666;">Contribution + tip:</span>
+                  <span style="font-weight: 500;">A$${feeBreakdown.neto.toFixed(2)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                  <span style="color: #666;">Processing fee:</span>
+                  <span style="font-weight: 500;">A$${feeBreakdown.stripeFee.toFixed(2)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                  <span style="color: #666;">Fixed fee:</span>
+                  <span style="font-weight: 500;">A$${feeBreakdown.fixedFee.toFixed(2)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 8px; font-size: 14px; font-weight: 600;">
+                  <span style="color: #333;">Total to charge:</span>
+                  <span style="color: #0066cc;">A$${feeBreakdown.checkoutTotal.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
 
             <div id="payment-element" style="margin-bottom: 20px;"></div>
