@@ -6,7 +6,15 @@ import { SeedBootstrap } from "@/components/SeedBootstrap";
 import { TokenExpiryMonitor } from "@/components/TokenExpiryMonitor";
 
 export const metadata: Metadata = {
-  title: "giivngo · Group money pooling",
+  // Base para resolver todas las URLs relativas de metadata (canonical, OG, etc.).
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://giivngo.com"),
+  title: {
+    // Título por defecto (home / páginas sin título propio).
+    default: "giivngo · Group money pooling",
+    // Las páginas hijas que definan un title string heredan el sufijo de marca:
+    //   title: "Sign in"  ->  "Sign in · giivngo"
+    template: "%s · giivngo",
+  },
   description:
     "Social gifting for life's happy moments. Create a pool, invite your people, and make amazing things happen together.",
 };
