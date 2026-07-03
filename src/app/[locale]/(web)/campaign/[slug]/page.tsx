@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildAlternates } from "@/i18n/metadata";
+import { buildAlternates, buildSocial } from "@/i18n/metadata";
 import CampaignContent from "./CampaignContent";
 
 export async function generateMetadata({
@@ -8,6 +8,7 @@ export async function generateMetadata({
   params: { locale: string; slug: string };
 }): Promise<Metadata> {
   return {
+    ...buildSocial(locale, `/campaign/${slug}`),
     // canonical/hreflang con el slug real de la campaña.
     alternates: buildAlternates(locale, `/campaign/${slug}`),
   };

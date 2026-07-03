@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import { buildAlternates } from "@/i18n/metadata";
+import { buildAlternates, buildSocial } from "@/i18n/metadata";
 import Home1 from "./home1";
 import Home2 from "./home2";
 
@@ -13,6 +13,7 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   return {
+    ...buildSocial(locale, "/"),
     alternates: buildAlternates(locale, "/"),
   };
 }
