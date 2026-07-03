@@ -258,13 +258,41 @@ export default function PublicCampaignPage() {
         creatorStripeAccountId: (campaign as any).creatorStripeAccountId || undefined,
       });
 
+      // Verify clientSecret is valid
+      if (!response.clientSecret) {
+        toast.error(t("campaign.checkout_failed"), 'No payment secret received');
+        setSubmitting(false);
+        return;
+      }
+
+      // Verify Stripe is loaded
+      const StripeLib = (window as any).Stripe;
+      if (!StripeLib) {
+        toast.error(t("campaign.checkout_failed"), 'Payment system not loaded');
+        setSubmitting(false);
+        return;
+      }
+
       // Initialize Stripe
-      const stripe = (window as any).Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+      const stripe = StripeLib(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+      if (!stripe) {
+        toast.error(t("campaign.checkout_failed"), 'Failed to initialize payment system');
+        setSubmitting(false);
+        return;
+      }
+
       const totalAmount = feeBreakdown.checkoutTotal.toFixed(2);
 
-      // Use Payment Element (modern approach)
-      const elements = stripe.elements({ clientSecret: response.clientSecret });
+      // Create elements with clientSecret
+      console.log('🔵 [Payment] Creating elements with clientSecret:', response.clientSecret.substring(0, 20) + '...');
+      const elements = stripe.elements({
+        clientSecret: response.clientSecret,
+      });
       const paymentElement = elements.create('payment');
+
+      if (!paymentElement) {
+        throw new Error('Failed to create payment element');
+      }
 
       // Create modal HTML
       const modalHTML = `
