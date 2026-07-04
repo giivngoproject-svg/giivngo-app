@@ -4,14 +4,13 @@ import { useLocale } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslation } from "@/lib/useTranslation";
 import { routing } from "@/i18n/routing";
-import { Globe } from "lucide-react";
 
 type Locale = (typeof routing.locales)[number];
 
-const LANGUAGE_OPTIONS: { value: Locale; label: string; flag: string }[] = [
-  { value: "en-au", label: "English", flag: "🇦🇺" },
-  { value: "es-419", label: "Español", flag: "🌎" },
-  { value: "pt-br", label: "Português", flag: "🇧🇷" },
+const LANGUAGE_OPTIONS: { value: Locale; label: string }[] = [
+  { value: "en-au", label: "English" },
+  { value: "es-419", label: "Español" },
+  { value: "pt-br", label: "Português" },
 ];
 
 interface LanguageSwitcherProps {
@@ -64,9 +63,6 @@ export function LanguageSwitcher({
   // Label color
   const labelColor = isTop ? "text-white/80" : "text-slate-600";
 
-  // Icon color
-  const iconColor = isTop ? "text-white/70" : "text-slate-500";
-
   return (
     <div className={`flex items-center ${compact ? "gap-2" : "gap-3"} ${className}`}>
       {showLabel && (
@@ -96,15 +92,10 @@ export function LanguageSwitcher({
         >
           {LANGUAGE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.flag} {option.label}
+              {option.label}
             </option>
           ))}
         </select>
-
-        {/* Globe icon */}
-        <div className={`absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none ${compact ? "ml-2" : "ml-3"}`}>
-          <Globe size={compact ? 16 : 18} className={iconColor} />
-        </div>
       </div>
     </div>
   );

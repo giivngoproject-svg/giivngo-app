@@ -322,6 +322,17 @@ export const translations = {
     "landing.security.bank": "Bank-Level Security",
     "landing.security.trusted": "Trusted by Thousands",
 
+    // Landing Page - Pricing
+    "landing.pricing.title_1": "Very low",
+    "landing.pricing.title_2": "fees",
+    "landing.pricing.fee": "3.8% + A$0.60",
+    "landing.pricing.fee_note":
+      "Fees are paid by contributors at checkout. Campaign creators keep 100% — every dollar reaches the pool.",
+    "landing.pricing.description":
+      "Creating a pool is always free. When friends contribute, a small 3.8% + A$0.60 fee per contribution keeps Giivngo running and your money safe.",
+    "landing.pricing.no_hidden":
+      "No subscriptions. No hidden fees. You see it upfront, every time.",
+
     // Landing Page - Examples
     "landing.example.bali": "Trip to Bali",
     "landing.example.percentage": "62% of $5,000",
@@ -797,7 +808,7 @@ export const translations = {
 
     // Landing Page - Hero
     "landing.tagline": "SUEÑOS HECHOS REALIDAD, JUNTOS",
-    "landing.hero.title": "Regalos en grupo",
+    "landing.hero.title": "Social Gifting",
     "landing.hero.subtitle": "Para los momentos felices de la vida",
     "landing.hero.description": "Crea una colecta, invita a tu gente y hagan realidad los momentos más felices de la vida.",
     "landing.hero.cta": "Crea una colecta – es gratis",
@@ -830,8 +841,8 @@ export const translations = {
     "landing.nav.signup": "Regístrate gratis",
 
     // Landing - Hero Headline
-    "landing.hero.headline.line1": "Para los",
-    "landing.hero.headline.line2": "momentos felices",
+    "landing.hero.headline.line1": "para los",
+    "landing.hero.headline.line2": "momentos más felices",
     "landing.hero.headline.line3": "de la vida",
 
     // Landing - Featured Cards Section
@@ -871,6 +882,17 @@ export const translations = {
     "landing.security.payments": "Pagos seguros",
     "landing.security.bank": "Seguridad de nivel bancario",
     "landing.security.trusted": "Miles de personas confían en nosotros",
+
+    // Landing Page - Pricing
+    "landing.pricing.title_1": "Comisión",
+    "landing.pricing.title_2": "muy baja",
+    "landing.pricing.fee": "3,8% + $0,60",
+    "landing.pricing.fee_note":
+      "Los fees los paga quien contribuye, al momento del pago. Quien crea la campaña recibe el 100% — cada peso llega al fondo.",
+    "landing.pricing.description":
+      "Crear una colecta siempre es gratis. Cuando tus amigos aportan, una pequeña comisión de 3,8% + $0,60 por aporte mantiene Giivngo funcionando y tu dinero seguro.",
+    "landing.pricing.no_hidden":
+      "Sin suscripciones. Sin cargos ocultos. Lo ves claro desde el principio, siempre.",
 
     "landing.example.bali": "Viaje a Bali",
     "landing.example.percentage": "62% de $5.000",
@@ -1325,7 +1347,7 @@ export const translations = {
 
     // Landing Page - Hero
     "landing.tagline": "JUNTOS, OS SONHOS VIRAM REALIDADE",
-    "landing.hero.title": "Presentes em grupo",
+    "landing.hero.title": "Social Gifting",
     "landing.hero.subtitle": "Para os momentos felizes da vida",
     "landing.hero.description": "Crie uma vaquinha, convide sua galera e façam acontecer os momentos mais felizes da vida.",
     "landing.hero.cta": "Crie uma vaquinha – é grátis",
@@ -1358,8 +1380,8 @@ export const translations = {
     "landing.nav.signup": "Cadastre-se grátis",
 
     // Landing - Hero Headline
-    "landing.hero.headline.line1": "Para os",
-    "landing.hero.headline.line2": "momentos felizes",
+    "landing.hero.headline.line1": "para os",
+    "landing.hero.headline.line2": "momentos mais felizes",
     "landing.hero.headline.line3": "da vida",
 
     // Landing - Featured Cards Section
@@ -1399,6 +1421,17 @@ export const translations = {
     "landing.security.payments": "Pagamentos seguros",
     "landing.security.bank": "Segurança de nível bancário",
     "landing.security.trusted": "Milhares de pessoas confiam",
+
+    // Landing Page - Pricing
+    "landing.pricing.title_1": "Taxas",
+    "landing.pricing.title_2": "baixas",
+    "landing.pricing.fee": "3,8% + R$0,60",
+    "landing.pricing.fee_note":
+      "As taxas são pagas por quem contribui, no momento do pagamento. Quem cria a campanha recebe 100% — cada real chega à vaquinha.",
+    "landing.pricing.description":
+      "Criar uma vaquinha é sempre grátis. Quando os amigos contribuem, uma pequena taxa de 3,8% + R$0,60 por contribuição mantém o Giivngo funcionando e o seu dinheiro seguro.",
+    "landing.pricing.no_hidden":
+      "Sem assinaturas. Sem taxas escondidas. Você vê tudo antes, sempre.",
 
     "landing.example.bali": "Viagem para Bali",
     "landing.example.percentage": "62% de $5.000",
