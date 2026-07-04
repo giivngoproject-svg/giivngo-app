@@ -374,8 +374,10 @@ export const translations = {
     "landing.app.google_play": "Google Play",
 
     // Landing Page - Footer
-    "landing.footer.copyright": "© 2024 Giivngo. All rights reserved.",
+    "landing.footer.copyright": "© 2026 Giivngo. All rights reserved.",
     "landing.footer.terms": "Terms of service",
+    "landing.footer.privacy": "Privacy",
+    "landing.footer.cookies": "Cookies",
     "landing.footer.security": "Security & privacy",
 
     // Navigation - Full
@@ -927,8 +929,10 @@ export const translations = {
     "landing.app.store": "App Store",
     "landing.app.google_play": "Google Play",
 
-    "landing.footer.copyright": "© 2024 Giivngo. Todos los derechos reservados.",
+    "landing.footer.copyright": "© 2026 Giivngo. Todos los derechos reservados.",
     "landing.footer.terms": "Términos de servicio",
+    "landing.footer.privacy": "Privacidad",
+    "landing.footer.cookies": "Cookies",
     "landing.footer.security": "Seguridad y privacidad",
 
     "nav.how_it_works": "Cómo funciona",
@@ -1466,8 +1470,10 @@ export const translations = {
     "landing.app.store": "App Store",
     "landing.app.google_play": "Google Play",
 
-    "landing.footer.copyright": "© 2024 Giivngo. Todos os direitos reservados.",
+    "landing.footer.copyright": "© 2026 Giivngo. Todos os direitos reservados.",
     "landing.footer.terms": "Termos de serviço",
+    "landing.footer.privacy": "Privacidade",
+    "landing.footer.cookies": "Cookies",
     "landing.footer.security": "Segurança e privacidade",
 
     "nav.how_it_works": "Como funciona",
