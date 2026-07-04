@@ -385,7 +385,7 @@ export default function PublicCampaignPage() {
 
       submitBtn.addEventListener('click', async () => {
         submitBtn.disabled = true;
-        submitBtn.textContent = '${t("campaign.processing")}';
+        submitBtn.textContent = `${t("campaign.processing")}`;
 
         // Step 1: Submit the Payment Element form for validation
         console.log('🔵 [Payment] Submitting payment element for validation...');
