@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { useAuth } from "@/stores/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { AuthCheck } from "@/components/AuthCheck";
@@ -16,7 +17,6 @@ import {
 } from "@/lib/types";
 import { POOL_MODES } from "@/lib/pool";
 import { cn } from "@/lib/cn";
-import { toast } from "@/stores/toast";
 import { WizardShell } from "@/components/wizard/WizardShell";
 import { PhotoUpload } from "@/components/wizard/PhotoUpload";
 import { TierEditor } from "@/components/wizard/TierEditor";
@@ -48,6 +48,24 @@ function CreatePageInner() {
   const goBack = () => setStep((Math.max(1, step - 1) as 1 | 2 | 3));
 
   const publish = async () => {
+    // Validate Stripe Connect
+    if (!user.stripe_account_id) {
+      const result = await Swal.fire({
+        title: "Stripe Connect Required",
+        text: "You need to link your Stripe account to create campaigns and receive payments.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Go to Profile",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#1E1B4B",
+      });
+
+      if (result.isConfirmed) {
+        router.push("/profile");
+      }
+      return;
+    }
+
     setIsPublishing(true);
     try {
       const tiered = data.pool_mode === "tiers";
@@ -76,11 +94,21 @@ function CreatePageInner() {
       });
 
       if (campaign) {
-        toast.success("Campaign published", `Share /campaign/${campaign.slug}`);
+        await Swal.fire({
+          title: "Campaign published! 🎉",
+          text: `Share /campaign/${campaign.slug}`,
+          icon: "success",
+          confirmButtonColor: "#1E1B4B",
+        });
         reset();
         router.push(`/manage/${campaign.slug}`);
       } else {
-        toast.error("Failed to publish", "Could not create campaign");
+        await Swal.fire({
+          title: "Failed to publish",
+          text: "Could not create campaign",
+          icon: "error",
+          confirmButtonColor: "#1E1B4B",
+        });
         // Delete uploaded image if campaign creation failed
         if (data.cover_photo_url) {
           try {
@@ -91,7 +119,12 @@ function CreatePageInner() {
         }
       }
     } catch (error: any) {
-      toast.error("Error", error.response?.data?.message || "Could not create campaign");
+      await Swal.fire({
+        title: "Error",
+        text: error.response?.data?.message || "Could not create campaign",
+        icon: "error",
+        confirmButtonColor: "#1E1B4B",
+      });
       // Delete uploaded image if campaign creation failed
       if (data.cover_photo_url) {
         try {

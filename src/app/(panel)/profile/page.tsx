@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Swal from "sweetalert2";
 import { formatDistanceToNowStrict } from "date-fns";
 import { CheckCircle2, Building2, Banknote, Clock } from "lucide-react";
 import { useAuth } from "@/stores/auth";
@@ -10,7 +11,6 @@ import { useTranslation } from "@/lib/useTranslation";
 import { AuthCheck } from "@/components/AuthCheck";
 import { storageApi, profileApi } from "@/lib/api";
 import { formatAUD } from "@/lib/money";
-import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/nav/TopNav";
@@ -100,9 +100,18 @@ function ProfilePageInner() {
         avatarUrl: url,
       });
 
-      toast.success("Avatar updated");
+      await Swal.fire({
+        title: "Avatar updated",
+        icon: "success",
+        confirmButtonColor: "#1E1B4B",
+      });
     } catch (error: any) {
-      toast.error("Upload failed", error.response?.data?.message || "Could not upload avatar");
+      await Swal.fire({
+        title: "Upload failed",
+        text: error.response?.data?.message || "Could not upload avatar",
+        icon: "error",
+        confirmButtonColor: "#1E1B4B",
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -117,9 +126,18 @@ function ProfilePageInner() {
         phone: user.phone,
         avatarUrl: user.avatar_url,
       });
-      toast.success("Profile saved");
+      await Swal.fire({
+        title: "Profile saved",
+        icon: "success",
+        confirmButtonColor: "#1E1B4B",
+      });
     } catch (error: any) {
-      toast.error("Save failed", error.response?.data?.message || "Could not save profile");
+      await Swal.fire({
+        title: "Save failed",
+        text: error.response?.data?.message || "Could not save profile",
+        icon: "error",
+        confirmButtonColor: "#1E1B4B",
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -131,7 +149,12 @@ function ProfilePageInner() {
       const { accountLink } = await profileApi.connectStripe();
       window.location.href = accountLink;
     } catch (error: any) {
-      toast.error("Setup failed", error.response?.data?.message || "Could not initiate Stripe Connect");
+      await Swal.fire({
+        title: "Setup failed",
+        text: error.response?.data?.message || "Could not initiate Stripe Connect",
+        icon: "error",
+        confirmButtonColor: "#1E1B4B",
+      });
       setIsConnecting(false);
     }
   };

@@ -3,6 +3,7 @@
 import { Suspense, useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { Loader } from "lucide-react";
 
 const EMPTY_CONTRIBUTIONS: any[] = [];
@@ -31,7 +32,6 @@ import { formatAUD, calcFee } from "@/lib/money";
 import { poolMode, tipTotal, POOL_MODE_LABELS } from "@/lib/pool";
 import { uid } from "@/lib/slug";
 import type { ContributionItem } from "@/lib/types";
-import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Progress } from "@/components/ui/Progress";
@@ -454,9 +454,18 @@ function ManagePageInner() {
           setIsUpdating(true);
           try {
             await updateCampaignAPI(campaign.slug, patch);
-            toast.success(t('manage.campaign_updated'));
+            await Swal.fire({
+              title: t('manage.campaign_updated'),
+              icon: "success",
+              confirmButtonColor: "#1E1B4B",
+            });
           } catch (error: any) {
-            toast.error(t('manage.update_failed'), error.response?.data?.message);
+            await Swal.fire({
+              title: t('manage.update_failed'),
+              text: error.response?.data?.message,
+              icon: "error",
+              confirmButtonColor: "#1E1B4B",
+            });
           } finally {
             setIsUpdating(false);
             setEditOpen(false);
@@ -472,9 +481,18 @@ function ManagePageInner() {
         onSave={async (endDate) => {
           try {
             await updateCampaignAPI(campaign.slug, { endDate: new Date(endDate).toISOString() });
-            toast.success(t('manage.end_date_extended'));
+            await Swal.fire({
+              title: t('manage.end_date_extended'),
+              icon: "success",
+              confirmButtonColor: "#1E1B4B",
+            });
           } catch (error: any) {
-            toast.error(t('manage.update_failed'), error.response?.data?.message);
+            await Swal.fire({
+              title: t('manage.update_failed'),
+              text: error.response?.data?.message,
+              icon: "error",
+              confirmButtonColor: "#1E1B4B",
+            });
           } finally {
             setExtendOpen(false);
           }
@@ -495,9 +513,18 @@ function ManagePageInner() {
               setIsUpdating(true);
               try {
                 await closeCampaignAPI(campaign.slug);
-                toast.success(t('manage.campaign_closed'));
+                await Swal.fire({
+                  title: t('manage.campaign_closed'),
+                  icon: "success",
+                  confirmButtonColor: "#1E1B4B",
+                });
               } catch (error: any) {
-                toast.error(t('manage.close_failed'), error.response?.data?.message);
+                await Swal.fire({
+                  title: t('manage.close_failed'),
+                  text: error.response?.data?.message,
+                  icon: "error",
+                  confirmButtonColor: "#1E1B4B",
+                });
               } finally {
                 setIsUpdating(false);
                 setCloseOpen(false);
@@ -521,8 +548,13 @@ function ManagePageInner() {
           </Button>
           {user.stripe_account_id ? (
             <Button
-              onClick={() => {
-                toast.success(t('manage.payout_initiated'), `${formatAUD(fee.net)} ${t('manage.payout_mock')}`);
+              onClick={async () => {
+                await Swal.fire({
+                  title: t('manage.payout_initiated'),
+                  text: `${formatAUD(fee.net)} ${t('manage.payout_mock')}`,
+                  icon: "success",
+                  confirmButtonColor: "#1E1B4B",
+                });
                 setPayoutOpen(false);
               }}
             >
@@ -552,11 +584,21 @@ function ManagePageInner() {
           try {
             const clone = await reactivateCampaignAPI(campaign.slug, endDate);
             if (clone) {
-              toast.success("Pool reactivated", "Same details, fresh dates and totals.");
+              await Swal.fire({
+                title: "Pool reactivated",
+                text: "Same details, fresh dates and totals.",
+                icon: "success",
+                confirmButtonColor: "#1E1B4B",
+              });
               router.push(`/manage/${clone.slug}`);
             }
           } catch (error: any) {
-            toast.error("Reactivate failed", error.response?.data?.message);
+            await Swal.fire({
+              title: "Reactivate failed",
+              text: error.response?.data?.message,
+              icon: "error",
+              confirmButtonColor: "#1E1B4B",
+            });
           } finally {
             setIsUpdating(false);
             setReactivateOpen(false);

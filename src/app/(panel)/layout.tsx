@@ -43,12 +43,17 @@ function PanelShell({
   const t = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [asideOpen, setAsideOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const SIDEBAR_ITEMS = [
-    { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
-    { href: '/create', label: t('nav.create'), icon: Plus },
-    { href: '/profile', label: t('nav.profile'), icon: CircleUserRound },
-    { href: '/settings', label: t('nav.settings'), icon: Cog },
+    { href: '/dashboard', label: mounted ? t('nav.dashboard') : 'Dashboard', icon: LayoutDashboard },
+    { href: '/create', label: mounted ? t('nav.create') : 'Create Campaign', icon: Plus },
+    { href: '/profile', label: mounted ? t('nav.profile') : 'Profile', icon: CircleUserRound },
+    { href: '/settings', label: mounted ? t('nav.settings') : 'Settings', icon: Cog },
   ];
 
 
@@ -154,7 +159,7 @@ function PanelShell({
             <div>
               {/* <h1 className="text-2xl font-bold text-gray-900">{pathname}</h1> */}
               <p className="text-sm text-gray-500 mt-1">
-                {t('layout.welcome_back', { name: user?.display_name || user?.name?.split(' ')[0] || 'User' })}
+                {mounted ? t('layout.welcome_back', { name: user?.display_name || user?.name?.split(' ')[0] || 'User' }) : `Welcome back, ${user?.display_name || user?.name?.split(' ')[0] || 'User'}! 👋`}
               </p>
             </div>
           </div>

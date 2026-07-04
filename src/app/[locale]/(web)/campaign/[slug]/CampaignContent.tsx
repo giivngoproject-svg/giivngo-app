@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import Swal from "sweetalert2";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2 } from "lucide-react";
 import { useCampaigns } from "@/stores/campaigns";
@@ -19,7 +20,6 @@ import {
   tipTotal,
   POOL_MODE_LABELS,
 } from "@/lib/pool";
-import { toast } from "@/stores/toast";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Progress } from "@/components/ui/Progress";
@@ -64,7 +64,12 @@ export default function PublicCampaignPage() {
 
         // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname);
-        toast.success('Payment received!', 'Your contribution has been recorded.');
+        Swal.fire({
+          title: 'Payment received! 🎉',
+          text: 'Your contribution has been recorded.',
+          icon: "success",
+          confirmButtonColor: "#1E1B4B",
+        });
       }
     }
   }, [slug]);
@@ -167,15 +172,15 @@ export default function PublicCampaignPage() {
 
   const handlePhoto = async (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
-      toast.error(t("common.error"));
+      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
       return;
     }
     try {
       const { url } = await storageApi.uploadImage(file);
       setPhoto(url);
-      toast.success(t("common.success"));
+      await Swal.fire({ title: t("common.success"), icon: "success", confirmButtonColor: "#1E1B4B" });
     } catch (error) {
-      toast.error(t("campaign.checkout_failed"));
+      await Swal.fire({ title: t("campaign.checkout_failed"), icon: "error", confirmButtonColor: "#1E1B4B" });
     }
   };
 
@@ -185,7 +190,7 @@ export default function PublicCampaignPage() {
 
     if (hasItems) {
       if (selectedItemIds.size === 0) {
-        toast.error(t("common.error"));
+        await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
         return;
       }
       const filtered = items.filter((i) => selectedItemIds.has(i.id));
@@ -194,16 +199,16 @@ export default function PublicCampaignPage() {
     } else {
       amt = Number(amount);
       if (!amt || amt <= 0) {
-        toast.error(t("common.error"));
+        await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
         return;
       }
       if (!tiered) {
         if (min && amt < min) {
-          toast.error(`Minimum is ${formatAUD(min)}`);
+          await Swal.fire({ title: `Minimum is ${formatAUD(min)}`, icon: "error", confirmButtonColor: "#1E1B4B" });
           return;
         }
         if (max && amt > max) {
-          toast.error(`Maximum is ${formatAUD(max)}`);
+          await Swal.fire({ title: `Maximum is ${formatAUD(max)}`, icon: "error", confirmButtonColor: "#1E1B4B" });
           return;
         }
       }
@@ -211,7 +216,7 @@ export default function PublicCampaignPage() {
 
     // Validate date of birth (required)
     if (!dateOfBirth.trim()) {
-      toast.error(t("common.error"));
+      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
       setSubmitting(false);
       return;
     }
@@ -219,14 +224,14 @@ export default function PublicCampaignPage() {
     // Validate date format (basic check)
     const dob = new Date(dateOfBirth);
     if (isNaN(dob.getTime())) {
-      toast.error(t("campaign.validation_failed"));
+      await Swal.fire({ title: t("campaign.validation_failed"), icon: "error", confirmButtonColor: "#1E1B4B" });
       setSubmitting(false);
       return;
     }
 
     // Check if date is not in future
     if (dob > new Date()) {
-      toast.error(t("common.error"));
+      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
       setSubmitting(false);
       return;
     }
@@ -260,7 +265,7 @@ export default function PublicCampaignPage() {
 
       // Verify clientSecret is valid
       if (!response.clientSecret) {
-        toast.error(t("campaign.checkout_failed"), 'No payment secret received');
+        await Swal.fire({ title: t("campaign.checkout_failed"), text: 'No payment secret received', icon: "error", confirmButtonColor: "#1E1B4B" });
         setSubmitting(false);
         return;
       }
@@ -268,7 +273,7 @@ export default function PublicCampaignPage() {
       // Verify Stripe is loaded
       const StripeLib = (window as any).Stripe;
       if (!StripeLib) {
-        toast.error(t("campaign.checkout_failed"), 'Payment system not loaded');
+        await Swal.fire({ title: t("campaign.checkout_failed"), text: 'Payment system not loaded', icon: "error", confirmButtonColor: "#1E1B4B" });
         setSubmitting(false);
         return;
       }
@@ -276,7 +281,7 @@ export default function PublicCampaignPage() {
       // Initialize Stripe
       const stripe = StripeLib(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
       if (!stripe) {
-        toast.error(t("campaign.checkout_failed"), 'Failed to initialize payment system');
+        await Swal.fire({ title: t("campaign.checkout_failed"), text: 'Failed to initialize payment system', icon: "error", confirmButtonColor: "#1E1B4B" });
         setSubmitting(false);
         return;
       }
@@ -390,7 +395,7 @@ export default function PublicCampaignPage() {
         if (submitError && submitError.error) {
           const errorMsg = submitError.error.message || JSON.stringify(submitError.error);
           console.error('❌ [Payment] Validation error:', submitError.error);
-          toast.error(t("campaign.validation_failed"), errorMsg);
+          await Swal.fire({ title: t("campaign.validation_failed"), text: errorMsg, icon: "error", confirmButtonColor: "#1E1B4B" });
           submitBtn.disabled = false;
           submitBtn.textContent = `${t("campaign.pay_button", { amount: totalAmount })}`;
           return;
@@ -410,14 +415,14 @@ export default function PublicCampaignPage() {
 
         if (error) {
           console.error('❌ [Payment] Payment error:', error);
-          toast.error(t("campaign.checkout_failed"), error.message);
+          await Swal.fire({ title: t("campaign.checkout_failed"), text: error.message, icon: "error", confirmButtonColor: "#1E1B4B" });
           submitBtn.disabled = false;
           submitBtn.textContent = `${t("campaign.pay_button", { amount: totalAmount })}`;
         } else if (paymentIntent?.status === 'succeeded') {
           console.log('✅ [Payment] Payment succeeded:', paymentIntent.id);
           modal.remove();
           paymentElement.destroy();
-          toast.success(t("campaign.payment_successful"));
+          await Swal.fire({ title: t("campaign.payment_successful"), icon: "success", confirmButtonColor: "#1E1B4B" });
 
           // Reset form
           setAmount('');
@@ -440,10 +445,12 @@ export default function PublicCampaignPage() {
       });
     } catch (error: any) {
       console.error("Checkout error:", error);
-      toast.error(
-        t("campaign.checkout_failed"),
-        error.message || error.response?.data?.message || t("common.error")
-      );
+      await Swal.fire({
+        title: t("campaign.checkout_failed"),
+        text: error.message || error.response?.data?.message || t("common.error"),
+        icon: "error",
+        confirmButtonColor: "#1E1B4B",
+      });
       setSubmitting(false);
     }
   };
