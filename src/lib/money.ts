@@ -24,7 +24,7 @@ export function calculateCheckoutTotal(montoNeto: number): {
   netAmount: number;
 } {
   const FIXED_FEE = 0.60;
-  const STRIPE_FACTOR = 0.96;
+  const STRIPE_FACTOR = 0.962; // 3.8% Stripe fee
 
   const checkoutTotal = Math.round(((montoNeto + FIXED_FEE) / STRIPE_FACTOR) * 100) / 100;
   const totalFees = Math.round((checkoutTotal - montoNeto) * 100) / 100;
