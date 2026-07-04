@@ -50,21 +50,21 @@ export const SEED_CAMPAIGNS: Campaign[] = [
     created_at: iso(-18),
   },
   {
-    id: "camp_footy",
+    id: "camp_shower",
     user_id: DEMO_USER.id,
-    title: "Office footy tipping syndicate 2026",
+    title: "Emma's baby shower fund",
     description:
-      "Same crew, new season. $50 buy-in, winner takes 70%, second 20%, third 10%. Tips locked Thursday 7pm AEST each round.",
-    type: "footy_tipping",
+      "A little one is on the way! We're pooling for the pram, the nursery and a pamper day for Emma before the big arrival. Suggested chip-in is $50.",
+    type: "baby_shower",
     goal_amount: 1500,
     raised_amount: 1350,
-    cover_photo_url:
-      "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1200&q=70",
+    cover_photo_url: "/baby-shower.webp",
     end_date: iso(4),
     status: "active",
-    slug: "footy-tipping-2026",
+    slug: "emmas-baby-shower",
     pool_mode: "tiers",
     tiers: [50],
+    recipient_name: "Emma",
     organiser_name: "Alex Morgan",
     created_at: iso(-22),
   },
@@ -124,14 +124,14 @@ export const SEED_CONTRIBUTIONS: Contribution[] = [
   { id: "c7", campaign_id: "camp_sarah", contributor_name: "Sam K.", amount: 100, message: "Margaritas in the villa!", emoji: "🍹", photo_url: portrait(15), status: "succeeded", created_at: iso(-3) },
   { id: "c8", campaign_id: "camp_sarah", contributor_name: "Beck", amount: 1100, tip_amount: 50, message: "From the whole Sydney crew x", emoji: "❤️", status: "succeeded", created_at: iso(-1) },
 
-  // Footy tipping
-  { id: "c9", campaign_id: "camp_footy", contributor_name: "Dec", amount: 50, status: "succeeded", created_at: iso(-19) },
-  { id: "c10", campaign_id: "camp_footy", contributor_name: "Pri", amount: 50, status: "succeeded", created_at: iso(-19) },
-  { id: "c11", campaign_id: "camp_footy", contributor_name: "Marco", amount: 50, status: "succeeded", created_at: iso(-18) },
-  { id: "c12", campaign_id: "camp_footy", contributor_name: "Anya", amount: 50, status: "succeeded", created_at: iso(-18) },
-  { id: "c13", campaign_id: "camp_footy", contributor_name: "Jules", amount: 50, status: "succeeded", created_at: iso(-17) },
-  { id: "c14", campaign_id: "camp_footy", contributor_name: "Sam", amount: 50, status: "succeeded", created_at: iso(-15) },
-  { id: "c15", campaign_id: "camp_footy", contributor_name: "Kim", amount: 50, status: "succeeded", created_at: iso(-14) },
+  // Emma's baby shower
+  { id: "c9", campaign_id: "camp_shower", contributor_name: "Dec", amount: 50, status: "succeeded", created_at: iso(-19) },
+  { id: "c10", campaign_id: "camp_shower", contributor_name: "Pri", amount: 50, status: "succeeded", created_at: iso(-19) },
+  { id: "c11", campaign_id: "camp_shower", contributor_name: "Marco", amount: 50, status: "succeeded", created_at: iso(-18) },
+  { id: "c12", campaign_id: "camp_shower", contributor_name: "Anya", amount: 50, status: "succeeded", created_at: iso(-18) },
+  { id: "c13", campaign_id: "camp_shower", contributor_name: "Jules", amount: 50, status: "succeeded", created_at: iso(-17) },
+  { id: "c14", campaign_id: "camp_shower", contributor_name: "Sam", amount: 50, status: "succeeded", created_at: iso(-15) },
+  { id: "c15", campaign_id: "camp_shower", contributor_name: "Kim", amount: 50, status: "succeeded", created_at: iso(-14) },
 
   // Mike's farewell
   { id: "c16", campaign_id: "camp_mike", contributor_name: "Sarah", amount: 100, message: "We'll miss you mate.", photo_url: portrait(20), status: "succeeded", created_at: iso(-16) },
