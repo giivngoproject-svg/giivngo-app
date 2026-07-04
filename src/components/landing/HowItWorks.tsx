@@ -83,10 +83,10 @@ export function HowItWorks() {
               </div>
               <div className="px-4 pb-[18px] pt-3.5">
                 <h5 className={`${heading} text-[15px] font-bold text-foreground`}>
-                  Weekend away 🏖️
+                  {t("landing.how.phone_title")}
                 </h5>
                 <div className="my-1.5 mb-3 inline-flex items-center rounded-full bg-accentTeal/10 px-2.5 py-1 text-[11px] font-semibold text-accentTeal">
-                  Trip ready! 🎉
+                  {t("landing.how.phone_badge")}
                 </div>
                 {CONTRIBUTORS.map((c) => (
                   <div
@@ -100,14 +100,14 @@ export function HowItWorks() {
                         className="h-6 w-6 rounded-full object-cover"
                       />
                       <span className="text-xs text-foreground">
-                        <b className="font-semibold">{c.name}</b>{" "}
-                        <span className="text-[10.5px] text-gray-400">contributed</span>
+                        <b className="font-semibold">{c.name === "You" ? t("ui.you") : c.name}</b>{" "}
+                        <span className="text-[10.5px] text-gray-400">{t("ui.contributed")}</span>
                       </span>
                     </div>
                     <span className="text-xs font-bold text-foreground">{c.amount}</span>
                   </div>
                 ))}
-                <p className="mt-2.5 text-[11px] text-gray-400">+3 more</p>
+                <p className="mt-2.5 text-[11px] text-gray-400">{t("ui.more")}</p>
               </div>
             </div>
           </div>

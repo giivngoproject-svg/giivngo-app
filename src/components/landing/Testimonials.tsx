@@ -9,29 +9,25 @@ const TESTIMONIALS = [
     name: "Jess",
     city: "Sydney",
     img: 5,
-    quote:
-      "Giivngo made our Bali trip so easy. Everyone chipped in, we hit our goal fast and had the best time!",
+    quoteKey: "landing.testimonials.1.quote" as const,
   },
   {
     name: "Liam",
     city: "Melbourne",
     img: 12,
-    quote:
-      "I set up a pool for my birthday and woke up to the sweetest surprise. Best gift ever.",
+    quoteKey: "landing.testimonials.2.quote" as const,
   },
   {
     name: "Mark",
     city: "Brisbane",
     img: 33,
-    quote:
-      "Our footy tipping group has never been better. Giivngo keeps it simple and stress-free.",
+    quoteKey: "landing.testimonials.3.quote" as const,
   },
   {
     name: "Priya",
     city: "Perth",
     img: 45,
-    quote:
-      "Love our weekly lotto syndicate. So easy to manage and everyone stays in the loop.",
+    quoteKey: "landing.testimonials.4.quote" as const,
   },
 ];
 
@@ -44,23 +40,23 @@ export function Testimonials() {
         {t("landing.testimonials.title")}
       </h2>
       <div className="grid gap-[22px] sm:grid-cols-2 lg:grid-cols-4">
-        {TESTIMONIALS.map((t) => (
+        {TESTIMONIALS.map((item) => (
           <div
-            key={t.name}
+            key={item.name}
             className="rounded-[18px] border border-border bg-white p-[22px]"
           >
             <div className="flex items-start gap-3">
               <img
-                src={`https://i.pravatar.cc/100?img=${t.img}`}
-                alt={t.name}
+                src={`https://i.pravatar.cc/100?img=${item.img}`}
+                alt={item.name}
                 className="h-[42px] w-[42px] flex-[0_0_42px] rounded-full object-cover"
               />
               <p className="text-[13.5px] leading-relaxed text-gray-700">
-                &ldquo;{t.quote}&rdquo;
+                &ldquo;{t(item.quoteKey)}&rdquo;
               </p>
             </div>
             <p className="mt-4 text-[13px] text-muted">
-              <b className="font-bold text-foreground">{t.name}</b>, {t.city}
+              <b className="font-bold text-foreground">{item.name}</b>, {item.city}
             </p>
           </div>
         ))}
