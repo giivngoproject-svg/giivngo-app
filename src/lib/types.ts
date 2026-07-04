@@ -1,7 +1,7 @@
 export type CampaignType =
   | "birthday"
-  | "footy_tipping"
-  | "office_lotto"
+  | "baby_shower"
+  | "xmas_party"
   | "farewell"
   | "event_entry"
   | "custom";
@@ -148,8 +148,8 @@ export type Payout = {
 
 export const CAMPAIGN_TYPE_LABELS: Record<CampaignType, string> = {
   birthday: "Birthday fund",
-  footy_tipping: "Footy tipping syndicate",
-  office_lotto: "Office lotto syndicate",
+  baby_shower: "Baby shower fund",
+  xmas_party: "Xmas work party",
   farewell: "Farewell collection",
   event_entry: "Group event entry",
   custom: "Custom",

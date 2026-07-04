@@ -15,7 +15,7 @@ export const translations = {
     "dashboard.subtitle": "Hi {name} 👋",
     "dashboard.empty.title": "No campaigns yet",
     "dashboard.empty.description":
-      "Start your first one and share the link with your group. Birthday trip, footy tipping, farewell — anything goes.",
+      "Start your first one and share the link with your group. Birthday trip, baby shower, farewell — anything goes.",
     "dashboard.create_first": "Create your first campaign",
     "dashboard.created": "Created",
     "dashboard.raised": "Raised",
@@ -291,13 +291,13 @@ export const translations = {
     "landing.showcase.cards.2.stats": "18 friends • $1,200 contributed",
     "landing.showcase.cards.2.badge": "Gift delivered! 🎉",
 
-    "landing.showcase.cards.3.title": "Footy tipping",
-    "landing.showcase.cards.3.stats": "24 mates • $650 prize pool",
-    "landing.showcase.cards.3.badge": "Season underway 🏈",
+    "landing.showcase.cards.3.title": "Baby shower",
+    "landing.showcase.cards.3.stats": "16 friends • $940 contributed",
+    "landing.showcase.cards.3.badge": "Nursery sorted! 🍼",
 
-    "landing.showcase.cards.4.title": "Lotto syndicate",
-    "landing.showcase.cards.4.stats": "14 members • Weekly pool ready",
-    "landing.showcase.cards.4.badge": "Next draw Sat 🎰",
+    "landing.showcase.cards.4.title": "Xmas work party",
+    "landing.showcase.cards.4.stats": "22 colleagues • $1,100 contributed",
+    "landing.showcase.cards.4.badge": "Party booked! 🎄",
 
     "landing.showcase.cards.5.title": "Wedding gift",
     "landing.showcase.cards.5.stats": "20 guests • $3,000 contributed",
@@ -559,9 +559,9 @@ export const translations = {
     "landing.testimonials.2.quote":
       "I set up a pool for my birthday and woke up to the sweetest surprise. Best gift ever.",
     "landing.testimonials.3.quote":
-      "Our footy tipping group has never been better. Giivngo keeps it simple and stress-free.",
+      "Our baby shower fund came together in days. Giivngo keeps it simple and stress-free.",
     "landing.testimonials.4.quote":
-      "Love our weekly lotto syndicate. So easy to manage and everyone stays in the loop.",
+      "Organised our Xmas work party pool in minutes. So easy to manage and everyone stays in the loop.",
 
     // Additional UI
     "ui.contributed": "contributed",
@@ -583,7 +583,7 @@ export const translations = {
     "dashboard.subtitle": "Hola {name} 👋",
     "dashboard.empty.title": "Sin campañas aún",
     "dashboard.empty.description":
-      "Crea la primera y comparte el enlace con tu grupo. Fondo para cumpleaños, sorteo de fútbol, despedida — lo que sea.",
+      "Crea la primera y comparte el enlace con tu grupo. Fondo para cumpleaños, baby shower, despedida — lo que sea.",
     "dashboard.create_first": "Crear tu primera campaña",
     "dashboard.created": "Creado",
     "dashboard.raised": "Recaudado",
@@ -854,13 +854,13 @@ export const translations = {
     "landing.showcase.cards.2.stats": "18 amigos • $1.200 aportados",
     "landing.showcase.cards.2.badge": "¡Regalo entregado! 🎉",
 
-    "landing.showcase.cards.3.title": "Quiniela de fútbol",
-    "landing.showcase.cards.3.stats": "24 amigos • $650 de pozo",
-    "landing.showcase.cards.3.badge": "Temporada en marcha 🏈",
+    "landing.showcase.cards.3.title": "Baby shower",
+    "landing.showcase.cards.3.stats": "16 amigos • $940 aportados",
+    "landing.showcase.cards.3.badge": "¡Todo listo para el bebé! 🍼",
 
-    "landing.showcase.cards.4.title": "Lotería en grupo",
-    "landing.showcase.cards.4.stats": "14 miembros • Pozo semanal listo",
-    "landing.showcase.cards.4.badge": "Próximo sorteo: sábado 🎰",
+    "landing.showcase.cards.4.title": "Fiesta de Navidad de la oficina",
+    "landing.showcase.cards.4.stats": "22 compañeros • $1.100 aportados",
+    "landing.showcase.cards.4.badge": "¡Fiesta reservada! 🎄",
 
     "landing.showcase.cards.5.title": "Regalo de boda",
     "landing.showcase.cards.5.stats": "20 invitados • $3.000 aportados",
@@ -1096,9 +1096,9 @@ export const translations = {
     "landing.testimonials.2.quote":
       "Armé una colecta para mi cumpleaños y desperté con la sorpresa más linda. El mejor regalo de mi vida.",
     "landing.testimonials.3.quote":
-      "Nuestra quiniela de fútbol nunca funcionó tan bien. Giivngo lo hace simple y sin estrés.",
+      "La colecta para el baby shower se armó en días. Giivngo lo hace simple y sin estrés.",
     "landing.testimonials.4.quote":
-      "Amo nuestra lotería grupal de cada semana. Súper fácil de organizar y todos quedan al tanto.",
+      "Organizamos la fiesta de Navidad de la oficina en minutos. Súper fácil de organizar y todos quedan al tanto.",
 
     // Additional UI
     "ui.contributed": "aportó",
@@ -1122,7 +1122,7 @@ export const translations = {
     "dashboard.subtitle": "Olá {name} 👋",
     "dashboard.empty.title": "Nenhuma campanha ainda",
     "dashboard.empty.description":
-      "Crie a primeira e compartilhe o link com seu grupo. Fundo de aniversário, bolão de futebol, despedida — o que quiser.",
+      "Crie a primeira e compartilhe o link com seu grupo. Fundo de aniversário, chá de bebê, despedida — o que quiser.",
     "dashboard.create_first": "Criar primeira campanha",
     "dashboard.created": "Criado",
     "dashboard.raised": "Arrecadado",
@@ -1393,13 +1393,13 @@ export const translations = {
     "landing.showcase.cards.2.stats": "18 amigos • $1.200 arrecadados",
     "landing.showcase.cards.2.badge": "Presente entregue! 🎉",
 
-    "landing.showcase.cards.3.title": "Bolão de futebol",
-    "landing.showcase.cards.3.stats": "24 amigos • $650 de prêmio",
-    "landing.showcase.cards.3.badge": "Temporada rolando 🏈",
+    "landing.showcase.cards.3.title": "Chá de bebê",
+    "landing.showcase.cards.3.stats": "16 amigos • $940 arrecadados",
+    "landing.showcase.cards.3.badge": "Tudo pronto para o bebê! 🍼",
 
-    "landing.showcase.cards.4.title": "Bolão da loteria",
-    "landing.showcase.cards.4.stats": "14 participantes • Aposta da semana pronta",
-    "landing.showcase.cards.4.badge": "Próximo sorteio: sábado 🎰",
+    "landing.showcase.cards.4.title": "Festa de Natal da empresa",
+    "landing.showcase.cards.4.stats": "22 colegas • $1.100 arrecadados",
+    "landing.showcase.cards.4.badge": "Festa marcada! 🎄",
 
     "landing.showcase.cards.5.title": "Presente de casamento",
     "landing.showcase.cards.5.stats": "20 convidados • $3.000 arrecadados",
@@ -1635,9 +1635,9 @@ export const translations = {
     "landing.testimonials.2.quote":
       "Fiz uma vaquinha para o meu aniversário e acordei com a surpresa mais fofa. Melhor presente da vida.",
     "landing.testimonials.3.quote":
-      "Nosso bolão de futebol nunca foi tão bom. O Giivngo deixa tudo simples e sem estresse.",
+      "A vaquinha do chá de bebê ficou pronta em poucos dias. O Giivngo deixa tudo simples e sem estresse.",
     "landing.testimonials.4.quote":
-      "Amo nosso bolão da loteria toda semana. Fácil de organizar e todo mundo fica por dentro.",
+      "Organizamos a festa de Natal da empresa em minutos. Fácil de organizar e todo mundo fica por dentro.",
 
     // Additional UI
     "ui.contributed": "contribuiu",

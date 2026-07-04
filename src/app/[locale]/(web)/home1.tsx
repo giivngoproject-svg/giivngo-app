@@ -42,8 +42,8 @@ const FEATURED_CARDS = [
   {
     id: 3,
     titleKey: 'landing.showcase.cards.3.title',
-    image: '/footy-tipping.webp',
-    icon: '🏈',
+    image: '/baby-shower.webp',
+    icon: '🍼',
     statsKey: 'landing.showcase.cards.3.stats',
     badgeKey: 'landing.showcase.cards.3.badge',
     badgeColor: '#7C5CFF',
@@ -51,8 +51,8 @@ const FEATURED_CARDS = [
   {
     id: 4,
     titleKey: 'landing.showcase.cards.4.title',
-    image: '/lotto-syndicate.webp',
-    icon: '🎰',
+    image: '/xmas-work-party.webp',
+    icon: '🎄',
     statsKey: 'landing.showcase.cards.4.stats',
     badgeKey: 'landing.showcase.cards.4.badge',
     badgeColor: '#FFC857',
