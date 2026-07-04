@@ -841,8 +841,8 @@ export const translations = {
     "landing.nav.signup": "Regístrate gratis",
 
     // Landing - Hero Headline
-    "landing.hero.headline.line1": "para los",
-    "landing.hero.headline.line2": "momentos más felices",
+    "landing.hero.headline.line1": "para momentos",
+    "landing.hero.headline.line2": "felices",
     "landing.hero.headline.line3": "de la vida",
 
     // Landing - Featured Cards Section
@@ -1380,8 +1380,8 @@ export const translations = {
     "landing.nav.signup": "Cadastre-se grátis",
 
     // Landing - Hero Headline
-    "landing.hero.headline.line1": "para os",
-    "landing.hero.headline.line2": "momentos mais felizes",
+    "landing.hero.headline.line1": "para momentos",
+    "landing.hero.headline.line2": "felizes",
     "landing.hero.headline.line3": "da vida",
 
     // Landing - Featured Cards Section

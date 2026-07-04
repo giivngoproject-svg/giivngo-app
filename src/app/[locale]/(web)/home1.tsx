@@ -101,7 +101,8 @@ export default function Home1() {
             {/* Main Headline */}
             <h1 className="text-5xl md:text-7xl lg:text-[5rem] font-bold text-white mb-6 leading-tight">
               {t('landing.hero.title')}<br />
-              {t('landing.hero.headline.line1')}{' '}
+              {t('landing.hero.headline.line1')}
+              <br />
               <span className="relative inline-block text-[#7C5CFF]">
                 {t('landing.hero.headline.line2')}
                 <svg className="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 200 6">
@@ -114,8 +115,7 @@ export default function Home1() {
                   </defs>
                   <path d="M 0 3 Q 50 0 100 3 T 200 3" stroke="url(#underline)" strokeWidth="3" fill="none" />
                 </svg>
-              </span>
-              <br />
+              </span>{' '}
               {t('landing.hero.headline.line3')}
             </h1>
 
