@@ -25,9 +25,18 @@ export type User = {
   display_name?: string;
   avatar_url?: string;
   phone?: string;
+  country_code: string; // ISO 3166-1 alpha-2 (AU, MX, BR)
   stripe_account_id?: string;
   email_verified: boolean;
   created_at: string;
+};
+
+export type Country = {
+  countryCode: string; // ISO 3166-1 alpha-2 (AU, MX, BR)
+  countryName: string; // Australia, Mexico, Brazil
+  currency: string; // AUD, MXN, BRL
+  locale: string; // en-AU, es-MX, pt-BR
+  stripeConnectSupported: boolean;
 };
 
 export type Campaign = {
@@ -56,6 +65,8 @@ export type Campaign = {
   // When true, hides gift wall, activity feed, and highlight reel until campaign ends.
   hide_until_birthday?: boolean;
   show_on_search?: boolean;
+  country_code?: string; // Country code for Stripe fees (MX, BR, AU) - defaults to AU
+  currency?: string; // Currency code (MXN, BRL, AUD) - defaults to AUD
   creator_stripe_account_id?: string; // Stripe Connect account ID of campaign creator
   created_at: string;
 };
@@ -81,6 +92,8 @@ export type CampaignResponseDto = {
   tiers?: number[];
   hideUntilBirthday?: boolean;
   showOnSearch?: boolean;
+  countryCode: string; // Country code for Stripe fees (MX, BR, AU)
+  currency: string; // Currency code (MXN, BRL, AUD)
   creatorStripeAccountId?: string;
   contributionItems?: Array<{
     id: string;

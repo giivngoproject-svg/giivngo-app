@@ -8,6 +8,7 @@ import { useAuth } from "@/stores/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { CountrySelector } from "@/components/CountrySelector";
 
 function GoogleIcon() {
   return (
@@ -28,12 +29,13 @@ export default function SignUpPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [countryCode, setCountryCode] = useState("AU");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !name || !password) return;
+    if (!email || !name || !password || !countryCode) return;
 
-    const success = await signUp(email, password, name);
+    const success = await signUp(email, password, name, countryCode);
     if (success) {
       router.push("/verify-email");
     }
@@ -89,6 +91,13 @@ export default function SignUpPage() {
           name="email_"
           disabled={isLoading}
           placeholder={t("auth.signup.email_placeholder")}
+        />
+        <CountrySelector
+          value={countryCode}
+          onChange={setCountryCode}
+          label="Country / País / País"
+          disabled={isLoading}
+          required
         />
         <Input
           label={t("auth.signup.password_label")}

@@ -5,7 +5,6 @@ import { useRouter, usePathname } from 'next/navigation';
 import { LayoutDashboard, Plus, Settings, LogOut, ChevronDown, Menu, PersonStanding, CircleUserRound, Cog } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Toaster } from '@/components/ui/Toaster';
-import { MockStripeCheckout } from '@/components/checkout/MockStripeCheckout';
 import { Avatar, Logo } from '@/components/nav/TopNav';
 import { useAuth } from '@/stores/auth';
 import { Button } from '@/components/ui/Button';
@@ -172,7 +171,6 @@ function PanelShell({
       </main>
 
       <Toaster />
-      <MockStripeCheckout />
     </div>
   );
 }

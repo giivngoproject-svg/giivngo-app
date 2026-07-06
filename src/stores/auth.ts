@@ -16,7 +16,7 @@ type AuthState = {
   hasCheckedAuth: boolean; // Flag to indicate checkAuth() has been called
 
   signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (email: string, password: string, name: string) => Promise<boolean>;
+  signUp: (email: string, password: string, name: string, countryCode?: string) => Promise<boolean>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => void;
   checkAuth: () => Promise<void>;
@@ -82,14 +82,15 @@ export const useAuth = create<AuthState>()(
         }
       },
 
-      signUp: async (email: string, password: string, name: string) => {
+      signUp: async (email: string, password: string, name: string, countryCode?: string) => {
         set({ isLoading: true, error: null });
         try {
           const { access_token, user } = await authApi.signUp(
             email,
             password,
             name,
-            name.split(" ")[0]
+            name.split(" ")[0],
+            countryCode || 'AU'
           );
 
           // Decode token to get expiry

@@ -41,6 +41,7 @@ import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 import { InvitePanel } from "@/components/campaign/InvitePanel";
 import { HighlightReel } from "@/components/campaign/HighlightReel";
 import { ItemEditor } from "@/components/wizard/ItemEditor";
+import { CountrySelector } from "@/components/wizard/CountrySelector";
 
 function ManagePageInner() {
   const t = useTranslation();
@@ -670,6 +671,8 @@ function EditModal({
     type: string;
     hide_until_birthday?: boolean;
     show_on_search?: boolean;
+    country_code?: string;
+    currency?: string;
   };
   t: ReturnType<typeof useTranslation>;
   onSave: (patch: {
@@ -679,6 +682,8 @@ function EditModal({
     contributionItems?: Array<{ label: string; amount: number }>;
     hideUntilBirthday?: boolean;
     showOnSearch?: boolean;
+    countryCode?: string;
+    currency?: string;
   }) => void;
 }) {
   const [title, setTitle] = useState(campaign.title);
@@ -692,6 +697,8 @@ function EditModal({
   );
   const [hideUntilBirthday, setHideUntilBirthday] = useState(campaign.hide_until_birthday ?? false);
   const [showOnSearch, setShowOnSearch] = useState((campaign as any).show_on_search ?? true);
+  const [countryCode, setCountryCode] = useState(campaign.country_code ?? "AU");
+  const [currency, setCurrency] = useState(campaign.currency ?? "AUD");
 
   // Reset form when modal opens
   useEffect(() => {
@@ -707,6 +714,8 @@ function EditModal({
       );
       setHideUntilBirthday(campaign.hide_until_birthday ?? false);
       setShowOnSearch((campaign as any).show_on_search ?? true);
+      setCountryCode(campaign.country_code ?? "AU");
+      setCurrency(campaign.currency ?? "AUD");
     }
   }, [open, campaign]);
 
@@ -728,6 +737,13 @@ function EditModal({
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
             prefix="A$"
+          />
+          <CountrySelector
+            value={countryCode}
+            onChange={(cc, curr) => {
+              setCountryCode(cc);
+              setCurrency(curr);
+            }}
           />
         </div>
 
@@ -793,6 +809,8 @@ function EditModal({
                 : undefined,
               hideUntilBirthday: campaign.type === "birthday" ? hideUntilBirthday : undefined,
               showOnSearch: showOnSearch,
+              countryCode,
+              currency,
             })
           }
         >

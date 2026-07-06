@@ -11,6 +11,7 @@ export const DEMO_USER: User = {
   display_name: "Alex",
   avatar_url: undefined,
   phone: "+61 400 111 222",
+  country_code: "AU",
   stripe_account_id: undefined,
   email_verified: true,
   created_at: iso(-30),
@@ -21,6 +22,7 @@ const otherOrganiser: User = {
   email: "[EMAIL_ADDRESS]",
   name: "Jamie Reeves",
   display_name: "Jamie",
+  country_code: "AU",
   created_at: iso(-60),
   stripe_account_id: undefined,
   email_verified: true,
@@ -47,6 +49,8 @@ export const SEED_CAMPAIGNS: Campaign[] = [
     recipient_name: "Sarah",
     pool_mode: "standard",
     organiser_name: "Alex Morgan",
+    country_code: "AU",
+    currency: "AUD",
     created_at: iso(-18),
   },
   {
@@ -66,6 +70,8 @@ export const SEED_CAMPAIGNS: Campaign[] = [
     tiers: [50],
     recipient_name: "Emma",
     organiser_name: "Alex Morgan",
+    country_code: "AU",
+    currency: "AUD",
     created_at: iso(-22),
   },
   {
@@ -86,6 +92,8 @@ export const SEED_CAMPAIGNS: Campaign[] = [
     recipient_name: "Mike",
     pool_mode: "blind",
     organiser_name: "Alex Morgan",
+    country_code: "AU",
+    currency: "AUD",
     created_at: iso(-21),
   },
   {
@@ -106,6 +114,8 @@ export const SEED_CAMPAIGNS: Campaign[] = [
     max_contribution: 80,
     pool_mode: "mystery",
     organiser_name: "Jamie Reeves",
+    country_code: "AU",
+    currency: "AUD",
     created_at: iso(-45),
   },
 ];

@@ -18,6 +18,8 @@ export type WizardData = {
   contribution_items: ContributionItem[];
   hide_until_birthday: boolean;
   show_on_search: boolean;
+  country_code: string; // Country for Stripe fees (MX, BR, AU)
+  currency: string; // Currency code (MXN, BRL, AUD)
 };
 
 type WizardState = {
@@ -49,6 +51,8 @@ const DEFAULTS: WizardData = {
   contribution_items: [],
   hide_until_birthday: false,
   show_on_search: true,
+  country_code: "AU",
+  currency: "AUD",
 };
 
 export const useWizard = create<WizardState>((set) => ({

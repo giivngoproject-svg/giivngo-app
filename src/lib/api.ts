@@ -15,6 +15,7 @@ function transformUserFromApi(data: any) {
     display_name: data.displayName,
     avatar_url: data.avatarUrl,
     phone: data.phone,
+    country_code: data.countryCode ?? 'AU',
     stripe_account_id: data.stripeAccountId,
     email_verified: data.emailVerified ?? false,
     created_at: data.createdAt,
@@ -171,12 +172,13 @@ apiClient.interceptors.response.use(
  * Auth API calls
  */
 export const authApi = {
-  signUp: async (email: string, password: string, name: string, displayName?: string) => {
+  signUp: async (email: string, password: string, name: string, displayName?: string, countryCode?: string) => {
     const res = await apiClient.post('/auth/sign-up', {
       email,
       password,
       name,
       displayName,
+      countryCode: countryCode || 'AU',
     });
     return {
       access_token: res.data.access_token,
@@ -274,6 +276,11 @@ export const contributionsApi = {
  * Profile API calls
  */
 export const profileApi = {
+  getCountries: async () => {
+    const res = await apiClient.get('/profile/countries');
+    return res.data;
+  },
+
   get: async () => {
     const res = await apiClient.get('/profile');
     return transformUserFromApi(res.data);

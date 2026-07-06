@@ -21,6 +21,7 @@ import { WizardShell } from "@/components/wizard/WizardShell";
 import { PhotoUpload } from "@/components/wizard/PhotoUpload";
 import { TierEditor } from "@/components/wizard/TierEditor";
 import { ItemEditor } from "@/components/wizard/ItemEditor";
+import { CountrySelector } from "@/components/wizard/CountrySelector";
 import { deleteImage } from "@/lib/mock/storage";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
@@ -91,6 +92,8 @@ function CreatePageInner() {
         organiserName: user.name,
         showOnSearch: data.show_on_search,
         hideUntilBirthday: data.hide_until_birthday || undefined,
+        country_code: data.country_code,
+        currency: data.currency,
       });
 
       if (campaign) {
@@ -242,6 +245,11 @@ function Step1({
         </select>
       </div>
 
+      <CountrySelector
+        value={data.country_code}
+        onChange={(countryCode, currency) => patch({ country_code: countryCode, currency })}
+      />
+
       <div className="flex justify-between pt-4">
         <Button variant="ghost" onClick={onCancel}>
           {t("common.cancel")}
@@ -361,11 +369,17 @@ function Step2({
             min={0}
             step={5}
             value={data.min_contribution ?? ""}
-            onChange={(e) =>
-              patch({ min_contribution: e.target.value ? Number(e.target.value) : undefined })
-            }
+            onChange={(e) => {
+              const val = e.target.value ? Number(e.target.value) : undefined;
+              // If max is set and val is greater than max, don't allow it
+              if (val !== undefined && data.max_contribution && val > data.max_contribution) {
+                return;
+              }
+              patch({ min_contribution: val });
+            }}
             prefix="A$"
             placeholder="—"
+            hint={data.max_contribution ? `Max: A$${data.max_contribution}` : undefined}
           />
           <Input
             label={t('create.max_contribution')}
@@ -373,11 +387,28 @@ function Step2({
             min={0}
             step={5}
             value={data.max_contribution ?? ""}
-            onChange={(e) =>
-              patch({ max_contribution: e.target.value ? Number(e.target.value) : undefined })
-            }
+            onChange={(e) => {
+              const val = e.target.value ? Number(e.target.value) : undefined;
+
+              // If goal_amount exists and is > 0, max_contribution cannot exceed it
+              if (val !== undefined && data.goal_amount && data.goal_amount > 0 && val > data.goal_amount) {
+                return;
+              }
+
+              // If min is set and val is less than min, don't allow it
+              if (val !== undefined && data.min_contribution && val < data.min_contribution) {
+                return;
+              }
+
+              patch({ max_contribution: val });
+            }}
             prefix="A$"
             placeholder="—"
+            hint={
+              data.goal_amount && data.goal_amount > 0
+                ? `Max allowed: A$${data.goal_amount}`
+                : "Leave empty for no limit"
+            }
           />
         </div>
       )}

@@ -9,7 +9,12 @@ import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2 } 
 import { useCampaigns } from "@/stores/campaigns";
 import { useTranslation } from "@/lib/useTranslation";
 import { contributionsApi, storageApi } from "@/lib/api";
-import { formatAUD, calculateCheckoutTotal } from "@/lib/money";
+import { formatCurrency, roundAmount } from "@/lib/money";
+import { getIntlLocale } from "@/lib/locale";
+import { useLocale } from "@/hooks/useLocale";
+import { useFees } from "@/hooks/useFees";
+import { useCheckout } from "@/hooks/useCheckout";
+import { FeeBreakdownComponent } from "@/components/checkout/FeeBreakdownComponent";
 import { AnonymousAvatarSelector } from "@/components/anonymous-avatar-selector";
 import {
   isGoalHidden,
@@ -41,6 +46,7 @@ const EMPTY_CONTRIBUTIONS: never[] = [];
 export default function PublicCampaignPage() {
   const t = useTranslation();
   const { slug } = useParams<{ slug: string }>();
+  const localeConfig = useLocale();
   const campaign = useCampaigns((s) => s.campaigns.find((c) => c.slug === slug));
   const storeIsLoading = useCampaigns((s) => s.isLoading);
   const loadCampaign = useCampaigns((s) => s.loadCampaign);
@@ -204,11 +210,11 @@ export default function PublicCampaignPage() {
       }
       if (!tiered) {
         if (min && amt < min) {
-          await Swal.fire({ title: `Minimum is ${formatAUD(min)}`, icon: "error", confirmButtonColor: "#1E1B4B" });
+          await Swal.fire({ title: `Minimum is ${formatCurrency(min, campaign.currency || 'AUD', getIntlLocale(localeConfig.locale))}`, icon: "error", confirmButtonColor: "#1E1B4B" });
           return;
         }
         if (max && amt > max) {
-          await Swal.fire({ title: `Maximum is ${formatAUD(max)}`, icon: "error", confirmButtonColor: "#1E1B4B" });
+          await Swal.fire({ title: `Maximum is ${formatCurrency(max, campaign.currency || 'AUD', getIntlLocale(localeConfig.locale))}`, icon: "error", confirmButtonColor: "#1E1B4B" });
           return;
         }
       }
@@ -238,18 +244,13 @@ export default function PublicCampaignPage() {
 
     setSubmitting(true);
     try {
-      // Calculate fee breakdown
       const tipAmount = tip ? Number(tip) : 0;
-      const montoNeto = amt + tipAmount;
-      const feeBreakdown = calculateCheckoutTotal(montoNeto);
 
+      // CRITICAL: Do NOT pre-calculate fees on client
+      // Backend will authoritatively calculate all fees based on country/currency
       const response = await contributionsApi.checkout(campaign.slug, {
         amount: amt,
         tipAmount: tipAmount || undefined,
-        netAmount: feeBreakdown.neto,
-        totalFees: feeBreakdown.totalFees,
-        stripeFee: feeBreakdown.stripeFee,
-        checkoutTotal: feeBreakdown.checkoutTotal,
         contributorName: name.trim() || undefined,
         contributorEmail: email.trim() || undefined,
         dateOfBirth: dateOfBirth.trim(),
@@ -286,9 +287,10 @@ export default function PublicCampaignPage() {
         return;
       }
 
-      const totalAmount = feeBreakdown.checkoutTotal.toFixed(2);
+      const totalAmount = response.checkoutTotal.toFixed(2);
+      const intlLocale = getIntlLocale(localeConfig.locale);
 
-      // Create elements with clientSecret
+      // Create elements with clientSecret (backend-calculated)
       console.log('🔵 [Payment] Creating elements with clientSecret:', response.clientSecret.substring(0, 20) + '...');
       const elements = stripe.elements({
         clientSecret: response.clientSecret,
@@ -299,7 +301,12 @@ export default function PublicCampaignPage() {
         throw new Error('Failed to create payment element');
       }
 
-      // Create modal HTML
+      // Create modal HTML with SERVER-CALCULATED fees
+      const stripeFeeFormatted = formatCurrency(response.stripeFee, response.currency, intlLocale);
+      const platformFeeFormatted = formatCurrency(response.platformFee, response.currency, intlLocale);
+      const totalFormatted = formatCurrency(response.checkoutTotal, response.currency, intlLocale);
+      const contributionFormatted = formatCurrency(amt, response.currency, intlLocale);
+
       const modalHTML = `
         <div id="payment-modal" style="
           position: fixed;
@@ -337,25 +344,25 @@ export default function PublicCampaignPage() {
               <p style="margin: 8px 0 0; font-size: 13px; color: #666;">${t("campaign.test_card_hint")}</p>
             </div>
 
-            <!-- Fee Breakdown -->
+            <!-- Fee Breakdown: SERVER-CALCULATED -->
             <div style="background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
               <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #333;">Payment breakdown</h3>
               <div style="space-y: 8px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                  <span style="color: #666;">Contribution + tip:</span>
-                  <span style="font-weight: 500;">A$${feeBreakdown.neto.toFixed(2)}</span>
+                  <span style="color: #666;">Your contribution:</span>
+                  <span style="font-weight: 500;">${contributionFormatted}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                  <span style="color: #666;">Processing fee:</span>
-                  <span style="font-weight: 500;">A$${feeBreakdown.stripeFee.toFixed(2)}</span>
+                  <span style="color: #666;">Stripe processing fee:</span>
+                  <span style="font-weight: 500;">${stripeFeeFormatted}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                  <span style="color: #666;">Fixed fee:</span>
-                  <span style="font-weight: 500;">A$${feeBreakdown.fixedFee.toFixed(2)}</span>
+                  <span style="color: #666;">Platform fee:</span>
+                  <span style="font-weight: 500;">${platformFeeFormatted}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 8px; font-size: 14px; font-weight: 600;">
                   <span style="color: #333;">Total to charge:</span>
-                  <span style="color: #0066cc;">A$${feeBreakdown.checkoutTotal.toFixed(2)}</span>
+                  <span style="color: #0066cc;">${totalFormatted}</span>
                 </div>
               </div>
             </div>
@@ -587,9 +594,9 @@ export default function PublicCampaignPage() {
             (
               <>
                 <div className="flex items-baseline justify-between">
-                  <p className="text-2xl font-bold">{formatAUD(campaign.raised_amount)}</p>
+                  <p className="text-2xl font-bold">{formatCurrency(campaign.raised_amount)}</p>
                   {campaign.goal_amount ? (
-                    <p className="text-sm text-muted">{t("manage.of")} {formatAUD(campaign.goal_amount)}</p>
+                    <p className="text-sm text-muted">{t("manage.of")} {formatCurrency(campaign.goal_amount)}</p>
                   ) : (
                     <p className="text-sm text-muted">{t("create.form.no_goal")}</p>
                   )}
@@ -613,7 +620,7 @@ export default function PublicCampaignPage() {
                 </div>
                 {tips > 0 && (
                   <p className="mt-2 text-xs text-accent">
-                    + {formatAUD(tips)} in tips for {recipient || "the recipient"}
+                    + {formatCurrency(tips)} in tips for {recipient || "the recipient"}
                   </p>
                 )}
               </>
@@ -650,7 +657,7 @@ export default function PublicCampaignPage() {
                             }`}
                         >
                           <span>{item.label}</span>
-                          <span>{formatAUD(item.amount)}</span>
+                          <span>{formatCurrency(item.amount)}</span>
                         </button>
                       ))}
                       {selectedItemIds.size > 0 && (
@@ -660,7 +667,7 @@ export default function PublicCampaignPage() {
                             .map((id) => items.find((i) => i.id === id)?.label)
                             .filter(Boolean)
                             .join(" + ")}{" "}
-                          = {formatAUD(
+                          = {formatCurrency(
                             Array.from(selectedItemIds).reduce(
                               (sum, id) => sum + (items.find((i) => i.id === id)?.amount || 0),
                               0,
@@ -681,7 +688,7 @@ export default function PublicCampaignPage() {
                               : "bg-foreground/5 hover:bg-foreground/10"
                             }`}
                         >
-                          {formatAUD(t)}
+                          {formatCurrency(t)}
                         </button>
                       ))}
                     </div>
@@ -698,7 +705,7 @@ export default function PublicCampaignPage() {
                                 : "bg-foreground/5 hover:bg-foreground/10"
                               }`}
                           >
-                            {formatAUD(q)}
+                            {formatCurrency(q)}
                           </button>
                         ))}
                       </div>
@@ -712,11 +719,11 @@ export default function PublicCampaignPage() {
                         onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : "")}
                         hint={
                           min && max
-                            ? `Between ${formatAUD(min)} and ${formatAUD(max)}`
+                            ? `Between ${formatCurrency(min)} and ${formatCurrency(max)}`
                             : min
-                              ? `Min ${formatAUD(min)}`
+                              ? `Min ${formatCurrency(min)}`
                               : max
-                                ? `Max ${formatAUD(max)}`
+                                ? `Max ${formatCurrency(max)}`
                                 : undefined
                         }
                       />
@@ -740,7 +747,7 @@ export default function PublicCampaignPage() {
                             : "bg-foreground/5 hover:bg-foreground/10"
                           }`}
                       >
-                        +{formatAUD(t)}
+                        +{formatCurrency(t)}
                       </button>
                     ))}
                   </div>
@@ -827,15 +834,13 @@ export default function PublicCampaignPage() {
                             0,
                           );
                           const netAmount = itemsTotal + (Number(tip) || 0);
-                          const checkout = calculateCheckoutTotal(netAmount);
-                          return `Contribute ${formatAUD(checkout.checkoutTotal)}`;
+                          return `Contribute ${formatCurrency(netAmount, campaign.currency || 'AUD', getIntlLocale(localeConfig.locale))}`;
                         })()
                       : "Select items"
                     : amount
                       ? (() => {
                           const netAmount = Number(amount) + (Number(tip) || 0);
-                          const checkout = calculateCheckoutTotal(netAmount);
-                          return `Contribute ${formatAUD(checkout.checkoutTotal)}`;
+                          return `Contribute ${formatCurrency(netAmount, campaign.currency || 'AUD', getIntlLocale(localeConfig.locale))}`;
                         })()
                       : "Contribute"}
                 </Button>

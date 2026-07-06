@@ -13,6 +13,7 @@ import { storageApi, profileApi } from "@/lib/api";
 import { formatAUD } from "@/lib/money";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { CountrySelector } from "@/components/CountrySelector";
 import { Avatar } from "@/components/nav/TopNav";
 import { StatusBadge } from "@/components/ui/Badge";
 
@@ -124,6 +125,7 @@ function ProfilePageInner() {
         name: user.name,
         displayName: user.display_name,
         phone: user.phone,
+        countryCode: user.country_code,
         avatarUrl: user.avatar_url,
       });
       await Swal.fire({
@@ -216,6 +218,11 @@ function ProfilePageInner() {
             type="tel"
             value={user.phone || ""}
             onChange={(e) => updateUser({ phone: e.target.value })}
+          />
+          <CountrySelector
+            value={user.country_code || 'AU'}
+            onChange={(code) => updateUser({ country_code: code })}
+            label="Country / País / País"
           />
         </div>
       </div>

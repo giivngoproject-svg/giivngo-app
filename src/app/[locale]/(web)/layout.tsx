@@ -7,7 +7,6 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { TopNav } from "@/components/nav/TopNav";
 import { Footer } from "@/components/nav/Footer";
 import { Toaster } from "@/components/ui/Toaster";
-import { MockStripeCheckout } from "@/components/checkout/MockStripeCheckout";
 
 // Prerender estático de las rutas públicas por locale (SEO)
 export function generateStaticParams() {
@@ -41,7 +40,6 @@ export default async function WebLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <Toaster />
-          <MockStripeCheckout />
         </div>
       </NextIntlClientProvider>
     </>
