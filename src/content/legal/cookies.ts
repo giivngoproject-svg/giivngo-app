@@ -1,10 +1,10 @@
 import type { LegalDocSet } from "./types";
 
 // Traducción de referencia (borrador) de "Cookie Policy.docx".
-// El inglés es el texto rector; es-419 y pt-br son traducciones pendientes de
+// El inglés es el texto rector; es y pt-br son traducciones pendientes de
 // revisión legal. Fecha de actualización: ver `updated`.
 export const cookies: LegalDocSet = {
-  "en-au": {
+  en: {
     title: "Cookie Policy",
     description:
       "How Giivngo and certain third-party tools use cookies and similar tracking technologies.",
@@ -67,7 +67,7 @@ export const cookies: LegalDocSet = {
     ],
   },
 
-  "es-419": {
+  es: {
     title: "Política de Cookies",
     description:
       "Cómo Giivngo y ciertas herramientas de terceros usan cookies y tecnologías de seguimiento similares.",

@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://giivngo.com";
+import { SITE_URL } from "@/i18n/metadata";
 
 export default function robots(): MetadataRoute.Robots {
   return {

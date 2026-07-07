@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { buildAlternates, buildSocial } from "@/i18n/metadata";
 import { LegalPage } from "@/components/legal/LegalPage";
 import { cookies } from "@/content/legal/cookies";
+import { LOCALE_TO_DICT, type Locale } from "@/i18n/markets";
 
 const PATH = "/cookies";
 
@@ -11,7 +12,7 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
-  const doc = cookies[locale as keyof typeof cookies] ?? cookies["en-au"];
+  const doc = cookies[LOCALE_TO_DICT[locale as Locale] ?? "en"];
   return {
     title: doc.title,
     description: doc.description,
@@ -26,6 +27,6 @@ export default function CookiesPage({
   params: { locale: string };
 }) {
   setRequestLocale(locale);
-  const doc = cookies[locale as keyof typeof cookies] ?? cookies["en-au"];
+  const doc = cookies[LOCALE_TO_DICT[locale as Locale] ?? "en"];
   return <LegalPage doc={doc} locale={locale} />;
 }

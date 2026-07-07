@@ -1,9 +1,9 @@
 import type { LegalDocSet } from "./types";
 
 // Traducción de referencia (borrador) de "Privacy Notice.docx".
-// El inglés es el texto rector; es-419 y pt-br están pendientes de revisión legal.
+// El inglés es el texto rector; es y pt-br están pendientes de revisión legal.
 export const privacy: LegalDocSet = {
-  "en-au": {
+  en: {
     title: "Privacy Notice",
     description:
       "How Giivngo collects, uses, and shares personal data of Pool Creators and Contributors who use the platform.",
@@ -194,7 +194,7 @@ export const privacy: LegalDocSet = {
     ],
   },
 
-  "es-419": {
+  es: {
     title: "Aviso de Privacidad",
     description:
       "Cómo Giivngo recopila, usa y comparte los datos personales de los Organizadores y Participantes que usan la plataforma.",

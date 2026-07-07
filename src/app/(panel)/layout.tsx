@@ -11,11 +11,11 @@ import { Button } from '@/components/ui/Button';
 import { useTranslation } from '@/lib/useTranslation';
 import { NextIntlClientProvider } from 'next-intl';
 import { useLanguage } from '@/stores/language';
-
 // El panel NO está localizado por URL (excluido del middleware). Su idioma sale
 // del store (localStorage). Sembramos un NextIntlClientProvider con el locale
-// equivalente para que useTranslation() (que lee useLocale) funcione dentro del panel.
-const DICT_TO_LOCALE = { en: 'en-au', es: 'es-419', 'pt-br': 'pt-br' } as const;
+// equivalente (dict -> locale canónico del idioma, de la fuente única de mercados)
+// para que useTranslation() (que lee useLocale) funcione dentro del panel.
+import { DICT_TO_LOCALE } from '@/i18n/markets';
 
 export default function PanelLayout({
   children,
