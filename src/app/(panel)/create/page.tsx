@@ -390,11 +390,6 @@ function Step2({
             onChange={(e) => {
               const val = e.target.value ? Number(e.target.value) : undefined;
 
-              // If goal_amount exists and is > 0, max_contribution cannot exceed it
-              if (val !== undefined && data.goal_amount && data.goal_amount > 0 && val > data.goal_amount) {
-                return;
-              }
-
               // If min is set and val is less than min, don't allow it
               if (val !== undefined && data.min_contribution && val < data.min_contribution) {
                 return;
@@ -404,11 +399,7 @@ function Step2({
             }}
             prefix="A$"
             placeholder="—"
-            hint={
-              data.goal_amount && data.goal_amount > 0
-                ? `Max allowed: A$${data.goal_amount}`
-                : "Leave empty for no limit"
-            }
+            hint="Leave empty for no limit"
           />
         </div>
       )}
