@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { getLocale } from "next-intl/server";
-import { SITE_DESCRIPTION } from "@/i18n/metadata";
+import { SITE_DESCRIPTION, SITE_URL } from "@/i18n/metadata";
 import "./globals.css";
 import { SeedBootstrap } from "@/components/SeedBootstrap";
 import { TokenExpiryMonitor } from "@/components/TokenExpiryMonitor";
 
 export const metadata: Metadata = {
   // Base para resolver todas las URLs relativas de metadata (canonical, OG, etc.).
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://giivngo.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     // Título por defecto (home / páginas sin título propio).
     default: "giivngo · Group money pooling",

@@ -1,33 +1,28 @@
 import type { LegalBlock, LegalDoc } from "@/content/legal/types";
+import { getMarket, LOCALE_TO_DICT, type Dict, type Locale } from "@/i18n/markets";
 
 // Server component: renderiza un documento legal ya localizado. No lleva 'use client'
 // (es contenido estático), así que el HTML traducido queda en el render del servidor.
 
-const UPDATED_LABEL: Record<string, string> = {
-  "en-au": "Last updated",
-  "es-419": "Última actualización",
+// Los rótulos van por IDIOMA (dict): los tres mercados ingleses comparten los suyos.
+const UPDATED_LABEL: Record<Dict, string> = {
+  en: "Last updated",
+  es: "Última actualización",
   "pt-br": "Última atualização",
 };
 
-// Etiqueta BCP-47 para Intl.DateTimeFormat (es-419 no la reconoce todo runtime → "es").
-const DATE_LOCALE: Record<string, string> = {
-  "en-au": "en-AU",
-  "es-419": "es",
-  "pt-br": "pt-BR",
-};
-
 // Nota de prevalencia para las versiones traducidas: el inglés es el texto rector.
-const PREVAILS_NOTE: Record<string, string | null> = {
-  "en-au": null,
-  "es-419":
-    "Esta es una traducción de referencia. En caso de discrepancia, prevalece la versión en inglés.",
+const PREVAILS_NOTE: Record<Dict, string | null> = {
+  en: null,
+  es: "Esta es una traducción de referencia. En caso de discrepancia, prevalece la versión en inglés.",
   "pt-br":
     "Esta é uma tradução de referência. Em caso de divergência, prevalece a versão em inglês.",
 };
 
 function formatDate(iso: string, locale: string) {
   const d = new Date(`${iso}T00:00:00`);
-  return new Intl.DateTimeFormat(DATE_LOCALE[locale] ?? "en-AU", {
+  // La fecha SÍ se formatea por mercado (en-US "July 4, 2026" vs en-AU "4 July 2026").
+  return new Intl.DateTimeFormat(getMarket(locale).hreflang, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -55,14 +50,15 @@ function Block({ block }: { block: LegalBlock }) {
 }
 
 export function LegalPage({ doc, locale }: { doc: LegalDoc; locale: string }) {
-  const prevails = PREVAILS_NOTE[locale];
+  const dict = LOCALE_TO_DICT[locale as Locale] ?? "en";
+  const prevails = PREVAILS_NOTE[dict];
 
   return (
     <article className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
       <header className="mb-10 border-b border-border pb-8">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{doc.title}</h1>
         <p className="mt-3 text-sm text-muted">
-          {UPDATED_LABEL[locale] ?? UPDATED_LABEL["en-au"]}: {formatDate(doc.updated, locale)}
+          {UPDATED_LABEL[dict]}: {formatDate(doc.updated, locale)}
         </p>
         {prevails && <p className="mt-2 text-sm italic text-muted">{prevails}</p>}
       </header>

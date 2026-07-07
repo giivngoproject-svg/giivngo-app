@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { buildAlternates, buildSocial } from "@/i18n/metadata";
 import { LegalPage } from "@/components/legal/LegalPage";
 import { terms } from "@/content/legal/terms";
+import { LOCALE_TO_DICT, type Locale } from "@/i18n/markets";
 
 const PATH = "/terms";
 
@@ -11,7 +12,7 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
-  const doc = terms[locale as keyof typeof terms] ?? terms["en-au"];
+  const doc = terms[LOCALE_TO_DICT[locale as Locale] ?? "en"];
   return {
     title: doc.title,
     description: doc.description,
@@ -26,6 +27,6 @@ export default function TermsPage({
   params: { locale: string };
 }) {
   setRequestLocale(locale);
-  const doc = terms[locale as keyof typeof terms] ?? terms["en-au"];
+  const doc = terms[LOCALE_TO_DICT[locale as Locale] ?? "en"];
   return <LegalPage doc={doc} locale={locale} />;
 }

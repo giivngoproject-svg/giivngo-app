@@ -1,11 +1,11 @@
 import type { LegalDocSet } from "./types";
 
 // Traducción de referencia (borrador) de "GiivngoTerms of Use.docx".
-// El inglés es el texto rector; es-419 y pt-br están pendientes de revisión legal.
+// El inglés es el texto rector; es y pt-br están pendientes de revisión legal.
 // NOTA: se conservan los marcadores del documento fuente ([FEES …], [SIX (6) /
 // TWELVE (12)]) y se normalizó la numeración final (fuente: 19 → "20.1").
 export const terms: LegalDocSet = {
-  "en-au": {
+  en: {
     title: "Terms of Use",
     description:
       "The terms governing access to and use of Giivngo's website, apps, and related services.",
@@ -411,7 +411,7 @@ export const terms: LegalDocSet = {
     ],
   },
 
-  "es-419": {
+  es: {
     title: "Términos de Uso",
     description:
       "Los términos que rigen el acceso y el uso del sitio web, las apps y los servicios relacionados de Giivngo.",

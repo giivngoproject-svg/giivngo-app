@@ -1,8 +1,11 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+// router y el link a /dashboard van al PANEL (sin prefijo de locale) → next/navigation
+// y next/link crudos. Los links públicos (/sign-in, /verify-email) usan el localizado.
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import NextLink from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Mail, CheckCircle, AlertCircle, Loader } from "lucide-react";
 import { useAuth } from "@/stores/auth";
 import { authApi } from "@/lib/api";
@@ -153,9 +156,9 @@ function VerifyEmailInner() {
             <p className="text-gray-600 mb-6">
               Your account is all set. Redirecting to your dashboard...
             </p>
-            <Link href="/dashboard" className="inline-block">
+            <NextLink href="/dashboard" className="inline-block">
               <Button>Go to Dashboard</Button>
-            </Link>
+            </NextLink>
           </div>
         )}
 

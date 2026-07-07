@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Search, AlertCircle } from 'lucide-react';
 import type { CampaignResponseDto } from '@/lib/types';
 

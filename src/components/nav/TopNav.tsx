@@ -1,8 +1,11 @@
 "use client";
 
-import Link from "next/link";
+// Enlaces PÚBLICOS (rutas bajo [locale]/(web)) usan el Link/router localizado de
+// @/i18n/navigation, que antepone el locale actual (/es-mx/sign-in). Los enlaces
+// al PANEL (/dashboard, /profile) van SIN prefijo → next/link crudo (prop `panel`).
+import NextLink from "next/link";
 import Image from "next/image";
-import { useRouter, usePathname } from "next/navigation";
+import { Link, useRouter, usePathname } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, LogOut, User as UserIcon, LayoutDashboard, RotateCcw, MenuIcon, LogIn, SignalIcon, UserPen, ToolCase, FolderTree, CircleDollarSign, Building2 } from "lucide-react";
 import { useAuth } from "@/stores/auth";
@@ -36,7 +39,8 @@ export function TopNav() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isTop, setIsTop] = useState(true);
 
-  // Only apply scroll effect on homepage
+  // Only apply scroll effect on homepage.
+  // usePathname localizado devuelve la ruta SIN prefijo de locale ("/" en la home).
   const isHomepage = pathname === "/";
 
   useEffect(() => {
@@ -97,8 +101,8 @@ export function TopNav() {
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                   <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-2xl shadow-lift overflow-hidden z-20">
-                    <MenuLink href="/dashboard" icon={<LayoutDashboard size={15} />} onClick={() => setMenuOpen(false)} > {t("nav.dashboard")} </MenuLink>
-                    <MenuLink href="/profile" icon={<UserIcon size={15} />} onClick={() => setMenuOpen(false)}> {t("nav.profile")} </MenuLink>
+                    <MenuLink panel href="/dashboard" icon={<LayoutDashboard size={15} />} onClick={() => setMenuOpen(false)} > {t("nav.dashboard")} </MenuLink>
+                    <MenuLink panel href="/profile" icon={<UserIcon size={15} />} onClick={() => setMenuOpen(false)}> {t("nav.profile")} </MenuLink>
                     <button
                       onClick={() => {
                         setMenuOpen(false);
@@ -161,21 +165,24 @@ function MenuLink({
   icon,
   children,
   onClick,
+  panel = false,
 }: {
   href: string;
   icon: React.ReactNode;
   children: React.ReactNode;
   onClick?: () => void;
+  panel?: boolean; // true = ruta del panel (sin prefijo de locale) → next/link crudo
 }) {
+  const LinkComponent = panel ? NextLink : Link;
   return (
-    <Link
+    <LinkComponent
       href={href}
       onClick={onClick}
       className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-foreground/5"
     >
       {icon}
       {children}
-    </Link>
+    </LinkComponent>
   );
 }
 

@@ -1,6 +1,4 @@
-import type { routing } from "@/i18n/routing";
-
-export type Locale = (typeof routing.locales)[number];
+import type { Dict } from "@/i18n/markets";
 
 // Bloque de contenido de un documento legal.
 // - "p": párrafo. `lead` (opcional) es un fragmento en negrita al inicio
@@ -26,5 +24,6 @@ export type LegalDoc = {
   sections: LegalSection[];
 };
 
-// Un documento en los tres locales públicos del sitio.
-export type LegalDocSet = Record<Locale, LegalDoc>;
+// Un documento por IDIOMA (dict), no por mercado: los tres mercados ingleses
+// (en-au/en-us/en-nz) comparten el doc "en".
+export type LegalDocSet = Record<Dict, LegalDoc>;
