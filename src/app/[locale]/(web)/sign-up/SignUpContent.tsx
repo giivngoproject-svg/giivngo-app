@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+// Tanto router.push("/verify-email") como el link a /sign-in son rutas PÚBLICAS
+// (bajo [locale]) → navegación localizada que conserva el mercado actual.
+import { useRouter, Link } from "@/i18n/navigation";
 import { Mail, User, AlertCircle } from "lucide-react";
 import { useAuth } from "@/stores/auth";
 import { useTranslation } from "@/lib/useTranslation";

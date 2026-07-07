@@ -1,8 +1,10 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+// router.push(next) apunta al PANEL (/dashboard, sin prefijo) → next/navigation crudo.
+// El link a /sign-up es público → Link localizado.
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Mail, AlertCircle } from "lucide-react";
 import { useAuth } from "@/stores/auth";
 import { useTranslation } from "@/lib/useTranslation";
