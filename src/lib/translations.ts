@@ -265,7 +265,7 @@ export const translations = {
     // Landing Page - CTA Section
     "landing.cta.title": "Together, we go",
     "landing.cta.subtitle": "further.",
-    "landing.cta.description": "From birthdays and weddings to dream vacations and big wins, Giivngo helps you turn meaningful moments into lasting memories.",
+    "landing.cta.description": "From birthdays and weddings to dream vacations, Giivngo helps you turn meaningful moments into lasting memories.",
     "landing.cta.button": "Start your pool today – it's free",
 
     // Landing Page - Navigation
@@ -319,6 +319,7 @@ export const translations = {
 
     // Landing Page - Security
     "landing.security.payments": "Secure Payments",
+    "landing.security.safe": "Safe & Secure",
     "landing.security.bank": "Bank-Level Security",
     "landing.security.trusted": "Trusted by Thousands",
 
@@ -831,7 +832,7 @@ export const translations = {
 
     "landing.cta.title": "Juntos llegamos",
     "landing.cta.subtitle": "más lejos.",
-    "landing.cta.description": "De cumpleaños y bodas a viajes soñados y grandes logros: Giivngo te ayuda a convertir los momentos que importan en recuerdos inolvidables.",
+    "landing.cta.description": "De cumpleaños y bodas a viajes soñados: Giivngo te ayuda a convertir los momentos que importan en recuerdos inolvidables.",
     "landing.cta.button": "Crea tu colecta hoy – es gratis",
 
     "landing.nav.how_it_works": "Cómo funciona",
@@ -882,6 +883,7 @@ export const translations = {
     "landing.home2.secondary_cta": "Ver cómo funciona",
 
     "landing.security.payments": "Pagos seguros",
+    "landing.security.safe": "Seguro y protegido",
     "landing.security.bank": "Seguridad de nivel bancario",
     "landing.security.trusted": "Miles de personas confían en nosotros",
 
@@ -1372,7 +1374,7 @@ export const translations = {
 
     "landing.cta.title": "Juntos chegamos",
     "landing.cta.subtitle": "mais longe.",
-    "landing.cta.description": "De aniversários e casamentos a viagens dos sonhos e grandes conquistas: o Giivngo ajuda você a transformar momentos especiais em lembranças inesquecíveis.",
+    "landing.cta.description": "De aniversários e casamentos a viagens dos sonhos: o Giivngo ajuda você a transformar momentos especiais em lembranças inesquecíveis.",
     "landing.cta.button": "Comece sua vaquinha hoje – é grátis",
 
     "landing.nav.how_it_works": "Como funciona",
@@ -1423,6 +1425,7 @@ export const translations = {
     "landing.home2.secondary_cta": "Veja como funciona",
 
     "landing.security.payments": "Pagamentos seguros",
+    "landing.security.safe": "Seguro e protegido",
     "landing.security.bank": "Segurança de nível bancário",
     "landing.security.trusted": "Milhares de pessoas confiam",
 
