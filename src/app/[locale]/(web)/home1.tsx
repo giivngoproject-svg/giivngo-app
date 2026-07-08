@@ -166,7 +166,7 @@ export default function Home1() {
               </div>
               <div className="space-y-4">
                 <div className="flex -space-x-3">
-                  {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                  {[1, 3, 4, 5, 7].map((i) => (
                     <img
                       key={i}
                       src={`https://i.pravatar.cc/40?img=${i}`}
@@ -198,7 +198,7 @@ export default function Home1() {
         <div className="bg-white rounded-3xl shadow-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
             <div className="flex -space-x-3 shrink-0">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              {[1, 3, 4, 5, 7, 8].map((i) => (
                 <img
                   key={i}
                   src={`https://i.pravatar.cc/40?img=${i}`}

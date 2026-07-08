@@ -320,7 +320,7 @@ export default function Home2() {
                       <div className="pt-2 border-t text-gray-600">
                         <p className="font-medium mb-2">Contributors</p>
                         <div className="flex -space-x-2">
-                          {[1, 2, 3, 4].map((i) => (
+                          {[1, 3, 4].map((i) => (
                             <img
                               key={i}
                               src={`https://i.pravatar.cc/32?img=${i}`}
