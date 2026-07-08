@@ -78,7 +78,7 @@ function PanelShell({
 
         {/* Logo Section */}
         <div className="p-6 border-b border-gray-200">
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <Logo />
           </Link>
         </div>
