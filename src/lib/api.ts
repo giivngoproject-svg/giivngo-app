@@ -178,7 +178,7 @@ export const authApi = {
       password,
       name,
       displayName,
-      countryCode: countryCode || 'AU',
+      countryCode,
     });
     return {
       access_token: res.data.access_token,

@@ -90,7 +90,7 @@ export const useAuth = create<AuthState>()(
             password,
             name,
             name.split(" ")[0],
-            countryCode || 'AU'
+            countryCode
           );
 
           // Decode token to get expiry
