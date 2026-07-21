@@ -74,6 +74,7 @@ function CreatePageInner() {
         ? data.tiers.filter((t) => t > 0).sort((a, b) => a - b)
         : undefined;
 
+      console.log('Publishing campaign with showOnSearch:', data.show_on_search);
       const campaign = await createCampaign({
         title: data.title.trim(),
         description: data.description.trim(),
@@ -92,7 +93,7 @@ function CreatePageInner() {
         organiserName: user.name,
         showOnSearch: data.show_on_search,
         hideUntilBirthday: data.hide_until_birthday || undefined,
-        country_code: data.country_code,
+        countryCode: data.country_code,
         currency: data.currency,
       });
 
@@ -596,7 +597,10 @@ function Step3({
         <input
           type="checkbox"
           checked={data.show_on_search}
-          onChange={(e) => patch({ show_on_search: e.target.checked })}
+          onChange={(e) => {
+            console.log('show_on_search changed to:', e.target.checked);
+            patch({ show_on_search: e.target.checked });
+          }}
           className="mt-1"
         />
         <div>
