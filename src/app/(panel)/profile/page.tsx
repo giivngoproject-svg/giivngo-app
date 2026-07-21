@@ -234,39 +234,39 @@ function ProfilePageInner() {
             <Banknote size={18} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold">Bank account for payouts</p>
+            <p className="font-semibold">{t("profile.bank_account")}</p>
 
             {/* Status indicator */}
             {user.stripe_account_id ? (
               <>
                 <div className="mt-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
                   <p className="text-sm font-medium text-blue-900 mb-1">
-                    ✓ Vinculado a Stripe Connect
+                    {t("profile.stripe_connected")}
                   </p>
                   <p className="text-xs text-blue-700 font-mono mb-2">{user.stripe_account_id}</p>
                   {stripeStatus?.chargesEnabled ? (
                     <p className="text-xs text-emerald-700 font-medium">
-                      ✓ Listo para recibir pagos
+                      {t("profile.stripe_ready")}
                     </p>
                   ) : (
                     <p className="text-xs text-amber-700 font-medium">
-                      ⏳ En proceso de verificación (puede tomar unos minutos)
+                      {t("profile.stripe_verifying")}
                     </p>
                   )}
                 </div>
 
                 <p className="text-xs text-muted mt-3">
-                  Tu cuenta está vinculada. Los fondos se depositarán en la cuenta bancaria asociada.
+                  {t("profile.stripe_linked")}
                 </p>
               </>
             ) : (
               <>
                 <p className="text-sm text-muted mt-0.5">
-                  No tienes una cuenta de Stripe vinculada. Conecta una para recibir pagos cuando tus campañas terminen.
+                  {t("profile.stripe_not_linked")}
                 </p>
                 <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
                   <p className="text-xs text-amber-800">
-                    ⚠️ Sin vinculación = sin recibir fondos
+                    {t("profile.stripe_warning")}
                   </p>
                 </div>
               </>
