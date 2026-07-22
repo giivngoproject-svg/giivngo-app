@@ -334,16 +334,6 @@ export default function PublicCampaignPage() {
             <h2 style="margin: 0 0 8px; font-size: 24px; font-weight: 700;">${t("campaign.checkout_title")}</h2>
             <p style="color: #999; margin: 0 0 24px; font-size: 14px;">${t("campaign.checkout_subtitle")}</p>
 
-            <div style="background: #f0f7ff; border: 1px solid #cce5ff; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-              <p style="margin: 0 0 8px; font-size: 13px; color: #666; font-weight: 500;">
-                ${t("campaign.test_card")}
-              </p>
-              <p style="margin: 0; font-family: monospace; font-size: 16px; color: #222; font-weight: 600;">
-                ${t("campaign.test_card_number")}
-              </p>
-              <p style="margin: 8px 0 0; font-size: 13px; color: #666;">${t("campaign.test_card_hint")}</p>
-            </div>
-
             <!-- Fee Breakdown: SERVER-CALCULATED -->
             <div style="background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
               <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #333;">Payment breakdown</h3>
