@@ -9,7 +9,7 @@ const heading = "font-[family-name:var(--font-poppins)]";
 type Chip = { labelKey: string; Icon: LucideIcon };
 
 const CHIPS: Chip[] = [
-  { labelKey: "landing.security.bank", Icon: Lock },
+  { labelKey: "landing.security.safe", Icon: Lock },
   { labelKey: "landing.security.bank", Icon: Shield },
   { labelKey: "landing.benefit.transparent", Icon: Eye },
 ];
