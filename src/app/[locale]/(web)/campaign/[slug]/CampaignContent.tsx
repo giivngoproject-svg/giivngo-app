@@ -337,26 +337,26 @@ export default function PublicCampaignPage() {
 
             <!-- Fee Breakdown: SERVER-CALCULATED -->
             <div style="background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-              <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #333;">Payment breakdown</h3>
+              <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #333;">${t("campaign.breakdown_title")}</h3>
               <div style="space-y: 8px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                  <span style="color: #666;">Your contribution:</span>
+                  <span style="color: #666;">${t("campaign.breakdown_contribution")}</span>
                   <span style="font-weight: 500;">${contributionFormatted}</span>
                 </div>
                 ${tipFormatted ? `<div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                  <span style="color: #666;">Your tip:</span>
+                  <span style="color: #666;">${t("campaign.breakdown_tip")}</span>
                   <span style="font-weight: 500;">${tipFormatted}</span>
                 </div>` : ''}
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                  <span style="color: #666;">Stripe processing fee:</span>
+                  <span style="color: #666;">${t("campaign.breakdown_stripe_fee")}</span>
                   <span style="font-weight: 500;">${stripeFeeFormatted}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                  <span style="color: #666;">Platform fee:</span>
+                  <span style="color: #666;">${t("campaign.breakdown_platform_fee")}</span>
                   <span style="font-weight: 500;">${platformFeeFormatted}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 8px; font-size: 14px; font-weight: 600;">
-                  <span style="color: #333;">Total to charge:</span>
+                  <span style="color: #333;">${t("campaign.breakdown_total")}</span>
                   <span style="color: #0066cc;">${totalFormatted}</span>
                 </div>
               </div>

@@ -449,6 +449,12 @@ export const translations = {
     "campaign.anonymous_identity": "🎭 Choose Your Anonymous Identity",
     "campaign.secure_checkout": "Secure checkout · Stripe (simulated)",
     "campaign.escrow_description": "Funds are held in Stripe escrow and released to the organiser on the end date.",
+    "campaign.breakdown_title": "Payment breakdown",
+    "campaign.breakdown_contribution": "Your contribution:",
+    "campaign.breakdown_tip": "Your tip:",
+    "campaign.breakdown_stripe_fee": "Stripe processing fee:",
+    "campaign.breakdown_platform_fee": "Platform fee:",
+    "campaign.breakdown_total": "Total to charge:",
 
     // Authentication
     "auth.loading": "Loading...",
@@ -999,6 +1005,12 @@ export const translations = {
     "campaign.anonymous_identity": "🎭 Elige tu identidad anónima",
     "campaign.secure_checkout": "Pago seguro · Stripe (simulado)",
     "campaign.escrow_description": "El dinero queda resguardado en Stripe y se entrega al organizador en la fecha de cierre.",
+    "campaign.breakdown_title": "Desglose del pago",
+    "campaign.breakdown_contribution": "Tu aporte:",
+    "campaign.breakdown_tip": "Tu regalo extra:",
+    "campaign.breakdown_stripe_fee": "Comisión Stripe:",
+    "campaign.breakdown_platform_fee": "Comisión plataforma:",
+    "campaign.breakdown_total": "Total a cobrar:",
 
     "auth.loading": "Cargando...",
     "auth.signin.title": "¡Hola de nuevo!",
@@ -1540,6 +1552,12 @@ export const translations = {
     "campaign.anonymous_identity": "🎭 Escolha sua identidade anônima",
     "campaign.secure_checkout": "Pagamento seguro · Stripe (simulado)",
     "campaign.escrow_description": "O dinheiro fica protegido no Stripe e é liberado para o organizador na data de encerramento.",
+    "campaign.breakdown_title": "Detalhes do pagamento",
+    "campaign.breakdown_contribution": "Sua contribuição:",
+    "campaign.breakdown_tip": "Seu presente extra:",
+    "campaign.breakdown_stripe_fee": "Taxa Stripe:",
+    "campaign.breakdown_platform_fee": "Taxa da plataforma:",
+    "campaign.breakdown_total": "Total a cobrar:",
 
     "auth.loading": "Carregando...",
     "auth.signin.title": "Que bom te ver de novo!",

@@ -63,7 +63,7 @@ function SignInInner() {
 
   return (<>
     <section
-      className="relative pb-0 overflow-hidden min-h-[30vh]  flex items-center py-14"
+      className="relative pb-0 min-h-[30vh] flex items-center py-14"
       style={{
         backgroundImage:
           'url(https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&h=1080&fit=crop)',
@@ -71,7 +71,7 @@ function SignInInner() {
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent pointer-events-none" />
 
       <div className="w-full relative z-10 text-center mb-8 text-white">
         <h1 className="text-4xl font-bold tracking-tight">{t("auth.signin.title")}</h1>
@@ -81,7 +81,7 @@ function SignInInner() {
 
     </section>
 
-    <div className="max-w-md mx-auto px-5 py-12 sm:py-20 ">
+    <div className="max-w-md mx-auto px-5 py-12 sm:py-20 relative z-20">
 
 
       {expired && (
@@ -107,7 +107,7 @@ function SignInInner() {
           prefix={<Mail size={16} />}
           required
           disabled={isLoading}
-          placeholder="alex@demo.local"
+          placeholder="your@email.com"
         />
         <Input
           label={t("auth.signin.password_label")}

@@ -147,7 +147,7 @@ export function TopNav() {
           )}
         </div>
       </div>
-      <div className={`sm:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "min-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
+      <div className={`sm:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "block min-h-screen" : "hidden"}`}>
         {desktopLinks.map((link, index) => (
           <MenuLink key={index} href={link.href} icon={link.icon} onClick={() => setSidebarOpen(false)}  > <span className="py-3 text-pretty text-slate-900  w-full block font-bold">{t(link.labelKey as any)}</span> </MenuLink>
         ))}
