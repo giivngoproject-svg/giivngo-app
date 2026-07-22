@@ -68,6 +68,15 @@ const FEATURED_CARDS = [
   },
 ];
 
+const SOCIAL_PROOF_AVATARS = [
+  '/social-proof/avatar-1.webp',
+  '/social-proof/avatar-2.webp',
+  '/social-proof/avatar-3.webp',
+  '/social-proof/avatar-4.webp',
+  '/social-proof/avatar-5.webp',
+  '/social-proof/avatar-6.webp',
+];
+
 export default function Home1() {
   const t = useTranslation();
 
@@ -197,13 +206,16 @@ export default function Home1() {
       <section className="relative -mt-12 z-30 mb-24 w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="bg-white rounded-3xl shadow-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-            <div className="flex -space-x-3 shrink-0">
-              {[1, 3, 4, 5, 7, 8].map((i) => (
-                <img
-                  key={i}
-                  src={`https://i.pravatar.cc/40?img=${i}`}
-                  alt="User"
-                  className="w-10 h-10 rounded-full border-2 border-white"
+            <div className="flex items-center justify-center gap-2 shrink-0">
+              {SOCIAL_PROOF_AVATARS.map((src, index) => (
+                <Image
+                  key={src}
+                  src={src}
+                  alt={`Happy group member ${index + 1}`}
+                  width={160}
+                  height={160}
+                  sizes="(min-width: 768px) 48px, 40px"
+                  className="h-10 w-10 rounded-full object-cover shadow-sm ring-2 ring-white sm:h-12 sm:w-12"
                 />
               ))}
               {/* <div className="w-10 h-10 rounded-full bg-[#7C5CFF] text-white flex items-center justify-center text-xs font-bold border-2 border-white">
