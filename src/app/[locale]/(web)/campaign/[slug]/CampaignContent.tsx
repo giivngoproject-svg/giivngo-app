@@ -724,7 +724,7 @@ export default function PublicCampaignPage() {
                 {/* Tip the recipient */}
                 <div>
                   <label className="block text-sm font-medium mb-1.5">
-                    Add a tip{recipient ? ` for ${recipient}` : ""} (optional)
+                    {recipient ? t("campaign.add_tip", { name: recipient }) : t("campaign.add_tip", { name: "the recipient" })} {t("campaign.tip_optional")}
                   </label>
                   <div className="flex gap-2 mb-2">
                     {TIP_OPTIONS.map((t) => (
