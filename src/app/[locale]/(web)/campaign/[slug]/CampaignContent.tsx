@@ -306,6 +306,7 @@ export default function PublicCampaignPage() {
       const platformFeeFormatted = formatCurrency(response.platformFee, response.currency, intlLocale);
       const totalFormatted = formatCurrency(response.checkoutTotal, response.currency, intlLocale);
       const contributionFormatted = formatCurrency(amt, response.currency, intlLocale);
+      const tipFormatted = response.tipAmount ? formatCurrency(response.tipAmount, response.currency, intlLocale) : null;
 
       const modalHTML = `
         <div id="payment-modal" style="
@@ -342,6 +343,10 @@ export default function PublicCampaignPage() {
                   <span style="color: #666;">Your contribution:</span>
                   <span style="font-weight: 500;">${contributionFormatted}</span>
                 </div>
+                ${tipFormatted ? `<div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                  <span style="color: #666;">Your tip:</span>
+                  <span style="font-weight: 500;">${tipFormatted}</span>
+                </div>` : ''}
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
                   <span style="color: #666;">Stripe processing fee:</span>
                   <span style="font-weight: 500;">${stripeFeeFormatted}</span>
