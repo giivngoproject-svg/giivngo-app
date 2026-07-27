@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslation } from "@/lib/useTranslation";
 import { Pencil, Link2, Users, CheckCircle2, Eye, Lock } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -14,11 +15,11 @@ const STEPS = [
 ];
 
 const CONTRIBUTORS = [
-  { name: "You", amount: "$150", img: 11 },
-  { name: "Sarah", amount: "$100", img: 45 },
-  { name: "Tom", amount: "$100", img: 51 },
-  { name: "Jess", amount: "$75", img: 5 },
-  { name: "Mike", amount: "$75", img: 33 },
+  { name: "You", amount: "$150", img: "/social-proof/avatar-4.webp" },
+  { name: "Sarah", amount: "$100", img: "/social-proof/avatar-1.webp" },
+  { name: "Tom", amount: "$100", img: "/social-proof/avatar-3.webp" },
+  { name: "Jess", amount: "$75", img: "/social-proof/avatar-5.webp" },
+  { name: "Mike", amount: "$75", img: "/social-proof/avatar-6.webp" },
 ];
 
 const BENEFITS = [
@@ -94,9 +95,12 @@ export function HowItWorks() {
                     className="flex items-center justify-between border-t border-border py-[7px]"
                   >
                     <div className="flex items-center gap-2">
-                      <img
-                        src={`https://i.pravatar.cc/60?img=${c.img}`}
+                      <Image
+                        src={c.img}
                         alt=""
+                        width={48}
+                        height={48}
+                        sizes="24px"
                         className="h-6 w-6 rounded-full object-cover"
                       />
                       <span className="text-xs text-foreground">
