@@ -64,6 +64,7 @@ function ManagePageInner() {
   const [reactivateOpen, setReactivateOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [mediaModal, setMediaModal] = useState<{ type: 'photo' | 'video'; url: string } | null>(null);
+  const [payout, setPayout] = useState<any>(null);
 
   // Load campaign and contributions on mount - use inline callbacks to avoid dependency issues
   useEffect(() => {
@@ -73,6 +74,16 @@ function ManagePageInner() {
       loadContributions(slug).catch(console.error);
     }
   }, [slug]);
+
+  // Load payout data from backend
+  useEffect(() => {
+    if (campaign?.id) {
+      fetch(`/api/payouts/campaigns/${campaign.id}`)
+        .then(res => res.json())
+        .then(data => setPayout(data))
+        .catch(console.error);
+    }
+  }, [campaign?.id]);
 
   const contributions = useMemo(
     () =>
@@ -163,7 +174,12 @@ function ManagePageInner() {
 
   const end = new Date(campaign.end_date);
   const daysLeft = Math.max(0, Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
-  const fee = calcFee(campaign.raised_amount);
+
+  // Use actual payout from backend if available, otherwise use raised amount (Giivngo covers Stripe fees)
+  const payoutAmount = payout?.netAmount ?? campaign.raised_amount;
+  const payoutFee = payout?.feeAmount ?? 0;
+  const fee = { net: payoutAmount, fee: payoutFee };
+
   const tips = tipTotal(contributions);
   const mode = poolMode(campaign);
   const recipient = campaign.recipient_name?.trim();
@@ -216,8 +232,7 @@ function ManagePageInner() {
         <Stat
           icon={<Banknote size={16} />}
           label={t('manage.net_payout')}
-          value={formatAUD(fee.net)}
-          hint={`${t('manage.after_fee')} (${formatAUD(fee.fee, { withCents: true })})`}
+          value={formatAUD(payout?.netAmount ?? fee.net)}
         />
         <Stat icon={<Users size={16} />} label={t('manage.contributors')} value={String(contributions.length)} />
         <Stat
