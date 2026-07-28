@@ -360,6 +360,21 @@ function Step2({
         hint={t('create.end_date.hint')}
       />
 
+      {data.end_date && (
+        <div className="mt-4 p-4 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+          <p className="text-sm text-blue-900 dark:text-blue-100">
+            <span className="font-semibold">{t('create.estimated_payout')}:</span>{' '}
+            {new Date(new Date(data.end_date).getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(
+              'en-AU',
+              { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+            )}
+          </p>
+          <p className="text-xs text-blue-800 dark:text-blue-200 mt-1">
+            {t('create.payout_note')}
+          </p>
+        </div>
+      )}
+
       {isTiers ? (
         <TierEditor tiers={data.tiers} onChange={(tiers) => patch({ tiers })} />
       ) : (
