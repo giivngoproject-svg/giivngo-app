@@ -38,20 +38,9 @@ function CreatePageInner() {
   const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
-    return () => {
-      // wizard state is session-only; keep across navigations within the wizard.
-    };
-  }, []);
-
-  if (!user) return null;
-
-  const goNext = () => setStep((Math.min(3, step + 1) as 1 | 2 | 3));
-  const goBack = () => setStep((Math.max(1, step - 1) as 1 | 2 | 3));
-
-  const publish = async () => {
-    // Validate Stripe Connect
-    if (!user.stripe_account_id) {
-      const result = await Swal.fire({
+    // Validate Stripe Connect on page load
+    if (user && !user.stripe_account_id) {
+      Swal.fire({
         title: "Stripe Connect Required",
         text: "You need to link your Stripe account to create campaigns and receive payments.",
         icon: "warning",
@@ -59,14 +48,26 @@ function CreatePageInner() {
         confirmButtonText: "Go to Profile",
         cancelButtonText: "Cancel",
         confirmButtonColor: "#1E1B4B",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/profile");
+        } else {
+          router.push("/dashboard");
+        }
       });
-
-      if (result.isConfirmed) {
-        router.push("/profile");
-      }
-      return;
     }
 
+    return () => {
+      // wizard state is session-only; keep across navigations within the wizard.
+    };
+  }, [user, router]);
+
+  if (!user) return null;
+
+  const goNext = () => setStep((Math.min(3, step + 1) as 1 | 2 | 3));
+  const goBack = () => setStep((Math.max(1, step - 1) as 1 | 2 | 3));
+
+  const publish = async () => {
     setIsPublishing(true);
     try {
       const tiered = data.pool_mode === "tiers";

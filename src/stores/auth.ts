@@ -149,6 +149,7 @@ export const useAuth = create<AuthState>()(
       signOut: () => {
         if (typeof window !== "undefined") {
           localStorage.removeItem("auth_token");
+          localStorage.removeItem("giivngo.auth");
         }
         set({
           user: null,
