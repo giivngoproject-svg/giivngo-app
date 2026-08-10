@@ -88,32 +88,27 @@ export function useCheckout() {
   /**
    * Parse error from axios response
    * Extracts structured error info: message, statusCode, code
+   *
+   * Network error = no response from server (timeout, connection refused, etc.)
+   * Validation error = 400 status code
+   * Server error = 5xx status code
    */
   const parseCheckoutError = (error: any): CheckoutError => {
-    // Axios error with response
-    if (error?.response?.data) {
+    // Axios error with response (has HTTP status)
+    if (error?.response) {
       return {
-        message: error.response.data.message || error.response.statusText || 'Error desconocido',
+        message: error.response.data?.message || error.response.statusText || 'Error desconocido',
         statusCode: error.response.status,
-        code: error.response.data.code,
+        code: error.response.data?.code,
         isValidationError: error.response.status === 400,
       };
     }
 
-    // Axios error without response (network error, timeout, etc.)
-    if (error?.code) {
-      return {
-        message: 'Comprueba tu conexión a internet e intenta de nuevo',
-        statusCode: 0,
-        code: error.code,
-        isNetworkError: true,
-      };
-    }
-
-    // Generic error
+    // Axios error without response (network error, timeout, connection refused, etc.)
     return {
-      message: error?.message || 'Error desconocido',
+      message: 'Comprueba tu conexión a internet e intenta de nuevo',
       statusCode: 0,
+      code: error?.code,
       isNetworkError: true,
     };
   };

@@ -456,10 +456,14 @@ export default function PublicCampaignPage() {
       console.error("Checkout error:", error);
 
       // Parse error from axios
-      const statusCode = error?.response?.status || error?.statusCode || 0;
+      // Key: isNetworkError is true ONLY if there's no response from server
+      // (i.e., timeout, connection refused, etc.)
+      const hasResponse = !!error?.response;
+      const statusCode = error?.response?.status || 0;
       const errorMessage = error?.response?.data?.message || error?.message || t("common.error");
+      const isNetworkError = !hasResponse; // No response = network error
       const isValidationError = statusCode === 400;
-      const isNetworkError = statusCode === 0 || error?.code?.includes('ERR_');
+      const isServerError = statusCode >= 500;
 
       let displayTitle = t("campaign.checkout_failed");
       let displayMessage = errorMessage;
@@ -473,7 +477,7 @@ export default function PublicCampaignPage() {
         // 400 errors: show the exact message from server (validación o negocio)
         displayTitle = t("common.error");
         displayMessage = errorMessage;
-      } else if (statusCode >= 500) {
+      } else if (isServerError) {
         // 5xx errors: show generic message to avoid exposing server details
         displayTitle = t("common.error");
         displayMessage = "Algo salió mal. Por favor, intenta de nuevo.";
