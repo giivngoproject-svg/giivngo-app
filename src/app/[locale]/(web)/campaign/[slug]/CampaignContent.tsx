@@ -417,7 +417,14 @@ export default function PublicCampaignPage() {
 
         if (error) {
           console.error('❌ [Payment] Payment error:', error);
-          await Swal.fire({ title: t("campaign.checkout_failed"), text: error.message, icon: "error", confirmButtonColor: "#1E1B4B" });
+          // Stripe payment errors (card declined, etc.) - show to user
+          const stripeErrorMessage = error.message || 'Pago rechazado. Por favor, intenta de nuevo.';
+          await Swal.fire({
+            title: t("campaign.checkout_failed"),
+            text: stripeErrorMessage,
+            icon: "error",
+            confirmButtonColor: "#1E1B4B"
+          });
           submitBtn.disabled = false;
           submitBtn.textContent = `${t("campaign.pay_button", { amount: totalAmount })}`;
         } else if (paymentIntent?.status === 'succeeded') {
@@ -447,9 +454,35 @@ export default function PublicCampaignPage() {
       });
     } catch (error: any) {
       console.error("Checkout error:", error);
+
+      // Parse error from axios
+      const statusCode = error?.response?.status || error?.statusCode || 0;
+      const errorMessage = error?.response?.data?.message || error?.message || t("common.error");
+      const isValidationError = statusCode === 400;
+      const isNetworkError = statusCode === 0 || error?.code?.includes('ERR_');
+
+      let displayTitle = t("campaign.checkout_failed");
+      let displayMessage = errorMessage;
+
+      // Determine what to show based on error type
+      if (isNetworkError) {
+        displayTitle = t("common.error");
+        displayMessage = "Comprueba tu conexión a internet e intenta de nuevo";
+        console.warn("Network error during checkout:", error);
+      } else if (isValidationError) {
+        // 400 errors: show the exact message from server (validación o negocio)
+        displayTitle = t("common.error");
+        displayMessage = errorMessage;
+      } else if (statusCode >= 500) {
+        // 5xx errors: show generic message to avoid exposing server details
+        displayTitle = t("common.error");
+        displayMessage = "Algo salió mal. Por favor, intenta de nuevo.";
+        console.error("Server error during checkout:", error);
+      }
+
       await Swal.fire({
-        title: t("campaign.checkout_failed"),
-        text: error.message || error.response?.data?.message || t("common.error"),
+        title: displayTitle,
+        text: displayMessage,
         icon: "error",
         confirmButtonColor: "#1E1B4B",
       });

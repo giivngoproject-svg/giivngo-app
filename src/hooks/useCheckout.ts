@@ -40,9 +40,17 @@ export interface CheckoutResponse {
   };
 }
 
+interface CheckoutError {
+  message: string;
+  statusCode: number;
+  code?: string;
+  isValidationError?: boolean; // true si es 400 (validación o negocio)
+  isNetworkError?: boolean;
+}
+
 interface UseCheckoutState {
   isLoading: boolean;
-  error: string | null;
+  error: CheckoutError | null;
   feeResult: CheckoutResponse | null;
 }
 
@@ -78,6 +86,39 @@ export function useCheckout() {
   });
 
   /**
+   * Parse error from axios response
+   * Extracts structured error info: message, statusCode, code
+   */
+  const parseCheckoutError = (error: any): CheckoutError => {
+    // Axios error with response
+    if (error?.response?.data) {
+      return {
+        message: error.response.data.message || error.response.statusText || 'Error desconocido',
+        statusCode: error.response.status,
+        code: error.response.data.code,
+        isValidationError: error.response.status === 400,
+      };
+    }
+
+    // Axios error without response (network error, timeout, etc.)
+    if (error?.code) {
+      return {
+        message: 'Comprueba tu conexión a internet e intenta de nuevo',
+        statusCode: 0,
+        code: error.code,
+        isNetworkError: true,
+      };
+    }
+
+    // Generic error
+    return {
+      message: error?.message || 'Error desconocido',
+      statusCode: 0,
+      isNetworkError: true,
+    };
+  };
+
+  /**
    * Request checkout from backend
    * Returns fee breakdown WITHOUT charging yet
    * User reviews fees and confirms before proceeding to payment
@@ -89,6 +130,7 @@ export function useCheckout() {
     setState({ isLoading: true, error: null, feeResult: null });
 
     try {
+      // Use window.location to detect API URL at runtime
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       const response = await fetch(`${apiUrl}/campaigns/${campaignSlug}/checkout`, {
         method: 'POST',
@@ -100,7 +142,19 @@ export function useCheckout() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Checkout request failed: ${response.statusText}`);
+        const checkoutError: CheckoutError = {
+          message: errorData.message || response.statusText || 'Error desconocido',
+          statusCode: response.status,
+          code: errorData.code,
+          isValidationError: response.status === 400,
+        };
+
+        setState({
+          isLoading: false,
+          error: checkoutError,
+          feeResult: null,
+        });
+        return null;
       }
 
       const feeResult = (await response.json()) as CheckoutResponse;
@@ -113,10 +167,10 @@ export function useCheckout() {
 
       return feeResult;
     } catch (error: unknown) {
-      const message = (error as any).message || 'Failed to process checkout';
+      const checkoutError = parseCheckoutError(error);
       setState({
         isLoading: false,
-        error: message,
+        error: checkoutError,
         feeResult: null,
       });
       return null;
