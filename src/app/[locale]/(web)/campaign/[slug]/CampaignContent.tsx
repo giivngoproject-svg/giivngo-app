@@ -210,11 +210,11 @@ export default function PublicCampaignPage() {
       }
       if (!tiered) {
         if (min && amt < min) {
-          await Swal.fire({ title: `Minimum is ${formatCurrency(min, campaign.currency || 'AUD', getIntlLocale(localeConfig.locale))}`, icon: "error", confirmButtonColor: "#1E1B4B" });
+          await Swal.fire({ title: `Minimum contribution is ${campaign.currency || 'AUD'} $${min}`, icon: "error", confirmButtonColor: "#1E1B4B" });
           return;
         }
         if (max && amt > max) {
-          await Swal.fire({ title: `Maximum is ${formatCurrency(max, campaign.currency || 'AUD', getIntlLocale(localeConfig.locale))}`, icon: "error", confirmButtonColor: "#1E1B4B" });
+          await Swal.fire({ title: `Maximum contribution is ${campaign.currency || 'AUD'} $${max}`, icon: "error", confirmButtonColor: "#1E1B4B" });
           return;
         }
       }
