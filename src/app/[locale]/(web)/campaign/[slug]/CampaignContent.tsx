@@ -523,6 +523,17 @@ export default function PublicCampaignPage() {
               )}
             </div>
           </div>
+
+          {/* Campaign Video (if exists) */}
+          {campaign.cover_video_url && (
+            <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft">
+              <video
+                src={campaign.cover_video_url}
+                controls
+                className="w-full h-auto max-h-96 bg-black"
+              />
+            </div>
+          )}
           <div>
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               <StatusBadge status={campaign.status} />

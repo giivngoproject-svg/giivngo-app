@@ -35,6 +35,7 @@ function transformCampaignFromApi(data: any) {
     goal_amount: data.goalAmount,
     raised_amount: data.raisedAmount,
     cover_photo_url: data.coverPhotoUrl,
+    cover_video_url: data.coverVideoUrl,
     end_date: data.endDate,
     status: data.status,
     slug: data.slug,

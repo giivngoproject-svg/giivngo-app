@@ -19,6 +19,7 @@ import { POOL_MODES } from "@/lib/pool";
 import { cn } from "@/lib/cn";
 import { WizardShell } from "@/components/wizard/WizardShell";
 import { PhotoUpload } from "@/components/wizard/PhotoUpload";
+import { VideoUpload } from "@/components/wizard/VideoUpload";
 import { TierEditor } from "@/components/wizard/TierEditor";
 import { ItemEditor } from "@/components/wizard/ItemEditor";
 import { CountrySelector } from "@/components/wizard/CountrySelector";
@@ -82,6 +83,7 @@ function CreatePageInner() {
         type: data.type,
         goalAmount: data.goal_amount || undefined,
         coverPhotoUrl: data.cover_photo_url,
+        coverVideoUrl: data.cover_video_url,
         endDate: new Date(data.end_date).toISOString(),
         minContribution: tiered ? undefined : data.min_contribution,
         maxContribution: tiered ? undefined : data.max_contribution,
@@ -114,12 +116,19 @@ function CreatePageInner() {
           icon: "error",
           confirmButtonColor: "#1E1B4B",
         });
-        // Delete uploaded image if campaign creation failed
+        // Delete uploaded media if campaign creation failed
         if (data.cover_photo_url) {
           try {
             await deleteImage(data.cover_photo_url);
           } catch (err) {
             console.error("Could not delete uploaded image:", err);
+          }
+        }
+        if (data.cover_video_url) {
+          try {
+            await deleteImage(data.cover_video_url);
+          } catch (err) {
+            console.error("Could not delete uploaded video:", err);
           }
         }
       }
@@ -130,12 +139,19 @@ function CreatePageInner() {
         icon: "error",
         confirmButtonColor: "#1E1B4B",
       });
-      // Delete uploaded image if campaign creation failed
+      // Delete uploaded media if campaign creation failed
       if (data.cover_photo_url) {
         try {
           await deleteImage(data.cover_photo_url);
         } catch (err) {
           console.error("Could not delete uploaded image:", err);
+        }
+      }
+      if (data.cover_video_url) {
+        try {
+          await deleteImage(data.cover_video_url);
+        } catch (err) {
+          console.error("Could not delete uploaded video:", err);
         }
       }
     } finally {
@@ -205,6 +221,11 @@ function Step1({
       <PhotoUpload
         value={data.cover_photo_url}
         onChange={(url) => patch({ cover_photo_url: url })}
+      />
+
+      <VideoUpload
+        value={data.cover_video_url}
+        onChange={(url) => patch({ cover_video_url: url })}
       />
 
       <Input

@@ -48,6 +48,7 @@ export type Campaign = {
   goal_amount?: number;
   raised_amount: number;
   cover_photo_url?: string;
+  cover_video_url?: string;
   end_date: string;
   status: CampaignStatus;
   slug: string;

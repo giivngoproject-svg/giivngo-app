@@ -9,6 +9,7 @@ export type WizardData = {
   description: string;
   recipient_name?: string;
   cover_photo_url?: string;
+  cover_video_url?: string;
   goal_amount?: number;
   end_date: string;
   min_contribution?: number;
@@ -42,6 +43,7 @@ const DEFAULTS: WizardData = {
   description: "",
   recipient_name: undefined,
   cover_photo_url: undefined,
+  cover_video_url: undefined,
   goal_amount: undefined,
   end_date: defaultEnd(),
   min_contribution: undefined,
