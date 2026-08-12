@@ -317,8 +317,11 @@ function Step2({
   const hasItems = data.contribution_items.length > 0;
 
   // Validation: if min_contribution is set and contribution items exist, each item must be >= min_contribution
+  const minAmount = data.min_contribution || 0;
   const allItemsAboveMin =
-    data.min_contribution <= 0 || !hasItems || data.contribution_items.every((item) => item.amount >= data.min_contribution);
+    minAmount <= 0 ||
+    !hasItems ||
+    data.contribution_items.every((item) => item.amount >= minAmount);
 
   const canNext = !!data.end_date && (!isTiers || validTiers.length >= 1) && allItemsAboveMin;
   const [itemsExpanded, setItemsExpanded] = React.useState(false);
@@ -468,9 +471,9 @@ function Step2({
             <p className="text-xs text-muted mt-3">
               {t('create.add_items.hint')}
             </p>
-            {data.min_contribution > 0 && hasItems && !allItemsAboveMin && (
+            {minAmount > 0 && hasItems && !allItemsAboveMin && (
               <p className="text-xs text-red-600 dark:text-red-400 mt-3">
-                {t('create.items_must_exceed_min')} A ${data.min_contribution}
+                {t('create.items_must_exceed_min')} A ${minAmount}
               </p>
             )}
           </div>
