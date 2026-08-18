@@ -303,7 +303,6 @@ export default function PublicCampaignPage() {
 
       // Create modal HTML with SERVER-CALCULATED fees
       const stripeFeeFormatted = formatCurrency(response.stripeFee, response.currency, intlLocale);
-      const platformFeeFormatted = formatCurrency(response.platformFee, response.currency, intlLocale);
       const totalFormatted = formatCurrency(response.checkoutTotal, response.currency, intlLocale);
       const contributionFormatted = formatCurrency(amt, response.currency, intlLocale);
       const tipFormatted = response.tipAmount ? formatCurrency(response.tipAmount, response.currency, intlLocale) : null;
@@ -350,10 +349,6 @@ export default function PublicCampaignPage() {
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
                   <span style="color: #666;">${t("campaign.breakdown_stripe_fee")}</span>
                   <span style="font-weight: 500;">${stripeFeeFormatted}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-                  <span style="color: #666;">${t("campaign.breakdown_platform_fee")}</span>
-                  <span style="font-weight: 500;">${platformFeeFormatted}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 8px; font-size: 14px; font-weight: 600;">
                   <span style="color: #333;">${t("campaign.breakdown_total")}</span>

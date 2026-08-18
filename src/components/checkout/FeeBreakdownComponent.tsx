@@ -100,32 +100,24 @@ export function FeeBreakdownComponent({
         </div>
       )}
 
-      {/* Platform Fee */}
-      <div className="flex justify-between text-sm">
-        <span className="text-gray-600 dark:text-gray-400">Platform fee ({feeResult.breakdown.platformFeePct}%):</span>
-        <span className="text-gray-700 dark:text-gray-300">
-          {formatCurrency(feeResult.platformFee, currency, intlLocale)}
-        </span>
-      </div>
-
       {/* Divider */}
       <div className="border-t border-gray-300 dark:border-gray-600" />
 
       {/* Total Amount to Charge */}
       <div className="flex justify-between text-base font-semibold">
-        <span className="text-gray-900 dark:text-gray-100">Total you'll be charged:</span>
+        <span className="text-gray-900 dark:text-gray-100">Total to charge:</span>
         <span className="text-blue-600 dark:text-blue-400">
           {formatCurrency(feeResult.checkoutTotal, currency, intlLocale)}
         </span>
       </div>
 
-      {/* Organizer Receives */}
+      {/* Info */}
       <p className="text-xs text-gray-500 dark:text-gray-400">
         ℹ️ The organizer receives{' '}
         <span className="font-medium">
           {formatCurrency(feeResult.amount, currency, intlLocale)}
         </span>{' '}
-        after fees
+        plus tips
       </p>
     </div>
   );
