@@ -222,6 +222,8 @@ export const translations = {
     "common.close": "Close",
     "common.back": "Back",
     "common.confirm": "Confirm",
+    "common.error_camera_permission_denied": "Camera permission denied. Please allow camera access in your browser settings.",
+    "common.error_camera_not_found": "No camera device found on your device.",
 
     // Public Campaign Page
     "campaign.contribute": "Contribute",
@@ -382,6 +384,7 @@ export const translations = {
     "landing.footer.terms": "Terms of service",
     "landing.footer.privacy": "Privacy",
     "landing.footer.cookies": "Cookies",
+    "landing.footer.support": "Support",
     "landing.footer.security": "Security & privacy",
 
     // Navigation - Full
@@ -533,6 +536,8 @@ export const translations = {
     "wizard.add_item": "Add another item",
     "wizard.preview": "Preview",
     "wizard.photo_hint": "JPG or PNG, up to 5 MB",
+    "wizard.cover_photo_tab": "Add Photo",
+    "wizard.cover_video_tab": "Add Video",
     "wizard.contribution_tiers": "Contribution tiers",
     "wizard.amount": "Amount",
 
@@ -802,6 +807,8 @@ export const translations = {
     "common.close": "Cerrar",
     "common.back": "Volver",
     "common.confirm": "Confirmar",
+    "common.error_camera_permission_denied": "Permiso de cámara denegado. Por favor, permite el acceso a la cámara en tu navegador.",
+    "common.error_camera_not_found": "No se encontró cámara en tu dispositivo.",
 
     // Public Campaign Page
     "campaign.contribute": "Aportar",
@@ -947,6 +954,7 @@ export const translations = {
     "landing.footer.terms": "Términos de servicio",
     "landing.footer.privacy": "Privacidad",
     "landing.footer.cookies": "Cookies",
+    "landing.footer.support": "Soporte",
     "landing.footer.security": "Seguridad y privacidad",
 
     "nav.how_it_works": "Cómo funciona",
@@ -1087,6 +1095,8 @@ export const translations = {
     "wizard.add_item": "Agregar otro elemento",
     "wizard.preview": "Vista previa",
     "wizard.photo_hint": "JPG o PNG, hasta 5 MB",
+    "wizard.cover_photo_tab": "Agregar foto",
+    "wizard.cover_video_tab": "Agregar video",
     "wizard.contribution_tiers": "Niveles de contribución",
     "wizard.amount": "Monto",
 
@@ -1353,6 +1363,8 @@ export const translations = {
     "common.close": "Fechar",
     "common.back": "Voltar",
     "common.confirm": "Confirmar",
+    "common.error_camera_permission_denied": "Permissão de câmera negada. Por favor, permita o acesso à câmera nas configurações do seu navegador.",
+    "common.error_camera_not_found": "Nenhum dispositivo de câmera encontrado no seu dispositivo.",
 
     // Public Campaign Page
     "campaign.contribute": "Contribuir",
@@ -1498,6 +1510,7 @@ export const translations = {
     "landing.footer.terms": "Termos de serviço",
     "landing.footer.privacy": "Privacidade",
     "landing.footer.cookies": "Cookies",
+    "landing.footer.support": "Suporte",
     "landing.footer.security": "Segurança e privacidade",
 
     "nav.how_it_works": "Como funciona",
@@ -1638,6 +1651,8 @@ export const translations = {
     "wizard.add_item": "Adicionar outro item",
     "wizard.preview": "Visualização",
     "wizard.photo_hint": "JPG ou PNG, até 5 MB",
+    "wizard.cover_photo_tab": "Adicionar foto",
+    "wizard.cover_video_tab": "Adicionar vídeo",
     "wizard.contribution_tiers": "Níveis de contribuição",
     "wizard.amount": "Valor",
 

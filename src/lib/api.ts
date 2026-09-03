@@ -227,7 +227,8 @@ export const authApi = {
 export const campaignsApi = {
   getAll: async () => {
     const res = await apiClient.get('/campaigns');
-    return res.data.map(transformCampaignFromApi);
+    const data = res.data.data || res.data; // Handle paginated response
+    return (Array.isArray(data) ? data : []).map(transformCampaignFromApi);
   },
 
   create: async (campaignData: any) => {
@@ -264,7 +265,8 @@ export const campaignsApi = {
 export const contributionsApi = {
   getList: async (slug: string) => {
     const res = await apiClient.get(`/campaigns/${slug}/contributions`);
-    return res.data.map(transformContributionFromApi);
+    const data = res.data.data || res.data; // Handle paginated response
+    return (Array.isArray(data) ? data : []).map(transformContributionFromApi);
   },
 
   checkout: async (slug: string, checkoutData: any) => {

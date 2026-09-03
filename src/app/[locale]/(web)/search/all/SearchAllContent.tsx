@@ -5,6 +5,14 @@ import { Link } from '@/i18n/navigation';
 import { Search, AlertCircle } from 'lucide-react';
 import type { CampaignResponseDto } from '@/lib/types';
 
+interface PaginatedResponse {
+  data: CampaignResponseDto[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export default function SearchAllPage() {
   const [campaigns, setCampaigns] = useState<CampaignResponseDto[]>([]);
   const [filtered, setFiltered] = useState<CampaignResponseDto[]>([]);
@@ -18,7 +26,7 @@ export default function SearchAllPage() {
       try {
         setLoading(true);
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/campaigns/search/public`, {
+        const response = await fetch(`${apiUrl}/campaigns/search/public?limit=100`, {
           cache: 'no-store',
         });
 
@@ -26,9 +34,9 @@ export default function SearchAllPage() {
           throw new Error('Failed to fetch campaigns');
         }
 
-        const data: CampaignResponseDto[] = await response.json();
-        setCampaigns(data);
-        setFiltered(data);
+        const pageData: PaginatedResponse = await response.json();
+        setCampaigns(pageData.data);
+        setFiltered(pageData.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -41,13 +49,17 @@ export default function SearchAllPage() {
 
   // Filter campaigns by search query
   useEffect(() => {
-    const lowerQuery = query.toLowerCase();
-    const results = campaigns.filter(
-      (campaign) =>
-        campaign.title.toLowerCase().includes(lowerQuery) ||
-        campaign.description.toLowerCase().includes(lowerQuery)
-    );
-    setFiltered(results);
+    if (query.trim() === '') {
+      setFiltered(campaigns);
+    } else {
+      const lowerQuery = query.toLowerCase();
+      const results = campaigns.filter(
+        (campaign) =>
+          campaign.title.toLowerCase().includes(lowerQuery) ||
+          campaign.description.toLowerCase().includes(lowerQuery)
+      );
+      setFiltered(results);
+    }
   }, [query, campaigns]);
 
   return (
@@ -99,6 +111,8 @@ export default function SearchAllPage() {
             <p className="text-muted text-lg">
               {campaigns.length === 0
                 ? 'No campaigns available yet'
+                : query.trim() === ''
+                ? 'No campaigns available'
                 : 'No campaigns match your search'}
             </p>
           </div>

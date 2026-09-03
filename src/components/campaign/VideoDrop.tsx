@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Video, Upload, Square, X, Circle } from "lucide-react";
+import { useRef, useState } from "react";
+import { Video, Upload, X } from "lucide-react";
 import { useTranslation } from "@/lib/useTranslation";
 import { uploadVideo } from "@/lib/mock/storage";
 import { toast } from "@/stores/toast";
+import { VideoRecorder } from "@/components/media/VideoRecorder";
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25 MB
 const MAX_SECONDS = 15;
@@ -19,23 +20,8 @@ export function VideoDrop({
 }) {
   const t = useTranslation();
   const [recording, setRecording] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
   const [busy, setBusy] = useState(false);
-
-  const previewRef = useRef<HTMLVideoElement>(null);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const stopStream = () => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = null;
-  };
-
-  useEffect(() => stopStream, []);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (file: File) => {
     if (file.size > MAX_BYTES) {
@@ -50,124 +36,87 @@ export function VideoDrop({
     }
   };
 
-  const startRecording = async () => {
-    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-      toast.error(t("common.error"));
-      return;
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleUpload(file);
     }
+  };
+
+  const handleRecordConfirm = async (blob: Blob, preview: string) => {
+    setBusy(true);
     try {
-      setRecording(true);
-      setElapsed(0);
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      streamRef.current = stream;
-      chunksRef.current = [];
-
-      if (previewRef.current) {
-        previewRef.current.srcObject = stream;
-        previewRef.current.play().catch(() => {});
-      }
-
-      const recorder = new MediaRecorder(stream);
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-      recorder.onstop = async () => {
-        stopStream();
-        setRecording(false);
-        const blob = new Blob(chunksRef.current, { type: chunksRef.current[0]?.type || "video/webm" });
-        setBusy(true);
-        try {
-          onChange(await uploadVideo(blob));
-        } finally {
-          setBusy(false);
-        }
-      };
-      recorderRef.current = recorder;
-      recorder.start();
-
-      timerRef.current = setInterval(() => {
-        setElapsed((s) => {
-          if (s + 1 >= MAX_SECONDS) stopRecording();
-          return s + 1;
-        });
-      }, 1000);
-    } catch {
+      const file = new File([blob], "recording.webm", { type: blob.type });
+      await handleUpload(file);
       setRecording(false);
-      toast.error(t("common.error"));
-      stopStream();
+    } finally {
+      setBusy(false);
     }
   };
 
-  const stopRecording = () => {
-    if (recorderRef.current && recorderRef.current.state !== "inactive") {
-      recorderRef.current.stop();
-    }
-  };
-
-  if (value) {
+  if (recording) {
     return (
-      <div>
-        <label className="block text-sm font-medium mb-1.5">{t("form.video_title")}</label>
-        <div className="relative rounded-2xl overflow-hidden border border-border">
-          <video src={value} controls playsInline className="w-full max-h-56 object-cover bg-black" />
-          <button
-            type="button"
-            onClick={() => onChange(undefined)}
-            className="absolute top-2 right-2 p-1.5 bg-background/90 rounded-full shadow-soft hover:bg-background"
-            aria-label="Remove video"
-          >
-            <X size={14} />
-          </button>
-        </div>
-      </div>
+      <VideoRecorder
+        variant="inline"
+        maxDurationSeconds={MAX_SECONDS}
+        maxBytes={MAX_BYTES}
+        onConfirm={handleRecordConfirm}
+        onCancel={() => setRecording(false)}
+      />
     );
   }
 
   return (
-    <div>
-      <label className="block text-sm font-medium mb-1.5">{t("form.video_optional")}</label>
+    <div className="space-y-3">
+      {value && (
+        <div className="relative rounded-lg overflow-hidden bg-black">
+          <video
+            src={value}
+            controls
+            className="w-full max-h-64"
+          />
+          <button
+            onClick={() => onChange(undefined)}
+            className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
 
-      {recording ? (
-        <div className="rounded-2xl border border-border overflow-hidden">
-          <video ref={previewRef} autoPlay muted playsInline className="w-full max-h-56 object-contain bg-black" />
-          <div className="flex items-center justify-between p-2.5">
-            <span className="text-sm text-red-600 inline-flex items-center gap-1.5">
-              <Circle size={10} className="fill-red-600 animate-pulse" />
-              {elapsed}s / {MAX_SECONDS}s
-            </span>
+      {!value && (
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center space-y-3">
+          <Video className="w-10 h-10 mx-auto text-gray-400" />
+          <p className="text-sm text-gray-600">
+            Record or upload a short video (max {MAX_SECONDS}s, {(MAX_BYTES / 1024 / 1024).toFixed(0)}MB)
+          </p>
+
+          <div className="flex flex-col gap-2">
             <button
-              type="button"
-              onClick={stopRecording}
-              className="inline-flex items-center gap-1.5 text-sm font-medium px-3 h-9 rounded-xl bg-foreground text-background"
+              onClick={() => setRecording(true)}
+              disabled={busy}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
             >
-              <Square size={13} /> {t("common.close")}
+              Record Video
+            </button>
+
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={busy}
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 text-sm font-medium flex items-center justify-center gap-2"
+            >
+              <Upload size={16} />
+              Upload Video
             </button>
           </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={startRecording}
-            disabled={busy}
-            className="flex items-center justify-center gap-2 h-11 rounded-2xl border border-border text-sm text-muted hover:text-foreground hover:bg-foreground/[.02] disabled:opacity-50"
-          >
-            <Video size={15} /> {t("common.edit")}
-          </button>
-          <label className="flex items-center justify-center gap-2 h-11 rounded-2xl border border-dashed border-border text-sm text-muted hover:text-foreground hover:bg-foreground/[.02] cursor-pointer">
-            <Upload size={15} />
-            {busy ? t("common.loading") : t("common.edit")}
-            <input
-              type="file"
-              accept="video/*"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void handleUpload(f);
-                e.target.value = "";
-              }}
-            />
-          </label>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="video/*"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
         </div>
       )}
     </div>

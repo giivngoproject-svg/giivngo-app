@@ -18,8 +18,7 @@ import {
 import { POOL_MODES } from "@/lib/pool";
 import { cn } from "@/lib/cn";
 import { WizardShell } from "@/components/wizard/WizardShell";
-import { PhotoUpload } from "@/components/wizard/PhotoUpload";
-import { VideoUpload } from "@/components/wizard/VideoUpload";
+import { CoverMediaTabs } from "@/components/wizard/CoverMediaTabs";
 import { TierEditor } from "@/components/wizard/TierEditor";
 import { ItemEditor } from "@/components/wizard/ItemEditor";
 import { CountrySelector } from "@/components/wizard/CountrySelector";
@@ -214,18 +213,15 @@ function Step1({
   onNext: () => void;
   onCancel: () => void;
 }) {
-  const canNext = data.title.trim().length >= 3 && data.description.trim().length >= 15;
+  const canNext = data.title.trim().length >= 3 && data.description.trim().length >= 0;
 
   return (
     <div className="space-y-5">
-      <PhotoUpload
-        value={data.cover_photo_url}
-        onChange={(url) => patch({ cover_photo_url: url })}
-      />
-
-      <VideoUpload
-        value={data.cover_video_url}
-        onChange={(url) => patch({ cover_video_url: url })}
+      <CoverMediaTabs
+        photoUrl={data.cover_photo_url}
+        videoUrl={data.cover_video_url}
+        onPhotoChange={(url) => patch({ cover_photo_url: url })}
+        onVideoChange={(url) => patch({ cover_video_url: url })}
       />
 
       <Input

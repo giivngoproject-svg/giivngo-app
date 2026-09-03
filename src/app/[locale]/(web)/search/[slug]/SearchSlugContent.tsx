@@ -7,6 +7,14 @@ import type { CampaignResponseDto } from '@/lib/types';
 
 const ITEMS_PER_PAGE = 12;
 
+interface PaginatedResponse {
+  data: CampaignResponseDto[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export default function SearchSlugPage({ params }: { params: { slug: string } }) {
     const [campaigns, setCampaigns] = useState<CampaignResponseDto[]>([]);
     const [filtered, setFiltered] = useState<CampaignResponseDto[]>([]);
@@ -25,7 +33,7 @@ export default function SearchSlugPage({ params }: { params: { slug: string } })
             try {
                 setLoading(true);
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-                const response = await fetch(`${apiUrl}/campaigns/search/public`, {
+                const response = await fetch(`${apiUrl}/campaigns/search/public?limit=100`, {
                     cache: 'no-store',
                 });
 
@@ -33,12 +41,12 @@ export default function SearchSlugPage({ params }: { params: { slug: string } })
                     throw new Error('Failed to fetch campaigns');
                 }
 
-                const data: CampaignResponseDto[] = await response.json();
-                setCampaigns(data);
+                const pageData: PaginatedResponse = await response.json();
+                setCampaigns(pageData.data);
 
                 // Auto-filter by slug on first load
                 const lowerSlug = initialFilter;
-                const results = data.filter(
+                const results = pageData.data.filter(
                     (campaign) =>
                         campaign.title.toLowerCase().includes(lowerSlug) ||
                         campaign.description.toLowerCase().includes(lowerSlug)

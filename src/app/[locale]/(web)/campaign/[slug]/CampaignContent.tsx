@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { useParams } from "next/navigation";
 import Swal from "sweetalert2";
 import { formatDistanceToNowStrict } from "date-fns";
-import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2 } from "lucide-react";
+import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2, Image as ImageIcon, Video as VideoIcon } from "lucide-react";
 import { useCampaigns } from "@/stores/campaigns";
 import { useTranslation } from "@/lib/useTranslation";
 import { contributionsApi, storageApi } from "@/lib/api";
@@ -43,6 +43,66 @@ const TIP_OPTIONS = [5, 10, 20];
 // cached" and an infinite re-render loop via useSyncExternalStore).
 const EMPTY_CONTRIBUTIONS: never[] = [];
 
+function buildCheckoutVoucherHtml(params: {
+  campaignTitle: string;
+  amount: number;
+  tipAmount: number;
+  total: number;
+  contributorName?: string;
+  paymentIntentId?: string;
+  date?: string;
+}): string {
+  const { campaignTitle, amount, tipAmount, total, contributorName, paymentIntentId, date } = params;
+  const displayName = contributorName || 'Anonymous';
+  const today = date || new Date().toLocaleDateString('en-AU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+        <h2 style="margin: 0; font-size: 24px;">✓ Payment Confirmed</h2>
+      </div>
+
+      <div style="background: white; border: 1px solid #e5e7eb; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
+        <p style="margin-top: 0; font-size: 16px;">Thank you for your generous contribution!</p>
+
+        <div style="background: #f9fafb; padding: 16px; border-radius: 6px; margin: 20px 0;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+            <span style="color: #666;">Campaign</span>
+            <strong>${campaignTitle}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+            <span style="color: #666;">From</span>
+            <strong>${displayName}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+            <span style="color: #666;">Contribution</span>
+            <strong>A$${amount.toFixed(2)}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+            <span style="color: #666;">Tip</span>
+            <strong>A$${tipAmount.toFixed(2)}</strong>
+          </div>
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; display: flex; justify-content: space-between; font-size: 16px;">
+            <span style="color: #1e1b4b;">Total</span>
+            <strong style="color: #4f46e5; font-size: 18px;">A$${total.toFixed(2)}</strong>
+          </div>
+        </div>
+
+        <div style="background: #f3f4f6; padding: 12px; border-radius: 4px; font-size: 13px; color: #666;">
+          <p style="margin: 0;"><strong>Date:</strong> ${today}</p>
+          ${paymentIntentId ? `<p style="margin: 4px 0 0 0;"><strong>Confirmation ID:</strong> ${paymentIntentId.substring(0, 8).toUpperCase()}...</p>` : ''}
+        </div>
+
+        <p style="margin: 16px 0 0 0; font-size: 13px; color: #666; text-align: center;">A receipt has been sent to your email (if provided)</p>
+      </div>
+    </div>
+  `;
+}
+
 export default function PublicCampaignPage() {
   const t = useTranslation();
   const { slug } = useParams<{ slug: string }>();
@@ -70,12 +130,44 @@ export default function PublicCampaignPage() {
 
         // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname);
-        Swal.fire({
-          title: 'Payment received! 🎉',
-          text: 'Your contribution has been recorded.',
-          icon: "success",
-          confirmButtonColor: "#1E1B4B",
-        });
+
+        // Try to read voucher data from sessionStorage
+        const voucherData = sessionStorage.getItem('checkout_voucher');
+        sessionStorage.removeItem('checkout_voucher');
+
+        if (voucherData) {
+          try {
+            const data = JSON.parse(voucherData);
+            const voucherHtml = buildCheckoutVoucherHtml({
+              campaignTitle: data.campaignTitle,
+              amount: data.amount,
+              tipAmount: data.tipAmount,
+              total: data.total,
+              contributorName: data.contributorName,
+              date: data.date,
+            });
+
+            Swal.fire({
+              html: voucherHtml,
+              icon: "success",
+              confirmButtonColor: "#1E1B4B",
+            });
+          } catch (err) {
+            Swal.fire({
+              title: 'Payment received! 🎉',
+              text: 'Your contribution has been recorded.',
+              icon: "success",
+              confirmButtonColor: "#1E1B4B",
+            });
+          }
+        } else {
+          Swal.fire({
+            title: 'Payment received! 🎉',
+            text: 'Your contribution has been recorded.',
+            icon: "success",
+            confirmButtonColor: "#1E1B4B",
+          });
+        }
       }
     }
   }, [slug]);
@@ -98,6 +190,7 @@ export default function PublicCampaignPage() {
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>();
+  const [mediaTab, setMediaTab] = useState<"photo" | "video">("photo");
 
   // Show loading skeleton while fetching
   if (storeIsLoading && !campaign) {
@@ -398,6 +491,21 @@ export default function PublicCampaignPage() {
           return;
         }
 
+        // Save voucher data to sessionStorage before confirmPayment (for redirect path)
+        const voucherData = {
+          campaignTitle: campaign.title,
+          amount: amt,
+          tipAmount: tipAmount || 0,
+          total: response.checkoutTotal,
+          contributorName: name.trim() || undefined,
+          date: new Date().toLocaleDateString('en-AU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          }),
+        };
+        sessionStorage.setItem('checkout_voucher', JSON.stringify(voucherData));
+
         // Step 2: Confirm payment with Stripe
         console.log('🔵 [Payment] Confirming payment with Stripe...');
         const { error, paymentIntent } = await stripe.confirmPayment({
@@ -426,7 +534,27 @@ export default function PublicCampaignPage() {
           console.log('✅ [Payment] Payment succeeded:', paymentIntent.id);
           modal.remove();
           paymentElement.destroy();
-          await Swal.fire({ title: t("campaign.payment_successful"), icon: "success", confirmButtonColor: "#1E1B4B" });
+
+          // Show voucher with payment details
+          const voucherHtml = buildCheckoutVoucherHtml({
+            campaignTitle: campaign.title,
+            amount: amt,
+            tipAmount: tipAmount || 0,
+            total: response.checkoutTotal,
+            contributorName: name.trim() || undefined,
+            paymentIntentId: paymentIntent.id,
+            date: new Date().toLocaleDateString('en-AU', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            }),
+          });
+
+          await Swal.fire({
+            html: voucherHtml,
+            icon: "success",
+            confirmButtonColor: "#1E1B4B",
+          });
 
           // Reset form
           setAmount('');
@@ -503,32 +631,82 @@ export default function PublicCampaignPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         {/* Left: info */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Hero */}
+          {/* Hero - Media Tabs */}
           <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft">
-            <div className="aspect-[16/9] bg-foreground/5">
-              {campaign.cover_photo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+            {campaign.cover_photo_url && campaign.cover_video_url ? (
+              <>
+                {/* Tabs */}
+                <div className="flex border-b border-border">
+                  <button
+                    onClick={() => setMediaTab("photo")}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium border-b-2 transition-colors ${
+                      mediaTab === "photo"
+                        ? "border-accent text-accent"
+                        : "border-transparent text-muted hover:text-foreground"
+                    }`}
+                  >
+                    <ImageIcon size={18} />
+                    Photo
+                  </button>
+                  <button
+                    onClick={() => setMediaTab("video")}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium border-b-2 transition-colors ${
+                      mediaTab === "video"
+                        ? "border-accent text-accent"
+                        : "border-transparent text-muted hover:text-foreground"
+                    }`}
+                  >
+                    <VideoIcon size={18} />
+                    Video
+                  </button>
+                </div>
+
+                {/* Content */}
+                {mediaTab === "photo" && (
+                  <div className="aspect-[16/9] bg-foreground/5 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={campaign.cover_photo_url}
+                      alt={campaign.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                {mediaTab === "video" && (
+                  <div className="aspect-[16/9] bg-black overflow-hidden">
+                    <video
+                      src={campaign.cover_video_url}
+                      controls
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
+              </>
+            ) : campaign.cover_photo_url ? (
+              /* Only photo */
+              <div className="aspect-[16/9] bg-foreground/5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={campaign.cover_photo_url}
                   alt={campaign.title}
                   className="w-full h-full object-cover"
                 />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-accent/20 to-sky-200/40" />
-              )}
-            </div>
+              </div>
+            ) : campaign.cover_video_url ? (
+              /* Only video */
+              <div className="aspect-[16/9] bg-black">
+                <video
+                  src={campaign.cover_video_url}
+                  controls
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ) : (
+              /* No media */
+              <div className="aspect-[16/9] bg-gradient-to-br from-accent/20 to-sky-200/40" />
+            )}
           </div>
-
-          {/* Campaign Video (if exists) */}
-          {campaign.cover_video_url && (
-            <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft">
-              <video
-                src={campaign.cover_video_url}
-                controls
-                className="w-full h-auto max-h-96 bg-black"
-              />
-            </div>
-          )}
           <div>
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               <StatusBadge status={campaign.status} />

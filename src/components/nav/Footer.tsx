@@ -20,6 +20,9 @@ export function Footer() {
           <Link href="/cookies" className="hover:text-gray-900">
             {t("landing.footer.cookies")}
           </Link>
+          <a href="mailto:support@giivngo.com" className="hover:text-gray-900">
+            {t("landing.footer.support")}
+          </a>
         </div>
       </div>
     </footer>
