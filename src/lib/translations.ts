@@ -331,11 +331,11 @@ export const translations = {
     // Landing Page - Pricing
     "landing.pricing.title_1": "Very low",
     "landing.pricing.title_2": "fees",
-    "landing.pricing.fee": "3.8% + A$0.60",
+    "landing.pricing.fee": "4.4% + A$0.75",
     "landing.pricing.fee_note":
       "Fees are paid by contributors at checkout. Campaign creators keep 100% — every dollar reaches the pool.",
     "landing.pricing.description":
-      "Creating a pool is always free. When friends contribute, a small 3.8% + A$0.60 fee per contribution keeps Giivngo running and your money safe.",
+      "Creating a pool is always free. When friends contribute, a small 4.4% + A$0.75 fee per contribution keeps Giivngo running and your money safe.",
     "landing.pricing.no_hidden":
       "No subscriptions. No hidden fees. You see it upfront, every time.",
 
@@ -909,11 +909,11 @@ export const translations = {
     // Landing Page - Pricing
     "landing.pricing.title_1": "Comisión",
     "landing.pricing.title_2": "muy baja",
-    "landing.pricing.fee": "3,8% + $0,60",
+    "landing.pricing.fee": "4,4% + $0,75",
     "landing.pricing.fee_note":
       "Los fees los paga quien contribuye, al momento del pago. Quien crea la campaña recibe el 100% — cada peso llega al fondo.",
     "landing.pricing.description":
-      "Crear una colecta siempre es gratis. Cuando tus amigos aportan, una pequeña comisión de 3,8% + $0,60 por aporte mantiene Giivngo funcionando y tu dinero seguro.",
+      "Crear una colecta siempre es gratis. Cuando tus amigos aportan, una pequeña comisión de 4,4% + $0,75 por aporte mantiene Giivngo funcionando y tu dinero seguro.",
     "landing.pricing.no_hidden":
       "Sin suscripciones. Sin cargos ocultos. Lo ves claro desde el principio, siempre.",
 
@@ -1465,11 +1465,11 @@ export const translations = {
     // Landing Page - Pricing
     "landing.pricing.title_1": "Taxas",
     "landing.pricing.title_2": "baixas",
-    "landing.pricing.fee": "3,8% + R$0,60",
+    "landing.pricing.fee": "4,4% + R$0,75",
     "landing.pricing.fee_note":
       "As taxas são pagas por quem contribui, no momento do pagamento. Quem cria a campanha recebe 100% — cada real chega à vaquinha.",
     "landing.pricing.description":
-      "Criar uma vaquinha é sempre grátis. Quando os amigos contribuem, uma pequena taxa de 3,8% + R$0,60 por contribuição mantém o Giivngo funcionando e o seu dinheiro seguro.",
+      "Criar uma vaquinha é sempre grátis. Quando os amigos contribuem, uma pequena taxa de 4,4% + R$0,75 por contribuição mantém o Giivngo funcionando e o seu dinheiro seguro.",
     "landing.pricing.no_hidden":
       "Sem assinaturas. Sem taxas escondidas. Você vê tudo antes, sempre.",
 
