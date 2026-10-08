@@ -14,6 +14,7 @@ export type WizardData = {
   end_date: string;
   min_contribution?: number;
   max_contribution?: number;
+  max_contributions?: number; // Maximum number of contributions allowed (limited slots)
   pool_mode: PoolMode;
   tiers: number[];
   contribution_items: ContributionItem[];

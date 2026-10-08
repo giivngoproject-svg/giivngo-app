@@ -257,6 +257,11 @@ export const campaignsApi = {
     });
     return transformCampaignFromApi(res.data);
   },
+
+  reportCampaign: async (slug: string, reportData: any) => {
+    const res = await apiClient.post(`/campaigns/${slug}/report`, reportData);
+    return res.data;
+  },
 };
 
 /**

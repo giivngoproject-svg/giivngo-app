@@ -86,6 +86,7 @@ function CreatePageInner() {
         endDate: new Date(data.end_date).toISOString(),
         minContribution: tiered ? undefined : data.min_contribution,
         maxContribution: tiered ? undefined : data.max_contribution,
+        maxContributions: data.max_contributions || undefined,
         recipientName: data.recipient_name?.trim() || undefined,
         poolMode: data.pool_mode,
         tiers,
@@ -100,18 +101,60 @@ function CreatePageInner() {
       });
 
       if (campaign) {
+        const campaignUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/campaign/${campaign.slug}`;
+        let copied = false;
+
         await Swal.fire({
-          title: "Campaign published! 🎉",
-          text: `Share /campaign/${campaign.slug}`,
+          title: t("create.published.title"),
+          html: `
+            <p style="color: rgba(0,0,0,0.7); margin: 16px 0 24px;">
+              ${t("create.published.subtitle")}
+            </p>
+            <div style="display: flex; gap: 8px; align-items: center; margin: 16px 0; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 12px;">
+              <input
+                type="text"
+                id="campaign-url"
+                value="${campaignUrl}"
+                readonly
+                style="flex: 1; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: monospace; font-size: 12px; cursor: text;"
+              />
+              <button
+                id="copy-btn"
+                style="padding: 8px 16px; background: #1E1B4B; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s;"
+              >
+                ${t("create.published.copy_button")}
+              </button>
+            </div>
+          `,
           icon: "success",
           confirmButtonColor: "#1E1B4B",
+          confirmButtonText: "OK",
+          didOpen: () => {
+            const btn = Swal.getPopup()?.querySelector("#copy-btn") as HTMLButtonElement;
+            if (btn) {
+              btn.addEventListener("click", async () => {
+                try {
+                  await navigator.clipboard.writeText(campaignUrl);
+                  copied = true;
+                  btn.textContent = t("create.published.link_copied");
+                  btn.style.background = "#059669";
+                  setTimeout(() => {
+                    btn.textContent = t("create.published.copy_button");
+                    btn.style.background = "#1E1B4B";
+                  }, 2000);
+                } catch (err) {
+                  console.error("Failed to copy:", err);
+                }
+              });
+            }
+          }
         });
         reset();
         router.push(`/manage/${campaign.slug}`);
       } else {
         await Swal.fire({
-          title: "Failed to publish",
-          text: "Could not create campaign",
+          title: t("create.publish_error.title"),
+          text: t("create.publish_error.message"),
           icon: "error",
           confirmButtonColor: "#1E1B4B",
         });
@@ -133,8 +176,8 @@ function CreatePageInner() {
       }
     } catch (error: any) {
       await Swal.fire({
-        title: "Error",
-        text: error.response?.data?.message || "Could not create campaign",
+        title: t("create.generic_error.title"),
+        text: error.response?.data?.message || t("create.generic_error.message"),
         icon: "error",
         confirmButtonColor: "#1E1B4B",
       });
@@ -383,7 +426,7 @@ function Step2({
         min={today}
         value={data.end_date}
         onChange={(e) => patch({ end_date: e.target.value })}
-        hint={t('create.end_date.hint')}
+
       />
 
       {data.end_date && (
@@ -446,6 +489,21 @@ function Step2({
         </div>
       )}
 
+      {!isTiers && (
+        <Input
+          label={t('create.max_contributions')}
+          type="number"
+          min={1}
+          step={1}
+          value={data.max_contributions ?? ""}
+          onChange={(e) =>
+            patch({ max_contributions: e.target.value ? Number(e.target.value) : undefined })
+          }
+          placeholder="—"
+          hint={t('create.max_contributions.hint')}
+        />
+      )}
+
       <div className="space-y-3">
         <button
           type="button"
@@ -458,6 +516,9 @@ function Step2({
             className={cn("transition-transform", itemsExpanded && "rotate-180")}
           />
         </button>
+        <p className="text-xs text-muted leading-relaxed">
+          {t('create.add_items.description')}
+        </p>
         {itemsExpanded && (
           <div className="px-3.5 py-3 rounded-2xl border border-border bg-foreground/[.02]">
             <ItemEditor
@@ -620,6 +681,12 @@ function Step3({
                   <>
                     <dt className="text-muted">Max contribution</dt>
                     <dd className="text-right">{formatAUD(data.max_contribution)}</dd>
+                  </>
+                ) : null}
+                {data.max_contributions ? (
+                  <>
+                    <dt className="text-muted">Max slots</dt>
+                    <dd className="text-right">{data.max_contributions}</dd>
                   </>
                 ) : null}
               </>

@@ -5,10 +5,10 @@ import { Link } from "@/i18n/navigation";
 import { useParams } from "next/navigation";
 import Swal from "sweetalert2";
 import { formatDistanceToNowStrict } from "date-fns";
-import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2, Image as ImageIcon, Video as VideoIcon } from "lucide-react";
+import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2, Image as ImageIcon, Video as VideoIcon, Flag } from "lucide-react";
 import { useCampaigns } from "@/stores/campaigns";
 import { useTranslation } from "@/lib/useTranslation";
-import { contributionsApi, storageApi } from "@/lib/api";
+import { contributionsApi, storageApi, campaignsApi } from "@/lib/api";
 import { formatCurrency, roundAmount } from "@/lib/money";
 import { getIntlLocale } from "@/lib/locale";
 import { useLocale } from "@/hooks/useLocale";
@@ -187,6 +187,11 @@ export default function PublicCampaignPage() {
   const [photo, setPhoto] = useState<string | undefined>(undefined);
   const [video, setVideo] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportMessage, setReportMessage] = useState("");
+  const [reportEmail, setReportEmail] = useState("");
+  const [reportingSubmitting, setReportingSubmitting] = useState(false);
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>();
@@ -283,6 +288,32 @@ export default function PublicCampaignPage() {
     }
   };
 
+  const handleReport = async () => {
+    if (!reportReason.trim()) {
+      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+      return;
+    }
+
+    setReportingSubmitting(true);
+    try {
+      await campaignsApi.reportCampaign(slug, {
+        reasonCategory: reportReason,
+        message: reportMessage || undefined,
+        reporterEmail: reportEmail || undefined,
+      });
+
+      await Swal.fire({ title: t("campaign.report_submitted"), icon: "success", confirmButtonColor: "#1E1B4B" });
+      setShowReportModal(false);
+      setReportReason("");
+      setReportMessage("");
+      setReportEmail("");
+    } catch (error) {
+      await Swal.fire({ title: t("campaign.report_error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+    } finally {
+      setReportingSubmitting(false);
+    }
+  };
+
   const contribute = async () => {
     let amt: number;
     let selectedItems: Array<{ itemId: string; amount: number }> = [];
@@ -313,26 +344,36 @@ export default function PublicCampaignPage() {
       }
     }
 
-    // Validate date of birth (required)
-    if (!dateOfBirth.trim()) {
+    // Validate email (required)
+    if (!email.trim()) {
       await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
       setSubmitting(false);
       return;
     }
 
-    // Validate date format (basic check)
-    const dob = new Date(dateOfBirth);
-    if (isNaN(dob.getTime())) {
-      await Swal.fire({ title: t("campaign.validation_failed"), icon: "error", confirmButtonColor: "#1E1B4B" });
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
       setSubmitting(false);
       return;
     }
 
-    // Check if date is not in future
-    if (dob > new Date()) {
-      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
-      setSubmitting(false);
-      return;
+    // Validate date format if provided (optional)
+    if (dateOfBirth.trim()) {
+      const dob = new Date(dateOfBirth);
+      if (isNaN(dob.getTime())) {
+        await Swal.fire({ title: t("campaign.validation_failed"), icon: "error", confirmButtonColor: "#1E1B4B" });
+        setSubmitting(false);
+        return;
+      }
+
+      // Check if date is not in future
+      if (dob > new Date()) {
+        await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+        setSubmitting(false);
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -346,7 +387,7 @@ export default function PublicCampaignPage() {
         tipAmount: tipAmount || undefined,
         contributorName: name.trim() || undefined,
         contributorEmail: email.trim() || undefined,
-        dateOfBirth: dateOfBirth.trim(),
+        dateOfBirth: dateOfBirth.trim() || undefined,
         message: message.trim() || undefined,
         emoji,
         photoUrl: photo,
@@ -713,9 +754,19 @@ export default function PublicCampaignPage() {
               {mode !== "standard" && <Badge tone="accent">{POOL_MODE_LABELS[mode]}</Badge>}
               <span className="text-sm text-muted">by {campaign.organiser_name}</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-balance">
-              {campaign.title}
-            </h1>
+            <div className="flex items-start justify-between gap-4 mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-balance flex-1">
+                {campaign.title}
+              </h1>
+              <button
+                onClick={() => setShowReportModal(true)}
+                className="flex items-center gap-1 px-3 py-2 text-sm text-muted hover:text-foreground transition-colors"
+                title={t('campaign.report_button')}
+              >
+                <Flag size={16} />
+                <span className="hidden sm:inline">{t('campaign.report_button')}</span>
+              </button>
+            </div>
             {recipient && <p className="mt-1 text-muted">for {recipient}</p>}
             <p className="mt-5 text-foreground/80 whitespace-pre-wrap leading-relaxed">
               {campaign.description}
@@ -987,18 +1038,19 @@ export default function PublicCampaignPage() {
                 />
 
                 <Input
-                  label="Email for receipt (optional)"
+                  label={t('campaign.email_required')}
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
 
                 <Input
-                  label="Date of Birth (required)"
+                  label="Date of Birth"
                   type="date"
                   value={dateOfBirth}
                   onChange={(e) => setDateOfBirth(e.target.value)}
-                  hint="We need this to process your contribution"
+                  hint="Help us send you birthday greetings (optional)"
                 />
 
                 <Textarea
@@ -1061,7 +1113,7 @@ export default function PublicCampaignPage() {
                       : "Contribute"}
                 </Button>
                 <p className="text-xs text-muted text-center inline-flex items-center justify-center gap-1 w-full">
-                  <Lock size={11} /> Secure checkout · Stripe (simulated)
+                  <Lock size={11} /> {t('campaign.secure_checkout')}
                 </p>
               </div>
             )}
@@ -1076,6 +1128,68 @@ export default function PublicCampaignPage() {
           </p>
         </aside>
       </div>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-background rounded-3xl max-w-md w-full p-6 shadow-lg">
+            <h2 className="text-xl font-bold mb-2">{t('campaign.report_title')}</h2>
+            <p className="text-sm text-muted mb-4">{t('campaign.report_subtitle')}</p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">{t('campaign.report_reason')}</label>
+                <select
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="w-full mt-2 px-3.5 py-2.5 rounded-2xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-accent/30"
+                >
+                  <option value="">{t('campaign.report_reason')}</option>
+                  <option value="inappropriate">{t('campaign.report_reason_inappropriate')}</option>
+                  <option value="spam">{t('campaign.report_reason_spam')}</option>
+                  <option value="fraud">{t('campaign.report_reason_fraud')}</option>
+                  <option value="abuse">{t('campaign.report_reason_abuse')}</option>
+                  <option value="other">{t('campaign.report_reason_other')}</option>
+                </select>
+              </div>
+
+              <Textarea
+                label={t('campaign.report_message')}
+                placeholder="Tell us more about this issue..."
+                value={reportMessage}
+                onChange={(e) => setReportMessage(e.target.value)}
+                rows={3}
+              />
+
+              <Input
+                label={t('campaign.report_email')}
+                type="email"
+                placeholder="your@email.com"
+                value={reportEmail}
+                onChange={(e) => setReportEmail(e.target.value)}
+                hint={t('campaign.report_email_hint')}
+              />
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowReportModal(false)}
+                disabled={reportingSubmitting}
+                className="flex-1 px-4 py-2.5 rounded-2xl border border-border hover:bg-foreground/5 text-sm font-medium disabled:opacity-50"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={handleReport}
+                disabled={reportingSubmitting || !reportReason.trim()}
+                className="flex-1 px-4 py-2.5 rounded-2xl bg-accent text-white text-sm font-medium hover:bg-accent/90 disabled:opacity-50"
+              >
+                {reportingSubmitting ? t('common.loading') + '...' : t('campaign.report_submit')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

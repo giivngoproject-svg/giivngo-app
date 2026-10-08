@@ -54,6 +54,7 @@ export type Campaign = {
   slug: string;
   min_contribution?: number;
   max_contribution?: number;
+  max_contributions?: number; // Maximum number of contributions allowed (e.g., limited slots for event entries)
   organiser_name: string;
   // Who the pool is for (e.g. "Sarah"). Optional — drives tipping copy and the
   // recipient's highlight reel.
@@ -89,6 +90,7 @@ export type CampaignResponseDto = {
   endDate: string;
   minContribution?: number;
   maxContribution?: number;
+  maxContributions?: number; // Maximum number of contributions allowed (e.g., limited slots for event entries)
   poolMode?: PoolMode;
   tiers?: number[];
   hideUntilBirthday?: boolean;
@@ -161,10 +163,10 @@ export type Payout = {
 };
 
 export const CAMPAIGN_TYPE_LABELS: Record<CampaignType, string> = {
-  birthday: "Birthday fund",
-  baby_shower: "Baby shower fund",
+  birthday: "Birthday",
+  baby_shower: "Baby shower",
   xmas_party: "Xmas work party",
   farewell: "Farewell collection",
-  event_entry: "Group event entry",
+  event_entry: "Group event",
   custom: "Custom",
 };
