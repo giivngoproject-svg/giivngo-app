@@ -11,6 +11,9 @@ export function Footer() {
       <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
         <p>{t("landing.footer.copyright")}</p>
         <div className="flex items-center gap-6">
+          <Link href="/faq" className="hover:text-gray-900">
+            {t("landing.footer.faq")}
+          </Link>
           <Link href="/terms" className="hover:text-gray-900">
             {t("landing.footer.terms")}
           </Link>

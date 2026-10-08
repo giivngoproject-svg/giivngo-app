@@ -408,6 +408,7 @@ export const translations = {
 
     // Landing Page - Footer
     "landing.footer.copyright": "© 2026 Giivngo. All rights reserved.",
+    "landing.footer.faq": "FAQ",
     "landing.footer.terms": "Terms of service",
     "landing.footer.privacy": "Privacy",
     "landing.footer.cookies": "Cookies",
@@ -1005,6 +1006,7 @@ export const translations = {
     "landing.app.google_play": "Google Play",
 
     "landing.footer.copyright": "© 2026 Giivngo. Todos los derechos reservados.",
+    "landing.footer.faq": "Preguntas Frecuentes",
     "landing.footer.terms": "Términos de servicio",
     "landing.footer.privacy": "Privacidad",
     "landing.footer.cookies": "Cookies",
@@ -1588,6 +1590,7 @@ export const translations = {
     "landing.app.google_play": "Google Play",
 
     "landing.footer.copyright": "© 2026 Giivngo. Todos os direitos reservados.",
+    "landing.footer.faq": "Perguntas Frequentes",
     "landing.footer.terms": "Termos de serviço",
     "landing.footer.privacy": "Privacidade",
     "landing.footer.cookies": "Cookies",
