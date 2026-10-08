@@ -635,7 +635,7 @@ export const faq: LegalDocSet = {
       },
     ],
   },
-  "pt-BR": {
+  "pt-br": {
     title: "Perguntas Frequentes",
     description:
       "Tudo que você precisa saber sobre Giivngo — desde criar pools até contribuir.",
