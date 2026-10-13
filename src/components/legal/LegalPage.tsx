@@ -67,11 +67,11 @@ export function LegalPage({ doc, locale }: { doc: LegalDoc; locale: string }) {
         <Block key={`lead-${i}`} block={block} />
       ))}
 
-      {doc.sections.map((section) => {
-        const isSub = section.n.includes(".");
-        const heading = `${section.n}. ${section.title}`;
+      {doc.sections.map((section, idx) => {
+        const isSub = !section.unnumbered && section.n.includes(".");
+        const heading = section.unnumbered ? section.title : `${section.n}. ${section.title}`;
         return (
-          <section key={section.n} className={isSub ? "mt-6" : "mt-10"}>
+          <section key={`${section.n}-${idx}`} className={isSub ? "mt-6" : "mt-10"}>
             {isSub ? (
               <h3 className="text-lg font-semibold text-foreground">{heading}</h3>
             ) : (

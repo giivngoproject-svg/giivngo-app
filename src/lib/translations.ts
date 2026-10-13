@@ -409,7 +409,7 @@ export const translations = {
     // Landing Page - Footer
     "landing.footer.copyright": "© 2026 Giivngo. All rights reserved.",
     "landing.footer.faq": "FAQ",
-    "landing.footer.terms": "Terms of service",
+    "landing.footer.terms": "Terms of Use",
     "landing.footer.privacy": "Privacy",
     "landing.footer.cookies": "Cookies",
     "landing.footer.support": "Support",

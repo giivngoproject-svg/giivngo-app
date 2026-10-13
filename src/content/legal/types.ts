@@ -10,10 +10,12 @@ export type LegalBlock =
 
 // Sección o subsección. `n` sin punto => encabezado de nivel 2 ("3");
 // con punto => subsección de nivel 3 ("2.1").
+// `unnumbered` => encabezado de nivel 2 sin número (p. ej. "Part I — Terms of Use").
 export type LegalSection = {
   n: string;
   title: string;
   body?: LegalBlock[];
+  unnumbered?: boolean;
 };
 
 export type LegalDoc = {
