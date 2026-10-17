@@ -1,10 +1,16 @@
 export type CampaignType =
   | "birthday"
-  | "baby_shower"
-  | "xmas_party"
+  | "hens_bucks"
+  | "wedding"
+  | "work_party"
   | "farewell"
-  | "event_entry"
-  | "custom";
+  | "baby_shower"
+  | "trip"
+  | "something_else"
+  | "footy_tipping" // legacy
+  | "office_lotto" // legacy
+  | "event_entry" // legacy
+  | "custom"; // legacy
 
 export type CampaignStatus = "active" | "ended" | "paid_out";
 
@@ -66,6 +72,12 @@ export type Campaign = {
   contribution_items?: ContributionItem[];
   // When true, hides gift wall, activity feed, and highlight reel until campaign ends.
   hide_until_birthday?: boolean;
+  event_cost_enabled?: boolean;
+  event_cost_amount?: number;
+  event_cost_label?: string;
+  gift_enabled?: boolean;
+  gift_suggested_amounts?: number[];
+  hide_goal?: boolean;
   show_on_search?: boolean;
   country_code?: string; // Country code for Stripe fees (MX, BR, AU) - defaults to AU
   currency?: string; // Currency code (MXN, BRL, AUD) - defaults to AUD
@@ -94,6 +106,12 @@ export type CampaignResponseDto = {
   poolMode?: PoolMode;
   tiers?: number[];
   hideUntilBirthday?: boolean;
+  eventCostEnabled?: boolean;
+  eventCostAmount?: number;
+  eventCostLabel?: string;
+  giftEnabled?: boolean;
+  giftSuggestedAmounts?: number[];
+  hideGoal?: boolean;
   showOnSearch?: boolean;
   countryCode: string; // Country code for Stripe fees (MX, BR, AU)
   currency: string; // Currency code (MXN, BRL, AUD)
@@ -164,9 +182,15 @@ export type Payout = {
 
 export const CAMPAIGN_TYPE_LABELS: Record<CampaignType, string> = {
   birthday: "Birthday",
+  hens_bucks: "Hens / Bucks",
+  wedding: "Wedding",
+  work_party: "Work party",
+  farewell: "Farewell",
   baby_shower: "Baby shower",
-  xmas_party: "Xmas work party",
-  farewell: "Farewell collection",
+  trip: "Trip",
+  something_else: "Something else",
+  footy_tipping: "Footy tipping",
+  office_lotto: "Office lotto",
   event_entry: "Group event",
   custom: "Custom",
 };

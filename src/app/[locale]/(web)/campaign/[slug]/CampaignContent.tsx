@@ -8,14 +8,15 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2, Image as ImageIcon, Video as VideoIcon, Flag } from "lucide-react";
 import { useCampaigns } from "@/stores/campaigns";
 import { useTranslation } from "@/lib/useTranslation";
-import { contributionsApi, storageApi, campaignsApi } from "@/lib/api";
+import { contributionsApi, storageApi, campaignsApi, type FeeQuote } from "@/lib/api";
 import { formatCurrency, roundAmount } from "@/lib/money";
 import { getIntlLocale } from "@/lib/locale";
 import { useLocale } from "@/hooks/useLocale";
 import { useFees } from "@/hooks/useFees";
 import { useCheckout } from "@/hooks/useCheckout";
 import { FeeBreakdownComponent } from "@/components/checkout/FeeBreakdownComponent";
-import { AnonymousAvatarSelector } from "@/components/anonymous-avatar-selector";
+import { IdentityPicker, type IdentityValue } from "@/components/campaign/IdentityPicker";
+import { ChevronDown } from "lucide-react";
 import {
   isGoalHidden,
   isContributorsHidden,
@@ -30,10 +31,8 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { Progress } from "@/components/ui/Progress";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
 import { GiftWall } from "@/components/campaign/GiftWall";
-import { Countdown } from "@/components/campaign/Countdown";
-import { ActivityFeed } from "@/components/campaign/ActivityFeed";
 import { EmojiPicker } from "@/components/campaign/EmojiPicker";
-import { VideoDrop } from "@/components/campaign/VideoDrop";
+import { MediaAttach } from "@/components/campaign/MediaAttach";
 
 const QUICK_AMOUNTS = [20, 50, 100, 200];
 const TIP_OPTIONS = [5, 10, 20];
@@ -43,17 +42,34 @@ const TIP_OPTIONS = [5, 10, 20];
 // cached" and an infinite re-render loop via useSyncExternalStore).
 const EMPTY_CONTRIBUTIONS: never[] = [];
 
-function buildCheckoutVoucherHtml(params: {
+type VoucherParams = {
   campaignTitle: string;
   amount: number;
   tipAmount: number;
   total: number;
+  eventCostAmount?: number;
+  feeAmount?: number;
+  feePercent?: number;
+  feeFlat?: number;
+  currency?: string;
   contributorName?: string;
   paymentIntentId?: string;
   date?: string;
-}): string {
-  const { campaignTitle, amount, tipAmount, total, contributorName, paymentIntentId, date } = params;
+};
+
+function buildCheckoutVoucherHtml(params: VoucherParams): string {
+  const { campaignTitle, amount, tipAmount, total, eventCostAmount, feeAmount, feePercent, feeFlat, contributorName, paymentIntentId, date } = params;
   const displayName = contributorName || 'Anonymous';
+  const money = (n: number) =>
+    new Intl.NumberFormat('en-AU', { style: 'currency', currency: params.currency || 'AUD' }).format(n);
+  const row = (label: string, value: string) => `
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+            <span style="color: #666;">${label}</span>
+            <strong>${value}</strong>
+          </div>`;
+  const feeLabel = feePercent !== undefined && feeFlat !== undefined
+    ? `Service fee (${feePercent}% + ${money(feeFlat)})`
+    : 'Service fee';
   const today = date || new Date().toLocaleDateString('en-AU', {
     day: 'numeric',
     month: 'long',
@@ -78,17 +94,13 @@ function buildCheckoutVoucherHtml(params: {
             <span style="color: #666;">From</span>
             <strong>${displayName}</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-            <span style="color: #666;">Contribution</span>
-            <strong>A$${amount.toFixed(2)}</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-            <span style="color: #666;">Tip</span>
-            <strong>A$${tipAmount.toFixed(2)}</strong>
-          </div>
+          ${eventCostAmount && eventCostAmount > 0 ? row('Event cost', money(eventCostAmount)) : ''}
+          ${row('Gift', money(amount))}
+          ${tipAmount > 0 ? row('Tip', money(tipAmount)) : ''}
+          ${feeAmount && feeAmount > 0 ? row(feeLabel, money(feeAmount)) : ''}
           <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; display: flex; justify-content: space-between; font-size: 16px;">
             <span style="color: #1e1b4b;">Total</span>
-            <strong style="color: #4f46e5; font-size: 18px;">A$${total.toFixed(2)}</strong>
+            <strong style="color: #4f46e5; font-size: 18px;">${money(total)}</strong>
           </div>
         </div>
 
@@ -143,6 +155,11 @@ export default function PublicCampaignPage() {
               amount: data.amount,
               tipAmount: data.tipAmount,
               total: data.total,
+              eventCostAmount: data.eventCostAmount,
+              feeAmount: data.feeAmount,
+              feePercent: data.feePercent,
+              feeFlat: data.feeFlat,
+              currency: data.currency,
               contributorName: data.contributorName,
               date: data.date,
             });
@@ -193,14 +210,43 @@ export default function PublicCampaignPage() {
   const [reportEmail, setReportEmail] = useState("");
   const [reportingSubmitting, setReportingSubmitting] = useState(false);
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
-  const [isPrivate, setIsPrivate] = useState(false);
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>();
+  const [identity, setIdentity] = useState<IdentityValue>({ mode: "name", nickname: "" });
+  const [includeEvent, setIncludeEvent] = useState(true);
   const [mediaTab, setMediaTab] = useState<"photo" | "video">("photo");
+
+  // Fee quote for the summary, refreshed when the amounts change (same calculation as checkout)
+  const [quote, setQuote] = useState<FeeQuote | null>(null);
+  useEffect(() => {
+    if (!campaign) return;
+    const items = campaign.contribution_items ?? [];
+    const newPricing = !!campaign.event_cost_enabled || !!campaign.gift_enabled;
+    const itemsSum = items.filter((i) => selectedItemIds.has(i.id)).reduce((sum, i) => sum + i.amount, 0);
+    const legacyItems = items.length > 0 && !newPricing;
+    const giftOrAmount = Number(amount) || 0;
+    const baseAmount = legacyItems ? itemsSum : giftOrAmount + (newPricing ? itemsSum : 0);
+    const includeEventCost = newPricing && !!campaign.event_cost_enabled && includeEvent;
+    const eventCost = includeEventCost ? campaign.event_cost_amount ?? 0 : 0;
+    if (baseAmount + eventCost + (Number(tip) || 0) <= 0) {
+      setQuote(null);
+      return;
+    }
+    const timer = setTimeout(() => {
+      contributionsApi
+        .quote(slug, {
+          amount: baseAmount,
+          tipAmount: Number(tip) || undefined,
+          includeEventCost: includeEventCost || undefined,
+        })
+        .then(setQuote)
+        .catch(() => setQuote(null));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [campaign, slug, amount, tip, includeEvent, selectedItemIds]);
 
   // Show loading skeleton while fetching
   if (storeIsLoading && !campaign) {
     return (
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
         {/* Hero skeleton */}
         <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft mb-8 animate-pulse">
           <div className="aspect-[16/9] bg-foreground/10" />
@@ -258,7 +304,11 @@ export default function PublicCampaignPage() {
   if (!campaign) return null;
 
   const end = new Date(campaign.end_date);
-  const daysLeft = Math.max(0, Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+  const msLeft = Math.max(0, end.getTime() - Date.now());
+  const hoursLeft = Math.floor(msLeft / 3600000);
+  const timeLeftLabel = hoursLeft >= 24
+    ? t("campaign.time.days", { d: Math.floor(hoursLeft / 24), h: hoursLeft % 24 })
+    : t("campaign.time.hours", { h: hoursLeft, m: Math.floor((msLeft % 3600000) / 60000) });
   const closed = campaign.status !== "active";
   const min = campaign.min_contribution;
   const max = campaign.max_contribution;
@@ -273,6 +323,19 @@ export default function PublicCampaignPage() {
   const tips = tipTotal(contributions);
   const recipient = campaign.recipient_name?.trim();
   const birthdayHidden = isBirthdayHidden(campaign);
+  // New create-flow pricing (event cost and/or gift). Legacy campaigns keep the old amount/items UI.
+  const usesNewPricing = !tiered && (!!campaign.event_cost_enabled || !!campaign.gift_enabled);
+  const giftName = recipient || campaign.organiser_name;
+  const usesBirthday = campaign.type === "birthday";
+  const eventCostAmount = campaign.event_cost_amount ?? 0;
+  const eventTotal = usesNewPricing && campaign.event_cost_enabled && includeEvent ? eventCostAmount : 0;
+  const giftSuggested = campaign.gift_suggested_amounts ?? [];
+  const giftAmount = usesNewPricing && campaign.gift_enabled ? Number(amount) || 0 : 0;
+  const itemsTotal = usesNewPricing
+    ? items.filter((i) => selectedItemIds.has(i.id)).reduce((sum, i) => sum + i.amount, 0)
+    : 0;
+  const grandTotal = eventTotal + giftAmount + itemsTotal + (Number(tip) || 0);
+  const fmt = (n: number) => formatCurrency(n, campaign.currency || "AUD", getIntlLocale(localeConfig.locale));
 
   const handlePhoto = async (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
@@ -318,7 +381,7 @@ export default function PublicCampaignPage() {
     let amt: number;
     let selectedItems: Array<{ itemId: string; amount: number }> = [];
 
-    if (hasItems) {
+    if (hasItems && !usesNewPricing) {
       if (selectedItemIds.size === 0) {
         await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
         return;
@@ -326,6 +389,13 @@ export default function PublicCampaignPage() {
       const filtered = items.filter((i) => selectedItemIds.has(i.id));
       selectedItems = filtered.map((i) => ({ itemId: i.id, amount: i.amount }));
       amt = selectedItems.reduce((sum, i) => sum + i.amount, 0);
+    } else if (usesNewPricing) {
+      selectedItems = items.filter((i) => selectedItemIds.has(i.id)).map((i) => ({ itemId: i.id, amount: i.amount }));
+      amt = giftAmount + itemsTotal;
+      if (amt < 0 || (amt === 0 && !(campaign.event_cost_enabled && includeEvent))) {
+        await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+        return;
+      }
     } else {
       amt = Number(amount);
       if (!amt || amt <= 0) {
@@ -342,6 +412,12 @@ export default function PublicCampaignPage() {
           return;
         }
       }
+    }
+
+    if (identity.mode === "nickname" && !identity.nickname.trim()) {
+      await Swal.fire({ title: t("campaign.identity.nickname_required"), icon: "error", confirmButtonColor: "#1E1B4B" });
+      setSubmitting(false);
+      return;
     }
 
     // Validate email (required)
@@ -393,8 +469,10 @@ export default function PublicCampaignPage() {
         photoUrl: photo,
         videoUrl: video,
         selectedItems: selectedItems,
-        isPrivate: isPrivate,
-        anonymousAvatarId: isPrivate ? selectedAvatarId : undefined,
+        isPrivate: identity.mode !== "name",
+        contributorNickname: identity.mode === "nickname" ? identity.nickname.trim() : undefined,
+        anonymousAvatarId: identity.mode === "nickname" ? identity.avatarId : undefined,
+        includeEventCost: usesNewPricing && !!campaign.event_cost_enabled && includeEvent ? true : undefined,
         creatorStripeAccountId: (campaign as any).creatorStripeAccountId || undefined,
       });
 
@@ -538,6 +616,11 @@ export default function PublicCampaignPage() {
           amount: amt,
           tipAmount: tipAmount || 0,
           total: response.checkoutTotal,
+          eventCostAmount: eventTotal,
+          feeAmount: response.stripeFee,
+          feePercent: quote?.feePercent,
+          feeFlat: quote?.feeFlat,
+          currency: campaign.currency || 'AUD',
           contributorName: name.trim() || undefined,
           date: new Date().toLocaleDateString('en-AU', {
             day: 'numeric',
@@ -582,6 +665,11 @@ export default function PublicCampaignPage() {
             amount: amt,
             tipAmount: tipAmount || 0,
             total: response.checkoutTotal,
+            eventCostAmount: eventTotal,
+            feeAmount: response.stripeFee,
+            feePercent: quote?.feePercent,
+            feeFlat: quote?.feeFlat,
+            currency: campaign.currency || 'AUD',
             contributorName: name.trim() || undefined,
             paymentIntentId: paymentIntent.id,
             date: new Date().toLocaleDateString('en-AU', {
@@ -608,8 +696,8 @@ export default function PublicCampaignPage() {
           setPhoto(undefined);
           setVideo(undefined);
           setSelectedItemIds(new Set());
-          setIsPrivate(false);
-          setSelectedAvatarId(undefined);
+          setIdentity({ mode: "name", nickname: "" });
+          setIncludeEvent(true);
           setSubmitting(false);
 
           // Refresh campaign data to show updated raised amount
@@ -659,17 +747,10 @@ export default function PublicCampaignPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+    <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
 
 
-      {/* Live activity ticker (hidden if birthday surprise) */}
-      {!closed && !birthdayHidden && (
-        <div className="mt-4 flex justify-center">
-          <ActivityFeed contributions={contributions} hideIdentities={contributorsHidden} />
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-8">
         {/* Left: info */}
         <div className="lg:col-span-2 space-y-6">
           {/* Hero - Media Tabs */}
@@ -767,10 +848,26 @@ export default function PublicCampaignPage() {
                 <span className="hidden sm:inline">{t('campaign.report_button')}</span>
               </button>
             </div>
-            {recipient && <p className="mt-1 text-muted">for {recipient}</p>}
+            {recipient && recipient !== campaign.organiser_name && <p className="mt-1 text-muted">for {recipient}</p>}
             <p className="mt-5 text-foreground/80 whitespace-pre-wrap leading-relaxed">
               {campaign.description}
             </p>
+
+            {/* Key facts: raised, contributors and time left in one strip */}
+            <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-border">
+              <div className="p-3 text-center">
+                <p className="font-bold tabular-nums">{goalHidden ? "—" : fmt(campaign.raised_amount)}</p>
+                <p className="text-xs text-muted">{t("campaign.stats.raised")}</p>
+              </div>
+              <div className="border-l border-border p-3 text-center">
+                <p className="font-bold tabular-nums">{contributorsHidden ? "—" : contributions.length}</p>
+                <p className="text-xs text-muted">{t("campaign.stats.contributors")}</p>
+              </div>
+              <div className="border-l border-border p-3 text-center">
+                <p className="font-bold tabular-nums">{closed ? t("campaign.closed") : timeLeftLabel}</p>
+                <p className="text-xs text-muted">{t("campaign.stats.time_left")}</p>
+              </div>
+            </div>
           </div>
 
           {/* Gift wall based on Pool Mode */}
@@ -828,7 +925,7 @@ export default function PublicCampaignPage() {
         </div>
 
         {/* Right: contribute */}
-        <aside className="lg:sticky lg:top-20 self-start space-y-4">
+        <aside className="lg:col-span-3 lg:sticky lg:top-20 self-start space-y-4">
           <div className="rounded-3xl border border-border bg-background p-5">
             {/* Birthday Surprise: hide everything */}
             {birthdayHidden ? (
@@ -873,18 +970,6 @@ export default function PublicCampaignPage() {
                   max={campaign.goal_amount || campaign.raised_amount || 1}
                   className="mt-2"
                 />
-                <div className="mt-3 flex items-center justify-between text-xs text-muted">
-                  <span className="inline-flex items-center gap-1">
-                    <Users size={12} /> {contributions.length} {t("campaign.contributors")}
-                  </span>
-                  {campaign.status === "active" ? (
-                    <span>
-                      {daysLeft} day{daysLeft === 1 ? "" : "s"} {t("campaign.days_left")}
-                    </span>
-                  ) : (
-                    <span>{t("campaign.ended_ago", { time: formatDistanceToNowStrict(end) })}</span>
-                  )}
-                </div>
                 {tips > 0 && (
                   <p className="mt-2 text-xs text-accent">
                     + {formatCurrency(tips)} in tips for {recipient || "the recipient"}
@@ -898,7 +983,157 @@ export default function PublicCampaignPage() {
                 {t("campaign.closed")}
               </div>
             ) : (
-              <div className="mt-5 space-y-3">
+              <div className="mt-5 grid gap-6 md:grid-cols-2">
+                <h2 className="text-xl font-bold md:col-span-2">{t("campaign.form.chip_in", { name: giftName })}</h2>
+
+                <div className="space-y-5">
+
+                <StepHeading n={1} title={t("campaign.identity.title")} />
+                <IdentityPicker value={identity} onChange={setIdentity} />
+
+                <Input
+                  label={t("campaign.identity.real_name")}
+                  placeholder={t("campaign.identity.real_name_placeholder")}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  hint={t("campaign.identity.real_name_help")}
+                />
+
+                <Input
+                  label={t("campaign.identity.email_label")}
+                  type="email"
+                  placeholder="you@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+
+                    {campaign.event_cost_enabled && (
+                      <div className="space-y-3">
+                        <StepHeading n={2} title={t("campaign.event_cost.title")} />
+                        <div className="space-y-3 rounded-2xl border border-border p-4">
+                          <label className="flex cursor-pointer items-start gap-3">
+                            <input
+                              type="checkbox"
+                              checked={includeEvent}
+                              onChange={(e) => setIncludeEvent(e.target.checked)}
+                              className="mt-1 h-5 w-5 flex-none accent-accent"
+                            />
+                            <span className="text-sm font-medium">{t("campaign.event_cost.include")}</span>
+                          </label>
+                          <p className="text-sm text-muted">
+                            {t("campaign.event_cost.set_by", {
+                              name: campaign.organiser_name,
+                              label: campaign.event_cost_label || t("campaign.event_cost.default_label"),
+                              amount: fmt(eventCostAmount),
+                            })}
+                          </p>
+                          <div className="flex items-center justify-between gap-3 rounded-xl bg-foreground/5 px-3.5 py-3 text-sm">
+                            <span className="font-medium">{t("campaign.event_cost.fixed_charge")}</span>
+                            <span className="font-semibold tabular-nums">
+                              {fmt(eventCostAmount)}{" "}
+                              <span className="font-normal text-muted">{t("campaign.event_cost.per_person")}</span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                {usesNewPricing ? (
+                  <div className="space-y-4">
+                    {campaign.gift_enabled && (
+                      <div className="space-y-3">
+                        <StepHeading
+                          n={3}
+                          title={usesBirthday ? t("campaign.gift.title_birthday", { name: giftName }) : t("campaign.gift.title", { name: giftName })}
+                          optional
+                        />
+                        <p className="text-sm text-muted">{t("campaign.gift.help", { name: giftName })}</p>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[0, ...giftSuggested].map((q) => (
+                            <button
+                              key={q}
+                              type="button"
+                              onClick={() => setAmount(q)}
+                              className={`h-11 rounded-xl text-sm font-semibold transition-colors ${giftAmount === q
+                                  ? "bg-foreground text-background"
+                                  : "bg-foreground/5 hover:bg-foreground/10"
+                                }`}
+                            >
+                              {q === 0 ? t("campaign.gift.none") : fmt(q)}
+                            </button>
+                          ))}
+                        </div>
+                        <Input
+                          type="number"
+                          min={0}
+                          step={1}
+                          placeholder={t("campaign.gift.custom")}
+                          prefix={campaign.currency || "AUD"}
+                          value={amount}
+                          onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : "")}
+                        />
+                      </div>
+                    )}
+                {hasItems && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold">{t("campaign.contribution_options")}</p>
+                    {items.map((item) => {
+                      const active = selectedItemIds.has(item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => {
+                            const next = new Set(selectedItemIds);
+                            if (next.has(item.id)) next.delete(item.id);
+                            else next.add(item.id);
+                            setSelectedItemIds(next);
+                          }}
+                          className={`flex min-h-[44px] w-full items-center justify-between rounded-xl px-3 text-sm font-medium transition-colors ${active ? "bg-foreground text-background" : "bg-foreground/5 hover:bg-foreground/10"}`}
+                        >
+                          <span>{item.label}</span>
+                          <span>{fmt(item.amount)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {/* Tip the recipient */}
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">
+                    {recipient ? t("campaign.add_tip", { name: recipient }) : t("campaign.add_tip", { name: "the recipient" })} {t("campaign.tip_optional")}
+                  </label>
+                  <div className="flex gap-2 mb-2">
+                    {TIP_OPTIONS.map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setTip(tip === t ? "" : t)}
+                        className={`flex-1 h-9 rounded-xl text-sm font-medium transition-colors ${tip === t
+                            ? "bg-accent text-accent-foreground"
+                            : "bg-foreground/5 hover:bg-foreground/10"
+                          }`}
+                      >
+                        +{formatCurrency(t)}
+                      </button>
+                    ))}
+                  </div>
+                  <Input
+                    type="number"
+                    min={0}
+                    step={5}
+                    placeholder="Custom tip"
+                    prefix="A$"
+                    value={tip}
+                    onChange={(e) => setTip(e.target.value ? Number(e.target.value) : "")}
+                    hint="Goes straight to the recipient, on top of your contribution."
+                  />
+                </div>
+
+                  </div>
+                ) : (
+                <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium mb-1.5">
                     {hasItems ? t("campaign.contribution_options") : t("campaign.fixed_amount")}
@@ -998,7 +1233,11 @@ export default function PublicCampaignPage() {
                   )}
                 </div>
 
+                </div>
+                )}
+
                 {/* Tip the recipient */}
+                {!usesNewPricing && (
                 <div>
                   <label className="block text-sm font-medium mb-1.5">
                     {recipient ? t("campaign.add_tip", { name: recipient }) : t("campaign.add_tip", { name: "the recipient" })} {t("campaign.tip_optional")}
@@ -1030,19 +1269,18 @@ export default function PublicCampaignPage() {
                   />
                 </div>
 
-                <Input
-                  label="Name (optional)"
-                  placeholder="Or leave blank for anonymous"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+                )}
+                </div>
 
-                <Input
-                  label={t('campaign.email_required')}
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                <div className="space-y-5">
+                <StepHeading n={usesNewPricing ? 4 : undefined} title={t("campaign.message.title")} optional />
+                <Textarea
+                  label={t("campaign.message.label")}
+                  placeholder={usesBirthday ? t("campaign.message.placeholder_birthday") : t("campaign.message.placeholder")}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  maxLength={200}
+                  rows={2}
                 />
 
                 <Input
@@ -1053,48 +1291,61 @@ export default function PublicCampaignPage() {
                   hint="Help us send you birthday greetings (optional)"
                 />
 
-                <Textarea
-                  label="Message (optional)"
-                  placeholder="A note for the gift wall…"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows={2}
+                <EmojiPicker value={emoji} onChange={setEmoji} />
+
+                <MediaAttach
+                  photo={photo}
+                  video={video}
+                  onPhotoFile={handlePhoto}
+                  onPhotoRemove={() => setPhoto(undefined)}
+                  onVideoChange={setVideo}
                 />
 
-                <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-border hover:bg-foreground/5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isPrivate}
-                    onChange={(e) => setIsPrivate(e.target.checked)}
-                    className="mt-1"
-                  />
-                  <div>
-                    <p className="text-sm font-medium">Make my contribution private</p>
-                    <p className="text-xs text-muted mt-0.5">
-                      Your name won't appear publicly — {campaign.organiser_name} can still see it.
-                    </p>
-                  </div>
-                </label>
 
-                {isPrivate && (
-                  <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-3">
-                    <h3 className="text-sm font-semibold text-gray-900">🎭 Choose Your Anonymous Identity</h3>
-                    <AnonymousAvatarSelector
-                      value={selectedAvatarId}
-                      onChange={setSelectedAvatarId}
-                    />
+                {usesNewPricing && (
+                  <div className="space-y-2 border-t border-border pt-4 text-sm tabular-nums">
+                    {eventTotal > 0 && (
+                      <div className="flex justify-between gap-3">
+                        <span className="text-muted">{t("campaign.summary.event")}</span>
+                        <span>{fmt(eventTotal)}</span>
+                      </div>
+                    )}
+                    {itemsTotal > 0 && (
+                      <div className="flex justify-between gap-3">
+                        <span className="text-muted">{t("campaign.summary.items")}</span>
+                        <span>{fmt(itemsTotal)}</span>
+                      </div>
+                    )}
+                    {giftAmount > 0 && (
+                      <div className="flex justify-between gap-3">
+                        <span className="text-muted">{t("campaign.summary.gift")}</span>
+                        <span>{fmt(giftAmount)}</span>
+                      </div>
+                    )}
+                    {(Number(tip) || 0) > 0 && (
+                      <div className="flex justify-between gap-3">
+                        <span className="text-muted">{t("campaign.summary.tip")}</span>
+                        <span>{fmt(Number(tip))}</span>
+                      </div>
+                    )}
+                    {quote && quote.feeAmount > 0 && (
+                      <div className="flex justify-between gap-3">
+                        <span className="text-muted">
+                          {t("campaign.summary.fee", { pct: quote.feePercent, flat: fmt(quote.feeFlat) })}
+                        </span>
+                        <span>{fmt(quote.feeAmount)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between gap-3 pt-1 text-base font-semibold">
+                      <span>{t("campaign.summary.total")}</span>
+                      <span>{fmt(quote ? quote.checkoutTotal : grandTotal)}</span>
+                    </div>
                   </div>
                 )}
 
-                <EmojiPicker value={emoji} onChange={setEmoji} />
-
-                <PhotoPicker value={photo} onChange={setPhoto} onUpload={handlePhoto} />
-
-                <VideoDrop value={video} onChange={setVideo} />
-
-                <Button onClick={contribute} loading={submitting} className="w-full" size="lg">
+                <Button onClick={contribute} loading={submitting} className="w-full" size="lg" disabled={usesNewPricing && grandTotal <= 0}>
                   <Heart size={16} />
-                  {hasItems
+                  {usesNewPricing ? (grandTotal > 0 ? t("campaign.pay_amount", { amount: fmt(quote ? quote.checkoutTotal : grandTotal) }) : t("campaign.pay_select")) : hasItems
                     ? selectedItemIds.size > 0
                       ? (() => {
                           const itemsTotal = Array.from(selectedItemIds).reduce(
@@ -1116,11 +1367,10 @@ export default function PublicCampaignPage() {
                   <Lock size={11} /> {t('campaign.secure_checkout')}
                 </p>
               </div>
+              </div>
             )}
           </div>
 
-          {/* Countdown clock */}
-          {!closed && <Countdown endDate={campaign.end_date} />}
 
           <p className="text-xs text-muted text-center px-4 inline-flex items-center gap-1 justify-center w-full">
             {goalHidden && <EyeOff size={11} />}
@@ -1194,47 +1444,19 @@ export default function PublicCampaignPage() {
   );
 }
 
-function PhotoPicker({
-  value,
-  onChange,
-  onUpload,
-}: {
-  value?: string;
-  onChange: (v?: string) => void;
-  onUpload: (f: File) => void | Promise<void>;
-}) {
+function StepHeading({ n, title, optional }: { n?: number; title: string; optional?: boolean }) {
+  const t = useTranslation();
   return (
-    <div>
-      <label className="block text-sm font-medium mb-1.5">Add a photo (optional)</label>
-      {value ? (
-        <div className="flex items-center gap-3 p-2 rounded-2xl border border-border">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="" className="w-12 h-12 rounded-xl object-cover" />
-          <p className="text-sm text-muted flex-1">Attached</p>
-          <button
-            type="button"
-            onClick={() => onChange(undefined)}
-            className="text-xs text-muted hover:text-foreground"
-          >
-            Remove
-          </button>
-        </div>
-      ) : (
-        <label className="flex items-center justify-center gap-2 h-11 px-3.5 rounded-2xl border border-dashed border-border text-sm text-muted hover:text-foreground hover:bg-foreground/[.02] cursor-pointer">
-          <CameraIcon size={14} />
-          Upload a photo
-          <input
-            type="file"
-            accept="image/jpeg,image/png"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) void onUpload(f);
-              e.target.value = "";
-            }}
-          />
-        </label>
+    <div className="flex items-center gap-2.5">
+      {n !== undefined && (
+        <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-foreground text-sm font-bold text-background">
+          {n}
+        </span>
       )}
+      <h3 className="text-base font-semibold">
+        {title}
+        {optional && <span className="ml-1 font-normal text-muted">{t("campaign.optional")}</span>}
+      </h3>
     </div>
   );
 }

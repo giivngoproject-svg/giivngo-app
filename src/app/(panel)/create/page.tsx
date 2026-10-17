@@ -2,24 +2,21 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import Swal from "sweetalert2";
 import { useAuth } from "@/stores/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { AuthCheck } from "@/components/AuthCheck";
-import { useWizard } from "@/stores/wizard";
+import { useWizard, type WizardData } from "@/stores/wizard";
 import { useCampaigns } from "@/stores/campaigns";
 import { formatAUD } from "@/lib/money";
-import { usePoolModes } from "@/lib/usePoolModes";
-import {
-  CAMPAIGN_TYPE_LABELS,
-  type CampaignType,
-  type PoolMode,
-} from "@/lib/types";
-import { POOL_MODES } from "@/lib/pool";
+import { slugify } from "@/lib/slug";
+import type { CampaignType } from "@/lib/types";
+import type { TranslationKey } from "@/lib/translations";
+import { LOCALE_TO_HREFLANG, type Locale } from "@/i18n/markets";
 import { cn } from "@/lib/cn";
 import { WizardShell } from "@/components/wizard/WizardShell";
 import { CoverMediaTabs } from "@/components/wizard/CoverMediaTabs";
-import { TierEditor } from "@/components/wizard/TierEditor";
 import { ItemEditor } from "@/components/wizard/ItemEditor";
 import { CountrySelector } from "@/components/wizard/CountrySelector";
 import { deleteImage } from "@/lib/mock/storage";
@@ -27,10 +24,42 @@ import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
 import { Progress } from "@/components/ui/Progress";
-import { ChevronLeft, ChevronRight, Sparkles, EyeOff, Lock, Layers, Eye, ChevronDown } from "lucide-react";
+import {
+  Baby,
+  Briefcase,
+  Cake,
+  ChevronLeft,
+  ChevronRight,
+  Hand,
+  Heart,
+  PartyPopper,
+  Plane,
+  Sparkles,
+  ChevronDown,
+} from "lucide-react";
+
+// The eight occasions offered in the create flow, in display order.
+// Legacy campaign types (footy_tipping, office_lotto, event_entry, custom) stay in the API.
+const OCCASIONS: { value: CampaignType; icon: typeof Cake }[] = [
+  { value: "birthday", icon: Cake },
+  { value: "hens_bucks", icon: PartyPopper },
+  { value: "wedding", icon: Heart },
+  { value: "work_party", icon: Briefcase },
+  { value: "farewell", icon: Hand },
+  { value: "baby_shower", icon: Baby },
+  { value: "trip", icon: Plane },
+  { value: "something_else", icon: Sparkles },
+];
+
+type WizardT = ReturnType<typeof useTranslation>;
+type WizardPatch = (p: Partial<WizardData>) => void;
+
+const PAYOUT_DELAY_DAYS = 3; // Scheduler pays out 3 days after the campaign ends (Stripe balance settles first)
 
 function CreatePageInner() {
   const t = useTranslation();
+  const locale = useLocale();
+  const dateLocale = LOCALE_TO_HREFLANG[locale as Locale] ?? "en-AU";
   const user = useAuth((s) => s.user);
   const router = useRouter();
   const { step, data, setStep, patch, reset } = useWizard();
@@ -70,12 +99,8 @@ function CreatePageInner() {
   const publish = async () => {
     setIsPublishing(true);
     try {
-      const tiered = data.pool_mode === "tiers";
-      const tiers = tiered
-        ? data.tiers.filter((t) => t > 0).sort((a, b) => a - b)
-        : undefined;
+      const giftAmounts = data.gift_suggested_amounts.filter((a) => a > 0);
 
-      console.log('Publishing campaign with showOnSearch:', data.show_on_search);
       const campaign = await createCampaign({
         title: data.title.trim(),
         description: data.description.trim(),
@@ -84,20 +109,23 @@ function CreatePageInner() {
         coverPhotoUrl: data.cover_photo_url,
         coverVideoUrl: data.cover_video_url,
         endDate: new Date(data.end_date).toISOString(),
-        minContribution: tiered ? undefined : data.min_contribution,
-        maxContribution: tiered ? undefined : data.max_contribution,
+        recipientName: data.recipient_is_me ? user.name : data.recipient_name.trim() || undefined,
         maxContributions: data.max_contributions || undefined,
-        recipientName: data.recipient_name?.trim() || undefined,
-        poolMode: data.pool_mode,
-        tiers,
+        poolMode: data.keep_private ? "blind" : "standard",
         contributionItems: data.contribution_items.length > 0
           ? data.contribution_items.map(({ label, amount }) => ({ label, amount }))
           : undefined,
         organiserName: user.name,
         showOnSearch: data.show_on_search,
-        hideUntilBirthday: data.hide_until_birthday || undefined,
+        hideUntilBirthday: (data.type === "birthday" && data.hide_until_birthday) || undefined,
         countryCode: data.country_code,
         currency: data.currency,
+        eventCostEnabled: data.event_cost_enabled,
+        eventCostAmount: data.event_cost_enabled ? data.event_cost_amount : undefined,
+        eventCostLabel: data.event_cost_enabled ? data.event_cost_label.trim() || undefined : undefined,
+        giftEnabled: data.gift_enabled,
+        giftSuggestedAmounts: data.gift_enabled ? giftAmounts : [],
+        hideGoal: data.hide_goal,
       });
 
       if (campaign) {
@@ -208,6 +236,7 @@ function CreatePageInner() {
           t={t}
           data={data}
           patch={patch}
+          userName={user.name}
           onNext={goNext}
           onCancel={() => {
             reset();
@@ -215,13 +244,23 @@ function CreatePageInner() {
           }}
         />
       )}
-      {step === 2 && <Step2 t={t} data={data} patch={patch} onNext={goNext} onBack={goBack} />}
+      {step === 2 && (
+        <Step2
+          t={t}
+          data={data}
+          patch={patch}
+          userName={user.name}
+          dateLocale={dateLocale}
+          onNext={goNext}
+          onBack={goBack}
+        />
+      )}
       {step === 3 && (
         <Step3
           t={t}
           data={data}
-          patch={patch}
           organiserName={user.name}
+          dateLocale={dateLocale}
           onBack={goBack}
           onPublish={publish}
           isPublishing={isPublishing}
@@ -240,76 +279,170 @@ export default function CreatePage() {
 }
 
 // ──────────────────────────────────────────────────────────
-// Step 1: Basics
+// Helpers
+// ──────────────────────────────────────────────────────────
+
+function recipientFor(data: WizardData, userName: string) {
+  return data.recipient_is_me ? userName : data.recipient_name.trim();
+}
+
+function formatDate(value: string, dateLocale: string, options: Intl.DateTimeFormatOptions) {
+  return new Date(value + "T12:00:00").toLocaleDateString(dateLocale, options);
+}
+
+function payoutDate(endDate: string, dateLocale: string) {
+  const d = new Date(endDate + "T12:00:00");
+  d.setDate(d.getDate() + PAYOUT_DELAY_DAYS);
+  return d.toLocaleDateString(dateLocale, { weekday: "long", day: "numeric", month: "long" });
+}
+
+function Switch({
+  checked,
+  onChange,
+  title,
+  help,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  title: string;
+  help: string;
+}) {
+  return (
+    <label className="flex items-start justify-between gap-4 cursor-pointer">
+      <span>
+        <span className="block text-sm font-medium">{title}</span>
+        <span className="block text-xs text-muted mt-0.5">{help}</span>
+      </span>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-1 h-5 w-5 accent-accent flex-none"
+      />
+    </label>
+  );
+}
+
+// ──────────────────────────────────────────────────────────
+// Step 1: Occasion & details
 // ──────────────────────────────────────────────────────────
 
 function Step1({
   t,
   data,
   patch,
+  userName,
   onNext,
   onCancel,
 }: {
-  t: ReturnType<typeof useTranslation>;
-  data: ReturnType<typeof useWizard.getState>["data"];
-  patch: (p: Partial<typeof data>) => void;
+  t: WizardT;
+  data: WizardData;
+  patch: WizardPatch;
+  userName: string;
   onNext: () => void;
   onCancel: () => void;
 }) {
-  const canNext = data.title.trim().length >= 3 && data.description.trim().length >= 0;
+  const recipient = recipientFor(data, userName);
+  const canNext =
+    data.title.trim().length >= 3 && (data.recipient_is_me || data.recipient_name.trim().length > 0);
+
+  // The pool name follows the occasion and recipient until the organiser edits it.
+  useEffect(() => {
+    if (data.title_edited) return;
+    const suggested = recipient ? t(`create.name.${data.type}` as TranslationKey, { name: recipient }) : "";
+    if (suggested !== data.title) patch({ title: suggested });
+  }, [data.type, data.title_edited, data.title, recipient, patch, t]);
 
   return (
-    <div className="space-y-5">
-      <CoverMediaTabs
-        photoUrl={data.cover_photo_url}
-        videoUrl={data.cover_video_url}
-        onPhotoChange={(url) => patch({ cover_photo_url: url })}
-        onVideoChange={(url) => patch({ cover_video_url: url })}
-      />
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-xl font-semibold">{t("create.s1.heading")}</h2>
+        <p className="text-sm text-muted">{t("create.s1.sub")}</p>
+      </div>
+
+      <div className="space-y-2">
+        <span className="block text-sm font-medium">{t("create.s1.occasion_label")}</span>
+        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t("create.s1.occasion_label")}>
+          {OCCASIONS.map(({ value, icon: Icon }) => {
+            const active = data.type === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => patch({ type: value })}
+                className={cn(
+                  "flex items-center gap-2.5 min-h-[52px] rounded-2xl border px-3 py-2.5 text-left text-sm font-medium transition-all",
+                  active
+                    ? "border-accent/60 bg-accent/5 ring-2 ring-accent/30 text-accent"
+                    : "border-border hover:bg-foreground/[.02]",
+                )}
+              >
+                <Icon size={18} className={active ? "text-accent" : "text-muted"} />
+                {t(`create.occasion.${value}` as TranslationKey)}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <span className="block text-sm font-medium">{t("create.s1.who")}</span>
+        <div className="grid grid-cols-2 gap-1 rounded-2xl bg-foreground/[.04] p-1" role="group" aria-label={t("create.s1.who")}>
+          {[
+            { me: true, label: t("create.s1.who_me") },
+            { me: false, label: t("create.s1.who_other") },
+          ].map((option) => (
+            <button
+              key={String(option.me)}
+              type="button"
+              aria-pressed={data.recipient_is_me === option.me}
+              onClick={() => patch({ recipient_is_me: option.me })}
+              className={cn(
+                "min-h-[40px] rounded-xl text-sm font-medium transition-all",
+                data.recipient_is_me === option.me ? "bg-background shadow-soft text-foreground" : "text-muted",
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        {!data.recipient_is_me && (
+          <Input
+            aria-label={t("create.s1.who_other")}
+            placeholder={t("create.s1.recipient_placeholder")}
+            value={data.recipient_name}
+            onChange={(e) => patch({ recipient_name: e.target.value })}
+          />
+        )}
+      </div>
 
       <Input
-        label={t("create.campaign_name")}
-        placeholder={t("create.campaign_name.placeholder")}
+        label={t("create.s1.name_label")}
         value={data.title}
-        onChange={(e) => patch({ title: e.target.value })}
-        hint="Keep it short and warm — this is the first thing contributors see."
-      />
-
-      <Input
-        label={t("create.recipient_name")}
-        placeholder="Sarah"
-        value={data.recipient_name ?? ""}
-        onChange={(e) => patch({ recipient_name: e.target.value })}
-        hint="The recipient — used for tipping and their video highlight reel."
-      />
-
-      <Textarea
-        label={t("create.description")}
-        placeholder={t("create.description.placeholder")}
-        value={data.description}
-        onChange={(e) => patch({ description: e.target.value })}
-        rows={5}
-        hint={t("create.description.hint")}
+        onChange={(e) => patch({ title: e.target.value, title_edited: true })}
+        hint={t("create.s1.name_help")}
       />
 
       <div className="space-y-1.5">
-        <label className="block text-sm font-medium">{t("create.campaign_type")}</label>
-        <select
-          value={data.type}
-          onChange={(e) => patch({ type: e.target.value as CampaignType })}
-          className="w-full h-11 px-3.5 rounded-2xl border border-border bg-background text-[15px] outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50"
-        >
-          {Object.entries(CAMPAIGN_TYPE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v}
-            </option>
-          ))}
-        </select>
+        <span className="block text-sm font-medium">
+          {t("create.s1.media_label")} <span className="text-muted font-normal">{t("create.optional")}</span>
+        </span>
+        <CoverMediaTabs
+          photoUrl={data.cover_photo_url}
+          videoUrl={data.cover_video_url}
+          onPhotoChange={(url) => patch({ cover_photo_url: url })}
+          onVideoChange={(url) => patch({ cover_video_url: url })}
+        />
       </div>
 
-      <CountrySelector
-        value={data.country_code}
-        onChange={(countryCode, currency) => patch({ country_code: countryCode, currency })}
+      <Textarea
+        label={t("create.s1.desc_label")}
+        placeholder={t(`create.example.${data.type}` as TranslationKey)}
+        value={data.description}
+        onChange={(e) => patch({ description: e.target.value })}
+        rows={4}
       />
 
       <div className="flex justify-between pt-4">
@@ -326,239 +459,219 @@ function Step1({
 }
 
 // ──────────────────────────────────────────────────────────
-// Step 2: Goal & timing
+// Step 2: Event cost & gift
 // ──────────────────────────────────────────────────────────
-
-const MODE_ICONS: Record<PoolMode, React.ReactNode> = {
-  standard: <Eye size={16} />,
-  mystery: <EyeOff size={16} />,
-  blind: <Lock size={16} />,
-  tiers: <Layers size={16} />,
-};
 
 function Step2({
   t,
   data,
   patch,
+  userName,
+  dateLocale,
   onNext,
   onBack,
 }: {
-  t: ReturnType<typeof useTranslation>;
-  data: ReturnType<typeof useWizard.getState>["data"];
-  patch: (p: Partial<typeof data>) => void;
+  t: WizardT;
+  data: WizardData;
+  patch: WizardPatch;
+  userName: string;
+  dateLocale: string;
   onNext: () => void;
   onBack: () => void;
 }) {
-  const { labels: poolModeLabels, descriptions: poolModeDescriptions } = usePoolModes();
+  const [attempted, setAttempted] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
-  const isTiers = data.pool_mode === "tiers";
-  const validTiers = data.tiers.filter((t) => t > 0);
-  const hasItems = data.contribution_items.length > 0;
+  const anyPrice = data.event_cost_enabled || data.gift_enabled;
+  const eventAmountMissing = data.event_cost_enabled && !((data.event_cost_amount ?? 0) > 0);
 
-  // Validation: if min_contribution is set and contribution items exist, each item must be >= min_contribution
-  const minAmount = data.min_contribution || 0;
-  const allItemsAboveMin =
-    minAmount <= 0 ||
-    !hasItems ||
-    data.contribution_items.every((item) => item.amount >= minAmount);
+  const setGiftAmount = (index: number, value: string) => {
+    const next = [...data.gift_suggested_amounts];
+    next[index] = Number(value) || 0;
+    patch({ gift_suggested_amounts: next });
+  };
 
-  const canNext = !!data.end_date && (!isTiers || validTiers.length >= 1) && allItemsAboveMin;
-  const [itemsExpanded, setItemsExpanded] = React.useState(false);
+  const handleNext = () => {
+    setAttempted(true);
+    if (!anyPrice || eventAmountMissing) return;
+    onNext();
+  };
 
   return (
-    <div className="space-y-5">
-      <div className="space-y-2">
-        <label className="block text-sm font-medium">Pool mode</label>
-        <div className="grid grid-cols-2 gap-2">
-          {POOL_MODES.map((mode) => {
-            const active = data.pool_mode === mode;
-            return (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => patch({ pool_mode: mode })}
-                className={cn(
-                  "text-left rounded-2xl border p-3 transition-all",
-                  active
-                    ? "border-accent/60 bg-accent/5 ring-2 ring-accent/30"
-                    : "border-border hover:bg-foreground/[.02]",
-                )}
-              >
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-1.5 text-sm font-medium",
-                    active ? "text-accent" : "text-foreground",
-                  )}
-                >
-                  {MODE_ICONS[mode]}
-                  {poolModeLabels[mode]}
-                </span>
-                <p className="text-xs text-muted mt-1 leading-snug">
-                  {poolModeDescriptions[mode]}
-                </p>
-              </button>
-            );
-          })}
-        </div>
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-xl font-semibold">{t("create.s2.heading")}</h2>
+        <p className="text-sm text-muted">{t("create.s2.sub")}</p>
       </div>
 
-      <Input
-        label={data.pool_mode === "mystery" ? t('create.goal_amount_mystery') : t('create.goal_amount')}
-        type="number"
-        min={0}
-        step={50}
-        value={data.goal_amount ?? ""}
-        onChange={(e) =>
-          patch({ goal_amount: e.target.value ? Number(e.target.value) : undefined })
-        }
-        prefix="A$"
-        placeholder="2000"
-        hint={
-          data.pool_mode === "mystery"
-            ? t('create.goal_amount_mystery_hint')
-            : t('create.goal_amount.hint')
-        }
-      />
-
-      <Input
-        label={t('create.end_date')}
-        type="date"
-        min={today}
-        value={data.end_date}
-        onChange={(e) => patch({ end_date: e.target.value })}
-
-      />
-
-      {data.end_date && (
-        <div className="mt-4 p-4 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
-          <p className="text-sm text-blue-900 dark:text-blue-100">
-            <span className="font-semibold">{t('create.estimated_payout')}:</span>{' '}
-            {new Date(new Date(data.end_date).getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(
-              'en-AU',
-              { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
-            )}
-          </p>
-          <p className="text-xs text-blue-800 dark:text-blue-200 mt-1">
-            {t('create.payout_note')}
-          </p>
-        </div>
-      )}
-
-      {isTiers ? (
-        <TierEditor tiers={data.tiers} onChange={(tiers) => patch({ tiers })} />
-      ) : (
-        <div className="grid grid-cols-2 gap-3">
-          <Input
-            label={t('create.min_contribution')}
-            type="number"
-            min={0}
-            step={5}
-            value={data.min_contribution ?? ""}
-            onChange={(e) => {
-              const val = e.target.value ? Number(e.target.value) : undefined;
-              // If max is set and val is greater than max, don't allow it
-              if (val !== undefined && data.max_contribution && val > data.max_contribution) {
-                return;
+      {/* Event cost */}
+      <div className={cn("rounded-2xl border p-4 space-y-4", data.event_cost_enabled ? "border-ink/60" : "border-border")}>
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={data.event_cost_enabled}
+            onChange={(e) => patch({ event_cost_enabled: e.target.checked })}
+            className="mt-1 h-5 w-5 accent-accent flex-none"
+          />
+          <span>
+            <span className="block font-semibold">{t("create.s2.event_title")}</span>
+            <span className="block text-sm text-muted">{t("create.s2.event_help")}</span>
+          </span>
+        </label>
+        {data.event_cost_enabled && (
+          <div className="space-y-3 pl-8">
+            <Input
+              label={t("create.s2.cost_per_person")}
+              type="number"
+              min={1}
+              step={1}
+              prefix="A$"
+              value={data.event_cost_amount ?? ""}
+              onChange={(e) =>
+                patch({ event_cost_amount: e.target.value ? Number(e.target.value) : undefined })
               }
-              patch({ min_contribution: val });
-            }}
-            prefix="A$"
-            placeholder="—"
-            hint={data.max_contribution ? `Max: A$${data.max_contribution}` : undefined}
-          />
-          <Input
-            label={t('create.max_contribution')}
-            type="number"
-            min={0}
-            step={5}
-            value={data.max_contribution ?? ""}
-            onChange={(e) => {
-              const val = e.target.value ? Number(e.target.value) : undefined;
-
-              // If min is set and val is less than min, don't allow it
-              if (val !== undefined && data.min_contribution && val < data.min_contribution) {
-                return;
-              }
-
-              patch({ max_contribution: val });
-            }}
-            prefix="A$"
-            placeholder="—"
-            hint="Leave empty for no limit"
-          />
-        </div>
-      )}
-
-      {!isTiers && (
-        <Input
-          label={t('create.max_contributions')}
-          type="number"
-          min={1}
-          step={1}
-          value={data.max_contributions ?? ""}
-          onChange={(e) =>
-            patch({ max_contributions: e.target.value ? Number(e.target.value) : undefined })
-          }
-          placeholder="—"
-          hint={t('create.max_contributions.hint')}
-        />
-      )}
-
-      <div className="space-y-3">
-        <button
-          type="button"
-          onClick={() => setItemsExpanded(!itemsExpanded)}
-          className="w-full flex items-center justify-between px-3.5 py-3 rounded-2xl border border-border hover:bg-foreground/5 text-sm font-medium"
-        >
-          <span>{t('create.add_items')}</span>
-          <ChevronDown
-            size={16}
-            className={cn("transition-transform", itemsExpanded && "rotate-180")}
-          />
-        </button>
-        <p className="text-xs text-muted leading-relaxed">
-          {t('create.add_items.description')}
-        </p>
-        {itemsExpanded && (
-          <div className="px-3.5 py-3 rounded-2xl border border-border bg-foreground/[.02]">
-            <ItemEditor
-              items={data.contribution_items}
-              onChange={(items) => patch({ contribution_items: items })}
+              error={attempted && eventAmountMissing ? t("create.s2.event_amount_required") : undefined}
             />
-            <p className="text-xs text-muted mt-3">
-              {t('create.add_items.hint')}
-            </p>
-            {minAmount > 0 && hasItems && !allItemsAboveMin && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-3">
-                {t('create.items_must_exceed_min')} A ${minAmount}
-              </p>
-            )}
+            <Input
+              label={t("create.s2.covers")}
+              placeholder={t("create.s2.covers_placeholder")}
+              value={data.event_cost_label}
+              onChange={(e) => patch({ event_cost_label: e.target.value })}
+            />
           </div>
         )}
       </div>
 
-      {data.type === "birthday" && (
-        <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-border hover:bg-foreground/5 cursor-pointer">
+      {/* Gift */}
+      <div className={cn("rounded-2xl border p-4 space-y-4", data.gift_enabled ? "border-ink/60" : "border-border")}>
+        <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
-            checked={data.hide_until_birthday}
-            onChange={(e) => patch({ hide_until_birthday: e.target.checked })}
-            className="mt-1"
+            checked={data.gift_enabled}
+            onChange={(e) => patch({ gift_enabled: e.target.checked })}
+            className="mt-1 h-5 w-5 accent-accent flex-none"
           />
-          <div>
-            <p className="text-sm font-medium">{t('create.hide_until_end')}</p>
-            <p className="text-xs text-muted mt-0.5">
-              {t('create.hide_until_end.hint')}
-            </p>
-          </div>
+          <span>
+            <span className="block font-semibold">{t("create.s2.gift_title", { name: recipientFor(data, userName) })}</span>
+            <span className="block text-sm text-muted">{t("create.s2.gift_help")}</span>
+          </span>
         </label>
-      )}
+        {data.gift_enabled && (
+          <div className="space-y-2 pl-8">
+            <span className="block text-sm font-medium">{t("create.s2.suggested")}</span>
+            <div className="grid grid-cols-3 gap-2">
+              {[0, 1, 2].map((index) => (
+                <Input
+                  key={index}
+                  type="number"
+                  min={1}
+                  step={1}
+                  prefix="$"
+                  aria-label={`${t("create.s2.suggested")} ${index + 1}`}
+                  value={data.gift_suggested_amounts[index] || ""}
+                  onChange={(e) => setGiftAmount(index, e.target.value)}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-muted">{t("create.s2.suggested_help")}</p>
+          </div>
+        )}
+      </div>
+
+      {attempted && !anyPrice && <p className="text-sm font-semibold text-red-600">{t("create.s2.pick_one")}</p>}
+
+      {/* Closing date and payout */}
+      <div className="space-y-3">
+        <Input
+          label={t("create.s2.closes")}
+          type="date"
+          min={today}
+          value={data.end_date}
+          onChange={(e) => patch({ end_date: e.target.value })}
+        />
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
+          {data.end_date
+            ? t("create.s2.payout", { date: payoutDate(data.end_date, dateLocale) })
+            : t("create.s2.payout_pick")}
+        </div>
+      </div>
+
+      {/* More options */}
+      <details className="rounded-2xl border border-border p-4 group">
+        <summary className="flex cursor-pointer list-none items-center justify-between min-h-[44px] text-sm font-semibold">
+          {t("create.s2.more")}
+          <ChevronDown size={16} className="transition-transform group-open:rotate-180" />
+        </summary>
+        <div className="mt-4 space-y-5">
+          <Input
+            label={t("create.s2.goal")}
+            type="number"
+            min={0}
+            step={50}
+            prefix="A$"
+            placeholder="2000"
+            value={data.goal_amount ?? ""}
+            onChange={(e) =>
+              patch({ goal_amount: e.target.value ? Number(e.target.value) : undefined })
+            }
+            hint={t("create.s2.goal_help")}
+          />
+
+          <Switch
+            checked={data.hide_goal}
+            onChange={(checked) => patch({ hide_goal: checked })}
+            title={t("create.s2.hide_goal")}
+            help={t("create.s2.hide_goal_help")}
+          />
+          <Switch
+            checked={data.keep_private}
+            onChange={(checked) => patch({ keep_private: checked })}
+            title={t("create.s2.private")}
+            help={t("create.s2.private_help")}
+          />
+
+          <Input
+            label={t("create.s2.spots")}
+            type="number"
+            min={1}
+            step={1}
+            placeholder="20"
+            value={data.max_contributions ?? ""}
+            onChange={(e) =>
+              patch({ max_contributions: e.target.value ? Number(e.target.value) : undefined })
+            }
+            hint={t("create.s2.spots_help")}
+          />
+
+          <div className="space-y-2">
+            <span className="block text-sm font-medium">{t("create.add_items")}</span>
+            <p className="text-xs text-muted">{t("create.add_items.description")}</p>
+            <ItemEditor
+              items={data.contribution_items}
+              onChange={(items) => patch({ contribution_items: items })}
+            />
+          </div>
+
+          {data.type === "birthday" && (
+            <Switch
+              checked={data.hide_until_birthday}
+              onChange={(checked) => patch({ hide_until_birthday: checked })}
+              title={t("create.hide_until_end")}
+              help={t("create.hide_until_end.hint")}
+            />
+          )}
+
+          <CountrySelector
+            value={data.country_code}
+            onChange={(countryCode, currency) => patch({ country_code: countryCode, currency })}
+          />
+        </div>
+      </details>
 
       <div className="flex justify-between pt-4">
         <Button variant="ghost" onClick={onBack}>
           <ChevronLeft size={16} /> {t("create.button_prev")}
         </Button>
-        <Button onClick={onNext} disabled={!canNext}>
+        <Button onClick={handleNext}>
           {t("create.button_next")}
           <ChevronRight size={16} />
         </Button>
@@ -568,161 +681,134 @@ function Step2({
 }
 
 // ──────────────────────────────────────────────────────────
-// Step 3: Preview & publish
+// Step 3: Check & share
 // ──────────────────────────────────────────────────────────
 
 function Step3({
   t,
   data,
-  patch,
   organiserName,
+  dateLocale,
   onBack,
   onPublish,
   isPublishing,
 }: {
-  t: ReturnType<typeof useTranslation>;
-  data: ReturnType<typeof useWizard.getState>["data"];
-  patch: (p: Partial<typeof data>) => void;
+  t: WizardT;
+  data: WizardData;
   organiserName: string;
+  dateLocale: string;
   onBack: () => void;
   onPublish: () => Promise<void>;
   isPublishing: boolean;
 }) {
-  const { labels: poolModeLabels } = usePoolModes();
+  const recipient = recipientFor(data, organiserName);
+  const occasionLabel = t(`create.occasion.${data.type}` as TranslationKey);
+  const title = data.title.trim() || t(`create.name.${data.type}` as TranslationKey, { name: recipient });
+  const giftAmounts = data.gift_suggested_amounts.filter((a) => a > 0);
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const linkPreview = `${origin}/campaign/${slugify(title) || "your-campaign"}`;
+
   return (
-    <div>
-      <p className="text-sm text-muted mb-4">
-        Have a final look. You can edit any of this after publishing.
-      </p>
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-xl font-semibold">{t("create.s3.heading")}</h2>
+        <p className="text-sm text-muted">{t("create.s3.sub")}</p>
+      </div>
 
       <div className="rounded-3xl border border-border overflow-hidden bg-background shadow-soft">
         {data.cover_photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={data.cover_photo_url}
-            alt={data.title}
-            className="w-full aspect-[16/9] object-cover"
-          />
+          <img src={data.cover_photo_url} alt={title} className="w-full aspect-[16/9] object-cover" />
         ) : (
           <div className="w-full aspect-[16/9] bg-gradient-to-br from-accent/20 to-sky-200/40" />
         )}
         <div className="p-6">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-2xl font-bold tracking-tight">{data.title || "Untitled"}</h2>
+            <h3 className="text-2xl font-bold tracking-tight">{title}</h3>
             <StatusBadge status="active" />
           </div>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <p className="text-sm text-muted">by {organiserName}</p>
-            {data.pool_mode !== "standard" && (
-              <Badge tone="accent">{poolModeLabels[data.pool_mode]}</Badge>
-            )}
-            {data.hide_until_birthday && (
-              <Badge tone="accent">🎂 Birthday surprise</Badge>
+            <p className="text-sm text-muted">{occasionLabel}</p>
+            {data.keep_private && <Badge tone="accent">{t("create.s3.private_badge")}</Badge>}
+            {data.hide_goal && <Badge tone="accent">{t("create.s3.goal_hidden_badge")}</Badge>}
+            {data.type === "birthday" && data.hide_until_birthday && (
+              <Badge tone="accent">🎂 {t("create.s3.birthday_surprise")}</Badge>
             )}
           </div>
-          {data.recipient_name?.trim() && (
-            <p className="text-sm text-muted mt-0.5">for {data.recipient_name.trim()}</p>
+          {!data.recipient_is_me && recipient && (
+            <p className="text-sm text-muted mt-0.5">{t("create.s3.for", { name: recipient })}</p>
           )}
           <p className="mt-4 text-sm leading-relaxed whitespace-pre-wrap">
-            {data.description || "No description yet."}
+            {data.description.trim() || t(`create.example.${data.type}` as TranslationKey)}
           </p>
 
-          {data.pool_mode === "mystery" ? (
-            <div className="mt-6 rounded-2xl bg-foreground/5 p-4 text-sm text-muted">
-              <EyeOff size={15} className="inline mr-1.5 -mt-0.5" />
-              Goal stays a mystery — contributors see only the occasion.
-            </div>
-          ) : (
-            <div className="mt-6">
-              <div className="flex items-baseline justify-between">
-                <p className="text-xl font-semibold">{formatAUD(0)}</p>
-                {data.goal_amount ? (
-                  <p className="text-sm text-muted">of {formatAUD(data.goal_amount)}</p>
-                ) : (
-                  <p className="text-sm text-muted">no goal set</p>
-                )}
+          <div className="mt-6 space-y-3 rounded-2xl bg-foreground/5 p-4 text-sm">
+            {data.event_cost_enabled && (
+              <div className="flex justify-between gap-3">
+                <span className="text-muted">
+                  {t("create.s3.event_row")}
+                  {data.event_cost_label.trim() ? ` · ${data.event_cost_label.trim()}` : ""}
+                </span>
+                <span className="font-semibold text-right">
+                  {formatAUD(data.event_cost_amount ?? 0)} <span className="font-normal text-muted">{t("create.s3.per_person")}</span>
+                </span>
               </div>
-              <Progress value={0} max={data.goal_amount || 100} className="mt-2" />
+            )}
+            {data.gift_enabled && (
+              <div className="flex justify-between gap-3">
+                <span className="text-muted">{t("create.s2.gift_title", { name: recipient })}</span>
+                <span className="font-semibold text-right">
+                  {giftAmounts.length > 0
+                    ? t("create.s3.gift_value", { amounts: giftAmounts.map((a) => formatAUD(a)).join(" / ") })
+                    : t("create.s3.gift_any")}
+                </span>
+              </div>
+            )}
+            {data.goal_amount && !data.hide_goal && (
+              <div className="flex justify-between gap-3">
+                <span className="text-muted">{t("create.s2.goal")}</span>
+                <span className="font-semibold">{formatAUD(data.goal_amount)}</span>
+              </div>
+            )}
+            {data.goal_amount && data.hide_goal && (
+              <div className="flex justify-between gap-3">
+                <span className="text-muted">{t("create.s2.goal")}</span>
+                <span className="font-semibold">{t("create.s3.goal_hidden_value")}</span>
+              </div>
+            )}
+            {data.end_date && (
+              <div className="flex justify-between gap-3">
+                <span className="text-muted">{t("create.s3.closes")}</span>
+                <span className="font-semibold">
+                  {formatDate(data.end_date, dateLocale, { day: "numeric", month: "short", year: "numeric" })}
+                </span>
+              </div>
+            )}
+            {data.keep_private && (
+              <div className="flex justify-between gap-3">
+                <span className="text-muted">{t("create.s3.privacy")}</span>
+                <span className="font-semibold">{t("create.s3.privacy_value")}</span>
+              </div>
+            )}
+          </div>
+
+          {!data.hide_goal && (
+            <div className="mt-5">
+              <Progress value={0} max={data.goal_amount || 100} />
             </div>
           )}
-
-          <dl className="mt-5 grid grid-cols-2 gap-y-2 text-sm">
-            <dt className="text-muted">Type</dt>
-            <dd className="text-right capitalize">{data.type.replace("_", " ")}</dd>
-            <dt className="text-muted">Pool mode</dt>
-            <dd className="text-right">{poolModeLabels[data.pool_mode]}</dd>
-            <dt className="text-muted">Ends</dt>
-            <dd className="text-right">
-              {new Date(data.end_date).toLocaleDateString("en-AU", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </dd>
-            {data.pool_mode === "tiers" ? (
-              <>
-                <dt className="text-muted">Tiers</dt>
-                <dd className="text-right">
-                  {data.tiers
-                    .filter((t) => t > 0)
-                    .map((t) => formatAUD(t))
-                    .join(" · ") || "—"}
-                </dd>
-              </>
-            ) : (
-              <>
-                {data.min_contribution ? (
-                  <>
-                    <dt className="text-muted">Min contribution</dt>
-                    <dd className="text-right">{formatAUD(data.min_contribution)}</dd>
-                  </>
-                ) : null}
-                {data.max_contribution ? (
-                  <>
-                    <dt className="text-muted">Max contribution</dt>
-                    <dd className="text-right">{formatAUD(data.max_contribution)}</dd>
-                  </>
-                ) : null}
-                {data.max_contributions ? (
-                  <>
-                    <dt className="text-muted">Max slots</dt>
-                    <dd className="text-right">{data.max_contributions}</dd>
-                  </>
-                ) : null}
-              </>
-            )}
-            {data.contribution_items.length > 0 ? (
-              <>
-                <dt className="text-muted">Items</dt>
-                <dd className="text-right">
-                  {data.contribution_items
-                    .filter((i) => i.label.trim() && i.amount > 0)
-                    .map((i) => `${i.label} (${formatAUD(i.amount)})`)
-                    .join(" · ") || "—"}
-                </dd>
-              </>
-            ) : null}
-          </dl>
         </div>
       </div>
 
-      <label className="flex items-start gap-3 p-3.5 rounded-2xl border border-border hover:bg-foreground/5 cursor-pointer mt-6">
-        <input
-          type="checkbox"
-          checked={data.show_on_search}
-          onChange={(e) => {
-            console.log('show_on_search changed to:', e.target.checked);
-            patch({ show_on_search: e.target.checked });
-          }}
-          className="mt-1"
-        />
-        <div>
-          <p className="text-sm font-medium">{t('create.show_search')}</p>
-          <p className="text-xs text-muted mt-0.5">{t('create.show_search.hint')}</p>
-        </div>
-      </label>
+      <div className="space-y-2">
+        <span className="block text-sm font-medium">{t("create.s3.link")}</span>
+        <div className="rounded-xl border border-border px-3.5 py-3 text-sm text-muted break-all">{linkPreview}</div>
+        <p className="text-xs text-muted">{t("create.s3.link_help")}</p>
+      </div>
 
-      <div className="flex justify-between pt-6">
+      <p className="text-sm text-muted">{t("create.s3.review_note")}</p>
+
+      <div className="flex justify-between pt-2">
         <Button variant="ghost" onClick={onBack} disabled={isPublishing}>
           <ChevronLeft size={16} /> {t("create.button_prev")}
         </Button>

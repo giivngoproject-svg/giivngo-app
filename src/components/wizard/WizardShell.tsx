@@ -11,11 +11,11 @@ export function WizardShell({
   children: React.ReactNode;
 }) {
   const t = useTranslation();
-  const steps = ["Campaign Setup", "Goal & timing", "Preview & publish"];
+  const steps = [t("wizard.title_1"), t("wizard.title_2"), t("wizard.title_3")];
   return (
     <div className="max-w-2xl mx-auto px-5 sm:px-8 py-10">
       <div className="mb-8">
-        <p className="text-sm text-muted">Step {step} of 3</p>
+        <p className="text-sm text-muted">{t("wizard.step_of", { step })}</p>
         <h1 className="text-3xl font-bold tracking-tight mt-1">{steps[step - 1]}</h1>
         {step === 1 && (
           <p className="text-sm text-muted py-2">

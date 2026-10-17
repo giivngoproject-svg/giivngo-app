@@ -47,6 +47,12 @@ function transformCampaignFromApi(data: any) {
     tiers: data.tiers,
     contribution_items: data.contributionItems,
     hide_until_birthday: data.hideUntilBirthday,
+    event_cost_enabled: data.eventCostEnabled,
+    event_cost_amount: data.eventCostAmount,
+    event_cost_label: data.eventCostLabel,
+    gift_enabled: data.giftEnabled,
+    gift_suggested_amounts: data.giftSuggestedAmounts,
+    hide_goal: data.hideGoal,
     show_on_search: data.showOnSearch ?? true,
     creator_stripe_account_id: data.creatorStripeAccountId,
     created_at: data.createdAt,
@@ -267,7 +273,24 @@ export const campaignsApi = {
 /**
  * Contribution API calls
  */
+export type FeeQuote = {
+  giftAmount: number;
+  eventCostAmount: number;
+  tipAmount: number;
+  baseAmount: number;
+  feeAmount: number;
+  checkoutTotal: number;
+  currency: string;
+  feePercent: number;
+  feeFlat: number;
+};
+
 export const contributionsApi = {
+  quote: async (slug: string, body: { amount: number; tipAmount?: number; includeEventCost?: boolean }): Promise<FeeQuote> => {
+    const res = await apiClient.post(`/campaigns/${slug}/contributions/quote`, body);
+    return res.data;
+  },
+
   getList: async (slug: string) => {
     const res = await apiClient.get(`/campaigns/${slug}/contributions`);
     const data = res.data.data || res.data; // Handle paginated response
@@ -370,3 +393,34 @@ export const storageApi = {
 };
 
 export default apiClient;
+
+
+
+export type AnonymousAvatarOption = {
+
+  id: string;
+
+  name: string;
+
+  description?: string;
+
+  imageUrl: string;
+
+  color?: string;
+
+};
+
+
+
+export const anonymousAvatarsApi = {
+
+  getAll: async (): Promise<AnonymousAvatarOption[]> => {
+
+    const res = await apiClient.get('/anonymous-avatars');
+
+    return res.data;
+
+  },
+
+};
+

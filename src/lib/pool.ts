@@ -22,8 +22,8 @@ export function poolMode(c: Pick<Campaign, "pool_mode">): PoolMode {
 }
 
 /** Goal/raised figures are hidden from contributors. */
-export function isGoalHidden(c: Pick<Campaign, "pool_mode">): boolean {
-  return poolMode(c) === "mystery";
+export function isGoalHidden(c: Pick<Campaign, "pool_mode" | "hide_goal">): boolean {
+  return poolMode(c) === "mystery" || !!c.hide_goal;
 }
 
 /** Contributor identities and amounts are hidden from everyone but the creator. */

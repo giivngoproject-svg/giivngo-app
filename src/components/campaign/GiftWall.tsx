@@ -1,12 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Slider, { type Settings } from "react-slick";
 import { formatDistanceToNowStrict } from "date-fns";
-import { PlayCircle, Image as ImageIcon, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlayCircle, Image as ImageIcon, X } from "lucide-react";
+import { cn } from "@/lib/cn";
 import { useTranslation } from "@/lib/useTranslation";
 import { Avatar } from "@/components/nav/TopNav";
 import { formatAUD } from "@/lib/money";
 import type { Contribution } from "@/lib/types";
+
+// Slick styles (global CSS from node_modules is allowed in the app router)
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+/** Desktop breakpoint: from here the wall fades every 3 seconds, two cards per slide. */
+const DESKTOP_QUERY = "(min-width: 768px)";
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isDesktop;
+}
+
+/**
+ * Visible arrows for desktop. The slick theme draws its arrows with font glyphs,
+ * which do not show when the theme font files are not served.
+ */
+function SlickArrow({
+  className,
+  onClick,
+  direction,
+}: {
+  className?: string;
+  onClick?: () => void;
+  direction: "prev" | "next";
+}) {
+  const Icon = direction === "prev" ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={direction === "prev" ? "Previous" : "Next"}
+      className={cn(
+        className,
+        "!flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background shadow-soft z-10 before:hidden hover:bg-foreground/5",
+        direction === "prev" ? "!left-2" : "!right-2",
+      )}
+    >
+      <Icon size={18} />
+    </button>
+  );
+}
+
+function chunk<T>(items: T[], size: number): T[][] {
+  const groups: T[][] = [];
+  for (let i = 0; i < items.length; i += size) groups.push(items.slice(i, i + size));
+  return groups;
+}
 
 /**
  * Live gift wall: one card per contribution with emoji, name, message and any
@@ -21,6 +78,7 @@ export function GiftWall({
 }) {
   const t = useTranslation();
   const [mediaModal, setMediaModal] = useState<{ type: 'image' | 'video'; url: string } | null>(null);
+  const isDesktop = useIsDesktop();
 
   if (contributions.length === 0) {
     return (
@@ -34,10 +92,7 @@ export function GiftWall({
     .slice()
     .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
 
-  return (
-    <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {sorted.map((c) => {
+  const cards = sorted.map((c) => {
           // For private contributions with anonymous avatar
           const isAnonymous = c.is_private;
           const hasAnonymousAvatar = isAnonymous && c.anonymous_avatar;
@@ -86,7 +141,7 @@ export function GiftWall({
           return (
             <div
               key={c.id}
-              className="animate-pop rounded-3xl border border-border bg-background p-4 flex flex-col gap-3"
+              className="animate-pop min-h-[142px] rounded-3xl border border-border bg-background p-4 flex flex-col gap-3"
             >
               {/* Header: Avatar/Emoji, Name, Amount */}
               <div className="flex items-start gap-3">
@@ -144,8 +199,52 @@ export function GiftWall({
               </p>
             </div>
           );
-        })}
-      </div>
+  });
+
+  // Desktop: fade carousel of two-card slides with arrows, drag and autoplay. Mobile: horizontal swipe.
+  const perSlide = isDesktop ? 2 : 1;
+  const slides = chunk(cards, perSlide);
+  const settings: Settings = isDesktop
+    ? {
+        dots: false,
+        arrows: true,
+        prevArrow: <SlickArrow direction="prev" />,
+        nextArrow: <SlickArrow direction="next" />,
+        swipe: true,
+        draggable: true,
+        infinite: slides.length > 1,
+        autoplay: slides.length > 1,
+        autoplaySpeed: 3000,
+        pauseOnHover: true,
+        fade: true,
+        speed: 700,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+      }
+    : {
+        dots: false,
+        arrows: false,
+        infinite: false,
+        autoplay: false,
+        fade: false,
+        speed: 300,
+        slidesToShow: 1.15,
+        slidesToScroll: 1,
+        swipeToSlide: true,
+      };
+
+  return (
+    <>
+      {/* key remounts the slider when the layout switches between desktop and mobile */}
+      <Slider key={isDesktop ? "desktop" : "mobile"} {...settings}>
+        {slides.map((group, index) => (
+          <div key={index} className="px-1.5 pb-2">
+            <div className={isDesktop ? "grid grid-cols-2 gap-3" : "grid grid-cols-1 gap-3"}>
+              {group}
+            </div>
+          </div>
+        ))}
+      </Slider>
 
       {/* Media Modal */}
       {mediaModal && (
