@@ -1123,11 +1123,11 @@ export default function PublicCampaignPage() {
                     type="number"
                     min={0}
                     step={5}
-                    placeholder="Custom tip"
+                    placeholder={t("campaign.tip.custom_placeholder")}
                     prefix="A$"
                     value={tip}
                     onChange={(e) => setTip(e.target.value ? Number(e.target.value) : "")}
-                    hint="Goes straight to the recipient, on top of your contribution."
+                    hint={t("campaign.tip.hint")}
                   />
                 </div>
 
@@ -1215,7 +1215,7 @@ export default function PublicCampaignPage() {
                         type="number"
                         min={min || 1}
                         max={max}
-                        placeholder="Other amount"
+                        placeholder={t("campaign.amount.other_placeholder")}
                         prefix="A$"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : "")}
@@ -1261,11 +1261,11 @@ export default function PublicCampaignPage() {
                     type="number"
                     min={0}
                     step={5}
-                    placeholder="Custom tip"
+                    placeholder={t("campaign.tip.custom_placeholder")}
                     prefix="A$"
                     value={tip}
                     onChange={(e) => setTip(e.target.value ? Number(e.target.value) : "")}
-                    hint="Goes straight to the recipient, on top of your contribution."
+                    hint={t("campaign.tip.hint")}
                   />
                 </div>
 
@@ -1284,11 +1284,11 @@ export default function PublicCampaignPage() {
                 />
 
                 <Input
-                  label="Date of Birth"
+                  label={t("campaign.dob.label")}
                   type="date"
                   value={dateOfBirth}
                   onChange={(e) => setDateOfBirth(e.target.value)}
-                  hint="Help us send you birthday greetings (optional)"
+                  hint={t("campaign.dob.hint")}
                 />
 
                 <EmojiPicker value={emoji} onChange={setEmoji} />

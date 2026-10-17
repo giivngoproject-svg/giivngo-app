@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { uploadImage } from "@/lib/mock/storage";
 import { useTranslation } from "@/lib/useTranslation";
-import { PhotoUpload } from "@/components/wizard/PhotoUpload";
-import { VideoUpload } from "@/components/wizard/VideoUpload";
-import { Image, Video, CheckCircle2 } from "lucide-react";
+import { toast } from "@/stores/toast";
+import { MediaAttach } from "@/components/campaign/MediaAttach";
 
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024; // 5 MB
+
+/** Cover photo or video for the create flow: dashed box with help text and two buttons, as in the mockup. */
 export function CoverMediaTabs({
   photoUrl,
   videoUrl,
@@ -18,48 +20,28 @@ export function CoverMediaTabs({
   onVideoChange: (url?: string) => void;
 }) {
   const t = useTranslation();
-  const [activeTab, setActiveTab] = useState<"photo" | "video">("photo");
+
+  const handlePhoto = async (file: File) => {
+    if (file.size > MAX_PHOTO_BYTES) {
+      toast.error(t("common.error"));
+      return;
+    }
+    onPhotoChange(await uploadImage(file));
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab("photo")}
-          className={`flex items-center gap-2 px-4 py-3 font-medium border-b-2 transition-colors ${
-            activeTab === "photo"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-gray-800"
-          }`}
-        >
-          <Image size={18} />
-          {t("wizard.cover_photo_tab")}
-          {photoUrl && <CheckCircle2 size={16} className="text-green-600 ml-1" />}
-        </button>
-
-        <button
-          onClick={() => setActiveTab("video")}
-          className={`flex items-center gap-2 px-4 py-3 font-medium border-b-2 transition-colors ${
-            activeTab === "video"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-gray-800"
-          }`}
-        >
-          <Video size={18} />
-          {t("wizard.cover_video_tab")}
-          {videoUrl && <CheckCircle2 size={16} className="text-green-600 ml-1" />}
-        </button>
-      </div>
-
-      {/* Tab Content */}
-      <div>
-        {activeTab === "photo" && (
-          <PhotoUpload value={photoUrl} onChange={onPhotoChange} />
-        )}
-
-        {activeTab === "video" && (
-          <VideoUpload value={videoUrl} onChange={onVideoChange} />
-        )}
+    <div className="flex flex-col items-center gap-2.5 rounded-2xl border border-dashed border-[#C9C5D3] bg-foreground/[.03] p-[18px] text-center">
+      <p className="text-sm text-muted">{t("wizard.cover.help")}</p>
+      <div className="w-full">
+        <MediaAttach
+          photo={photoUrl}
+          video={videoUrl}
+          onPhotoFile={handlePhoto}
+          onPhotoRemove={() => onPhotoChange(undefined)}
+          onVideoChange={onVideoChange}
+          variant="solid"
+          hideHint
+        />
       </div>
     </div>
   );

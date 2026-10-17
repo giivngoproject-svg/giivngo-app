@@ -10,8 +10,12 @@ import { VideoRecorder } from "@/components/media/VideoRecorder";
 const MAX_BYTES = 25 * 1024 * 1024; // 25 MB
 const MAX_SECONDS = 15;
 
-const GHOST =
-  "flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background text-sm font-semibold transition-colors hover:bg-foreground/[.02] disabled:opacity-50";
+const GHOST_BASE =
+  "flex min-h-[44px] items-center justify-center gap-2 rounded-xl border-[1.5px] bg-background text-sm font-semibold transition-colors hover:bg-foreground/[.02] disabled:opacity-50";
+const GHOST = {
+  dashed: `${GHOST_BASE} border-dashed border-[#C9C5D3]`,
+  solid: `${GHOST_BASE} border-solid border-border`,
+};
 
 /** Photo and video attachments for a contribution, styled like the contribute mockup. */
 export function MediaAttach({
@@ -20,12 +24,16 @@ export function MediaAttach({
   onPhotoFile,
   onPhotoRemove,
   onVideoChange,
+  variant = "dashed",
+  hideHint = false,
 }: {
   photo?: string;
   video?: string;
   onPhotoFile: (file: File) => void | Promise<void>;
   onPhotoRemove: () => void;
   onVideoChange: (url?: string) => void;
+  variant?: "dashed" | "solid";
+  hideHint?: boolean;
 }) {
   const t = useTranslation();
   const photoInput = useRef<HTMLInputElement>(null);
@@ -80,18 +88,16 @@ export function MediaAttach({
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
-        <button type="button" disabled={busy} onClick={() => photoInput.current?.click()} className={GHOST}>
+        <button type="button" disabled={busy} onClick={() => photoInput.current?.click()} className={GHOST[variant]}>
           <Camera size={18} />
           {t("campaign.media.add_photo")}
         </button>
-        <button type="button" disabled={busy} onClick={chooseVideo} className={GHOST}>
+        <button type="button" disabled={busy} onClick={chooseVideo} className={GHOST[variant]}>
           <VideoIcon size={18} />
           {t("campaign.media.add_video")}
         </button>
       </div>
-      <p className="text-xs text-muted">
-        {t("campaign.media.hint")}
-      </p>
+      {!hideHint && <p className="text-xs text-muted">{t("campaign.media.hint")}</p>}
 
       <input
         ref={photoInput}
