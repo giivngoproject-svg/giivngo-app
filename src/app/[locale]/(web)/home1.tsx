@@ -170,9 +170,7 @@ export default function Home1() {
           {/* Floating Card - Bali Trip */}
           <div className="hidden lg:block">
             <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-xs">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">🌴 {t('landing.example.bali')}</h3>
-              </div>
+
               <div className="space-y-4">
                 <div className="flex -space-x-3">
                   {[1, 3, 4, 5, 7].map((i) => (

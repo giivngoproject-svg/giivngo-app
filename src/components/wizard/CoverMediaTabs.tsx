@@ -23,7 +23,7 @@ export function CoverMediaTabs({
 
   const handlePhoto = async (file: File) => {
     if (file.size > MAX_PHOTO_BYTES) {
-      toast.error(t("common.error"));
+      toast.error(t("wizard.error.photo_too_large"));
       return;
     }
     onPhotoChange(await uploadImage(file));

@@ -316,7 +316,7 @@ export default function PublicCampaignPage() {
   const goalHidden = isGoalHidden(campaign);
   const contributorsHidden = isContributorsHidden(campaign);
   const tiered = isTiered(campaign);
-  const hasItems = campaign.contribution_items?.length ?? 0 > 0;
+  const hasItems = (campaign.contribution_items?.length ?? 0) > 0;
   const items = campaign.contribution_items ?? [];
   const tiers = campaign.tiers ?? [];
   const mode = poolMode(campaign);
@@ -339,7 +339,7 @@ export default function PublicCampaignPage() {
 
   const handlePhoto = async (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
-      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+      await Swal.fire({ title: t("common.error"), text: t("campaign.error.photo_too_large"), icon: "error", confirmButtonColor: "#1E1B4B" });
       return;
     }
     try {
@@ -353,7 +353,7 @@ export default function PublicCampaignPage() {
 
   const handleReport = async () => {
     if (!reportReason.trim()) {
-      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+      await Swal.fire({ title: t("common.error"), text: t("campaign.error.reason_required"), icon: "error", confirmButtonColor: "#1E1B4B" });
       return;
     }
 
@@ -383,7 +383,7 @@ export default function PublicCampaignPage() {
 
     if (hasItems && !usesNewPricing) {
       if (selectedItemIds.size === 0) {
-        await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+        await Swal.fire({ title: t("common.error"), text: t("campaign.error.items_required"), icon: "error", confirmButtonColor: "#1E1B4B" });
         return;
       }
       const filtered = items.filter((i) => selectedItemIds.has(i.id));
@@ -393,36 +393,36 @@ export default function PublicCampaignPage() {
       selectedItems = items.filter((i) => selectedItemIds.has(i.id)).map((i) => ({ itemId: i.id, amount: i.amount }));
       amt = giftAmount + itemsTotal;
       if (amt < 0 || (amt === 0 && !(campaign.event_cost_enabled && includeEvent))) {
-        await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+        await Swal.fire({ title: t("common.error"), text: t("campaign.error.amount_required"), icon: "error", confirmButtonColor: "#1E1B4B" });
         return;
       }
     } else {
       amt = Number(amount);
       if (!amt || amt <= 0) {
-        await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+        await Swal.fire({ title: t("common.error"), text: t("campaign.error.amount_invalid"), icon: "error", confirmButtonColor: "#1E1B4B" });
         return;
       }
       if (!tiered) {
         if (min && amt < min) {
-          await Swal.fire({ title: `Minimum contribution is ${campaign.currency || 'AUD'} $${min}`, icon: "error", confirmButtonColor: "#1E1B4B" });
+          await Swal.fire({ title: t("common.error"), text: t("campaign.error.min_amount", { amount: fmt(min) }), icon: "error", confirmButtonColor: "#1E1B4B" });
           return;
         }
         if (max && amt > max) {
-          await Swal.fire({ title: `Maximum contribution is ${campaign.currency || 'AUD'} $${max}`, icon: "error", confirmButtonColor: "#1E1B4B" });
+          await Swal.fire({ title: t("common.error"), text: t("campaign.error.max_amount", { amount: fmt(max) }), icon: "error", confirmButtonColor: "#1E1B4B" });
           return;
         }
       }
     }
 
     if (identity.mode === "nickname" && !identity.nickname.trim()) {
-      await Swal.fire({ title: t("campaign.identity.nickname_required"), icon: "error", confirmButtonColor: "#1E1B4B" });
+      await Swal.fire({ title: t("common.error"), text: t("campaign.identity.nickname_required"), icon: "error", confirmButtonColor: "#1E1B4B" });
       setSubmitting(false);
       return;
     }
 
     // Validate email (required)
     if (!email.trim()) {
-      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+      await Swal.fire({ title: t("common.error"), text: t("campaign.error.email_required"), icon: "error", confirmButtonColor: "#1E1B4B" });
       setSubmitting(false);
       return;
     }
@@ -430,7 +430,7 @@ export default function PublicCampaignPage() {
     // Basic email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+      await Swal.fire({ title: t("common.error"), text: t("campaign.error.email_invalid"), icon: "error", confirmButtonColor: "#1E1B4B" });
       setSubmitting(false);
       return;
     }
@@ -446,7 +446,7 @@ export default function PublicCampaignPage() {
 
       // Check if date is not in future
       if (dob > new Date()) {
-        await Swal.fire({ title: t("common.error"), icon: "error", confirmButtonColor: "#1E1B4B" });
+        await Swal.fire({ title: t("common.error"), text: t("campaign.error.dob_future"), icon: "error", confirmButtonColor: "#1E1B4B" });
         setSubmitting(false);
         return;
       }
@@ -723,7 +723,7 @@ export default function PublicCampaignPage() {
       // Determine what to show based on error type
       if (isNetworkError) {
         displayTitle = t("common.error");
-        displayMessage = "Comprueba tu conexión a internet e intenta de nuevo";
+        displayMessage = t("campaign.error.network");
         console.warn("Network error during checkout:", error);
       } else if (isValidationError) {
         // 400 errors: show the exact message from server (validación o negocio)
@@ -732,7 +732,7 @@ export default function PublicCampaignPage() {
       } else if (isServerError) {
         // 5xx errors: show generic message to avoid exposing server details
         displayTitle = t("common.error");
-        displayMessage = "Algo salió mal. Por favor, intenta de nuevo.";
+        displayMessage = t("campaign.error.server");
         console.error("Server error during checkout:", error);
       }
 
