@@ -7,7 +7,7 @@ import NextLink from "next/link";
 import Image from "next/image";
 import { Link, useRouter, usePathname } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
-import { ChevronDown, LogOut, User as UserIcon, LayoutDashboard, RotateCcw, MenuIcon, LogIn, SignalIcon, UserPen, ToolCase, FolderTree, CircleDollarSign, Building2 } from "lucide-react";
+import { ChevronDown, LogOut, User as UserIcon, LayoutDashboard, RotateCcw, MenuIcon, LogIn, SignalIcon, UserPen, ToolCase, FolderTree, CircleDollarSign, Building2, HelpCircle } from "lucide-react";
 import { useAuth } from "@/stores/auth";
 import { useCampaigns } from "@/stores/campaigns";
 import { toast } from "@/stores/toast";
@@ -24,6 +24,7 @@ const desktopLinks: DesktopLink[] = [
   // Hidden for now — re-enable once these pages/sections exist:
   // { href: "/features", labelKey: "landing.nav.features", icon: <FolderTree size={15} /> },
   { href: "/#pricing", labelKey: "landing.nav.pricing", icon: <CircleDollarSign size={15} /> },
+  { href: "/faq", labelKey: "nav.faq", icon: <HelpCircle size={15} /> },
   { href: "/search/all", labelKey: "nav.search_pool", icon: <CircleDollarSign size={15} /> },
   // { href: "/about", labelKey: "landing.nav.about", icon: <Building2 size={15} /> },
 ];
