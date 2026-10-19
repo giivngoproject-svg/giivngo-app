@@ -67,11 +67,9 @@ export function CampaignCard({
           )}
         </div>
 
-        <Progress
-          value={campaign.raised_amount}
-          max={campaign.goal_amount || campaign.raised_amount}
-          className="mt-2"
-        />
+        {campaign.goal_amount ? (
+          <Progress value={campaign.raised_amount} max={campaign.goal_amount} className="mt-2" />
+        ) : null}
 
         <div className="mt-3 flex items-center justify-between text-xs text-muted">
           <span className="inline-flex items-center gap-1">

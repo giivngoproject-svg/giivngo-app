@@ -8,6 +8,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2, Image as ImageIcon, Video as VideoIcon, Flag } from "lucide-react";
 import { useCampaigns } from "@/stores/campaigns";
 import { useTranslation } from "@/lib/useTranslation";
+import type { Campaign } from "@/lib/types";
 import { contributionsApi, storageApi, campaignsApi, type FeeQuote } from "@/lib/api";
 import { formatCurrency, roundAmount } from "@/lib/money";
 import { getIntlLocale } from "@/lib/locale";
@@ -45,6 +46,35 @@ const EMPTY_CONTRIBUTIONS: never[] = [];
 /** The gift field is shown when the campaign enables it, or when there is no event cost and no items. */
 function giftVisibleFor(c: { event_cost_enabled?: boolean; gift_enabled?: boolean; contribution_items?: unknown[] }) {
   return !!c.gift_enabled || (!c.event_cost_enabled && !(c.contribution_items?.length ?? 0));
+}
+
+/**
+ * Single source of truth for what the guest pays before fees.
+ * Used by the summary, the fee quote and checkout, so the three always agree.
+ */
+function pricingFor(
+  c: Campaign,
+  amount: number | "",
+  includeEvent: boolean,
+  selectedItemIds: Set<string>,
+) {
+  const items = c.contribution_items ?? [];
+  const hasItems = items.length > 0;
+  const giftVisible = giftVisibleFor(c);
+  const usesNewPricing = !isTiered(c) && (!!c.event_cost_enabled || giftVisible);
+  const itemsTotal = items
+    .filter((i) => selectedItemIds.has(i.id))
+    .reduce((sum, i) => sum + i.amount, 0);
+  const includeEventCost = usesNewPricing && !!c.event_cost_enabled && includeEvent;
+  const eventCost = includeEventCost ? c.event_cost_amount ?? 0 : 0;
+  const giftAmount = usesNewPricing && giftVisible ? Number(amount) || 0 : 0;
+  // Amount sent as `amount` at checkout: gift + selected items, without the event cost
+  const base = usesNewPricing
+    ? giftAmount + itemsTotal
+    : hasItems
+      ? itemsTotal
+      : Number(amount) || 0;
+  return { usesNewPricing, giftVisible, hasItems, includeEventCost, eventCost, giftAmount, itemsTotal, base };
 }
 
 type VoucherParams = {
@@ -219,28 +249,22 @@ export default function PublicCampaignPage() {
   const [includeEvent, setIncludeEvent] = useState(true);
   const [mediaTab, setMediaTab] = useState<"photo" | "video">("photo");
 
-  // Fee quote for the summary, refreshed when the amounts change (same calculation as checkout)
+  // Fee quote for the summary: same pricing as checkout, refreshed when any amount changes
   const [quote, setQuote] = useState<FeeQuote | null>(null);
   useEffect(() => {
     if (!campaign) return;
-    const items = campaign.contribution_items ?? [];
-    const newPricing = !!campaign.event_cost_enabled || giftVisibleFor(campaign);
-    const itemsSum = items.filter((i) => selectedItemIds.has(i.id)).reduce((sum, i) => sum + i.amount, 0);
-    const legacyItems = items.length > 0 && !newPricing;
-    const giftOrAmount = Number(amount) || 0;
-    const baseAmount = legacyItems ? itemsSum : giftOrAmount + (newPricing ? itemsSum : 0);
-    const includeEventCost = newPricing && !!campaign.event_cost_enabled && includeEvent;
-    const eventCost = includeEventCost ? campaign.event_cost_amount ?? 0 : 0;
-    if (baseAmount + eventCost + (Number(tip) || 0) <= 0) {
+    const p = pricingFor(campaign, amount, includeEvent, selectedItemIds);
+    const tipAmount = Number(tip) || 0;
+    if (p.base + p.eventCost + tipAmount <= 0) {
       setQuote(null);
       return;
     }
     const timer = setTimeout(() => {
       contributionsApi
         .quote(slug, {
-          amount: baseAmount,
-          tipAmount: Number(tip) || undefined,
-          includeEventCost: includeEventCost || undefined,
+          amount: p.base,
+          tipAmount: tipAmount || undefined,
+          includeEventCost: p.includeEventCost || undefined,
         })
         .then(setQuote)
         .catch(() => setQuote(null));
@@ -329,18 +353,22 @@ export default function PublicCampaignPage() {
   const recipient = campaign.recipient_name?.trim();
   const birthdayHidden = isBirthdayHidden(campaign);
   // New create-flow pricing (event cost and/or gift). Legacy campaigns keep the old amount/items UI.
-  const giftVisible = giftVisibleFor(campaign);
-  const usesNewPricing = !tiered && (!!campaign.event_cost_enabled || giftVisible);
+  const pricing = pricingFor(campaign, amount, includeEvent, selectedItemIds);
+  const { usesNewPricing, giftVisible, includeEventCost, giftAmount, itemsTotal } = pricing;
   const giftName = recipient || campaign.organiser_name;
   const usesBirthday = campaign.type === "birthday";
   const eventCostAmount = campaign.event_cost_amount ?? 0;
-  const eventTotal = usesNewPricing && campaign.event_cost_enabled && includeEvent ? eventCostAmount : 0;
+  const eventTotal = pricing.eventCost;
   const giftSuggested = campaign.gift_suggested_amounts ?? [];
-  const giftAmount = usesNewPricing && giftVisible ? Number(amount) || 0 : 0;
-  const itemsTotal = usesNewPricing
-    ? items.filter((i) => selectedItemIds.has(i.id)).reduce((sum, i) => sum + i.amount, 0)
-    : 0;
   const grandTotal = eventTotal + giftAmount + itemsTotal + (Number(tip) || 0);
+  // Show the fee only for the amounts on screen; a quote for older amounts is ignored
+  const feeQuote =
+    quote &&
+    quote.giftAmount === pricing.base &&
+    quote.eventCostAmount === eventTotal &&
+    quote.tipAmount === (Number(tip) || 0)
+      ? quote
+      : null;
   const fmt = (n: number) => formatCurrency(n, campaign.currency || "AUD", getIntlLocale(localeConfig.locale));
 
   const handlePhoto = async (file: File) => {
@@ -397,7 +425,7 @@ export default function PublicCampaignPage() {
       amt = selectedItems.reduce((sum, i) => sum + i.amount, 0);
     } else if (usesNewPricing) {
       selectedItems = items.filter((i) => selectedItemIds.has(i.id)).map((i) => ({ itemId: i.id, amount: i.amount }));
-      amt = giftAmount + itemsTotal;
+      amt = pricing.base;
       if (amt < 0 || (amt === 0 && !(campaign.event_cost_enabled && includeEvent))) {
         await Swal.fire({ title: t("common.error"), text: t("campaign.error.amount_required"), icon: "error", confirmButtonColor: "#1E1B4B" });
         return;
@@ -1334,24 +1362,24 @@ export default function PublicCampaignPage() {
                         <span>{fmt(Number(tip))}</span>
                       </div>
                     )}
-                    {quote && quote.feeAmount > 0 && (
+                    {feeQuote && feeQuote.feeAmount > 0 && (
                       <div className="flex justify-between gap-3">
                         <span className="text-muted">
-                          {t("campaign.summary.fee", { pct: quote.feePercent, flat: fmt(quote.feeFlat) })}
+                          {t("campaign.summary.fee", { pct: feeQuote.feePercent, flat: fmt(feeQuote.feeFlat) })}
                         </span>
-                        <span>{fmt(quote.feeAmount)}</span>
+                        <span>{fmt(feeQuote.feeAmount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between gap-3 pt-1 text-base font-semibold">
                       <span>{t("campaign.summary.total")}</span>
-                      <span>{fmt(quote ? quote.checkoutTotal : grandTotal)}</span>
+                      <span>{fmt(feeQuote ? feeQuote.checkoutTotal : grandTotal)}</span>
                     </div>
                   </div>
                 )}
 
                 <Button onClick={contribute} loading={submitting} className="w-full" size="lg" disabled={usesNewPricing && grandTotal <= 0}>
                   <Heart size={16} />
-                  {usesNewPricing ? (grandTotal > 0 ? t("campaign.pay_amount", { amount: fmt(quote ? quote.checkoutTotal : grandTotal) }) : t("campaign.pay_select")) : hasItems
+                  {usesNewPricing ? (grandTotal > 0 ? t("campaign.pay_amount", { amount: fmt(feeQuote ? feeQuote.checkoutTotal : grandTotal) }) : t("campaign.pay_select")) : hasItems
                     ? selectedItemIds.size > 0
                       ? (() => {
                           const itemsTotal = Array.from(selectedItemIds).reduce(
