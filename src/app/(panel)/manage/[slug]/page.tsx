@@ -469,7 +469,11 @@ function ManagePageInner() {
         onSave={async (patch) => {
           setIsUpdating(true);
           try {
-            await updateCampaignAPI(campaign.slug, patch);
+            // The store reports API errors by returning null instead of throwing
+            const updated = await updateCampaignAPI(campaign.slug, patch);
+            if (!updated) {
+              throw new Error(useCampaigns.getState().error || 'Update failed');
+            }
             await Swal.fire({
               title: t('manage.campaign_updated'),
               icon: "success",
@@ -478,7 +482,7 @@ function ManagePageInner() {
           } catch (error: any) {
             await Swal.fire({
               title: t('manage.update_failed'),
-              text: error.response?.data?.message,
+              text: error.response?.data?.message || error.message,
               icon: "error",
               confirmButtonColor: "#1E1B4B",
             });
@@ -688,6 +692,11 @@ function EditModal({
     show_on_search?: boolean;
     country_code?: string;
     currency?: string;
+    event_cost_enabled?: boolean;
+    event_cost_amount?: number;
+    event_cost_label?: string;
+    max_contributions?: number;
+    raised_amount?: number;
   };
   t: ReturnType<typeof useTranslation>;
   onSave: (patch: {
@@ -699,6 +708,10 @@ function EditModal({
     showOnSearch?: boolean;
     countryCode?: string;
     currency?: string;
+    eventCostEnabled?: boolean;
+    eventCostAmount?: number;
+    eventCostLabel?: string;
+    maxContributions?: number | null;
   }) => void;
 }) {
   const [title, setTitle] = useState(campaign.title);
@@ -714,6 +727,11 @@ function EditModal({
   const [showOnSearch, setShowOnSearch] = useState((campaign as any).show_on_search ?? true);
   const [countryCode, setCountryCode] = useState(campaign.country_code ?? "AU");
   const [currency, setCurrency] = useState(campaign.currency ?? "AUD");
+  const [eventEnabled, setEventEnabled] = useState(campaign.event_cost_enabled ?? false);
+  const [eventAmount, setEventAmount] = useState(campaign.event_cost_amount?.toString() ?? "");
+  const [eventLabel, setEventLabel] = useState(campaign.event_cost_label ?? "");
+  const [maxSpots, setMaxSpots] = useState(campaign.max_contributions?.toString() ?? "");
+  const eventAmountInvalid = eventEnabled && !(Number(eventAmount) > 0);
 
   // Reset form when modal opens
   useEffect(() => {
@@ -731,6 +749,10 @@ function EditModal({
       setShowOnSearch((campaign as any).show_on_search ?? true);
       setCountryCode(campaign.country_code ?? "AU");
       setCurrency(campaign.currency ?? "AUD");
+      setEventEnabled(campaign.event_cost_enabled ?? false);
+      setEventAmount(campaign.event_cost_amount?.toString() ?? "");
+      setEventLabel(campaign.event_cost_label ?? "");
+      setMaxSpots(campaign.max_contributions?.toString() ?? "");
     }
   }, [open, campaign]);
 
@@ -738,12 +760,20 @@ function EditModal({
     <Modal open={open} onClose={onClose} title={t('manage.edit_campaign')} size="lg">
       <div className="space-y-5">
         <div className="space-y-3">
-          <Input label={t('manage.edit_title')} value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Input
+            label={t('manage.edit_title')}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={100}
+            hint={t('manage.edit_title_limit')}
+          />
           <Textarea
             label={t('manage.edit_description')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            maxLength={1000}
             rows={4}
+            hint={t('manage.edit_description_limit', { count: description.length })}
           />
           <Input
             label={t('manage.edit_goal')}
@@ -753,13 +783,18 @@ function EditModal({
             onChange={(e) => setGoal(e.target.value)}
             prefix="A$"
           />
-          <CountrySelector
-            value={countryCode}
-            onChange={(cc, curr) => {
-              setCountryCode(cc);
-              setCurrency(curr);
-            }}
-          />
+          <div className={(campaign.raised_amount ?? 0) > 0 ? "pointer-events-none opacity-60" : undefined}>
+            <CountrySelector
+              value={countryCode}
+              onChange={(cc, curr) => {
+                setCountryCode(cc);
+                setCurrency(curr);
+              }}
+            />
+            {(campaign.raised_amount ?? 0) > 0 && (
+              <p className="mt-2 text-xs text-muted">{t('manage.edit_country_locked')}</p>
+            )}
+          </div>
         </div>
 
         <div className="border-t pt-4">
@@ -769,6 +804,49 @@ function EditModal({
           <ItemEditor
             items={items}
             onChange={setItems}
+          />
+        </div>
+
+        <div className="border-t pt-4 space-y-3">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={eventEnabled}
+              onChange={(e) => setEventEnabled(e.target.checked)}
+              className="mt-1"
+            />
+            <span className="text-sm font-medium">{t('manage.edit_event_enabled')}</span>
+          </label>
+          {eventEnabled && (
+            <div className="space-y-3 pl-8">
+              <Input
+                label={t('manage.edit_event_amount')}
+                type="number"
+                min={1}
+                value={eventAmount}
+                onChange={(e) => setEventAmount(e.target.value)}
+                prefix={campaign.currency ?? "AUD"}
+                error={eventAmountInvalid ? t('manage.edit_event_invalid') : undefined}
+              />
+              <Input
+                label={t('manage.edit_event_label')}
+                value={eventLabel}
+                onChange={(e) => setEventLabel(e.target.value)}
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="border-t pt-4">
+          <Input
+            label={t('manage.edit_max_contributions')}
+            type="number"
+            min={1}
+            step={1}
+            value={maxSpots}
+            onChange={(e) => setMaxSpots(e.target.value)}
+            placeholder="—"
+            hint={t('manage.edit_max_contributions_desc')}
           />
         </div>
 
@@ -826,8 +904,13 @@ function EditModal({
               showOnSearch: showOnSearch,
               countryCode,
               currency,
+              eventCostEnabled: eventEnabled,
+              eventCostAmount: eventEnabled ? Number(eventAmount) : undefined,
+              eventCostLabel: eventEnabled ? eventLabel.trim() : undefined,
+              maxContributions: maxSpots ? Number(maxSpots) : null,
             })
           }
+          disabled={eventAmountInvalid}
         >
           {t('manage.edit_save')}
         </Button>
