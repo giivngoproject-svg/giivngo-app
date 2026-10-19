@@ -42,6 +42,11 @@ const TIP_OPTIONS = [5, 10, 20];
 // cached" and an infinite re-render loop via useSyncExternalStore).
 const EMPTY_CONTRIBUTIONS: never[] = [];
 
+/** The gift field is shown when the campaign enables it, or when there is no event cost and no items. */
+function giftVisibleFor(c: { event_cost_enabled?: boolean; gift_enabled?: boolean; contribution_items?: unknown[] }) {
+  return !!c.gift_enabled || (!c.event_cost_enabled && !(c.contribution_items?.length ?? 0));
+}
+
 type VoucherParams = {
   campaignTitle: string;
   amount: number;
@@ -96,7 +101,7 @@ function buildCheckoutVoucherHtml(params: VoucherParams): string {
           </div>
           ${eventCostAmount && eventCostAmount > 0 ? row('Event cost', money(eventCostAmount)) : ''}
           ${row('Gift', money(amount))}
-          ${tipAmount > 0 ? row('Tip', money(tipAmount)) : ''}
+          ${tipAmount > 0 ? row('Additional gift', money(tipAmount)) : ''}
           ${feeAmount && feeAmount > 0 ? row(feeLabel, money(feeAmount)) : ''}
           <div style="border-top: 1px solid #e5e7eb; padding-top: 12px; display: flex; justify-content: space-between; font-size: 16px;">
             <span style="color: #1e1b4b;">Total</span>
@@ -219,7 +224,7 @@ export default function PublicCampaignPage() {
   useEffect(() => {
     if (!campaign) return;
     const items = campaign.contribution_items ?? [];
-    const newPricing = !!campaign.event_cost_enabled || !!campaign.gift_enabled;
+    const newPricing = !!campaign.event_cost_enabled || giftVisibleFor(campaign);
     const itemsSum = items.filter((i) => selectedItemIds.has(i.id)).reduce((sum, i) => sum + i.amount, 0);
     const legacyItems = items.length > 0 && !newPricing;
     const giftOrAmount = Number(amount) || 0;
@@ -324,13 +329,14 @@ export default function PublicCampaignPage() {
   const recipient = campaign.recipient_name?.trim();
   const birthdayHidden = isBirthdayHidden(campaign);
   // New create-flow pricing (event cost and/or gift). Legacy campaigns keep the old amount/items UI.
-  const usesNewPricing = !tiered && (!!campaign.event_cost_enabled || !!campaign.gift_enabled);
+  const giftVisible = giftVisibleFor(campaign);
+  const usesNewPricing = !tiered && (!!campaign.event_cost_enabled || giftVisible);
   const giftName = recipient || campaign.organiser_name;
   const usesBirthday = campaign.type === "birthday";
   const eventCostAmount = campaign.event_cost_amount ?? 0;
   const eventTotal = usesNewPricing && campaign.event_cost_enabled && includeEvent ? eventCostAmount : 0;
   const giftSuggested = campaign.gift_suggested_amounts ?? [];
-  const giftAmount = usesNewPricing && campaign.gift_enabled ? Number(amount) || 0 : 0;
+  const giftAmount = usesNewPricing && giftVisible ? Number(amount) || 0 : 0;
   const itemsTotal = usesNewPricing
     ? items.filter((i) => selectedItemIds.has(i.id)).reduce((sum, i) => sum + i.amount, 0)
     : 0;
@@ -972,7 +978,7 @@ export default function PublicCampaignPage() {
                 />
                 {tips > 0 && (
                   <p className="mt-2 text-xs text-accent">
-                    + {formatCurrency(tips)} in tips for {recipient || "the recipient"}
+                    + {formatCurrency(tips)} {t("campaign.additional_gift.short")}
                   </p>
                 )}
               </>
@@ -1040,7 +1046,7 @@ export default function PublicCampaignPage() {
                     )}
                 {usesNewPricing ? (
                   <div className="space-y-4">
-                    {campaign.gift_enabled && (
+                    {giftVisible && (
                       <div className="space-y-3">
                         <StepHeading
                           n={3}
@@ -1099,10 +1105,10 @@ export default function PublicCampaignPage() {
                     })}
                   </div>
                 )}
-                {/* Tip the recipient */}
+                {/* Additional gift: extra on top of the contribution, not counted toward the goal */}
                 <div>
                   <label className="block text-sm font-medium mb-1.5">
-                    {recipient ? t("campaign.add_tip", { name: recipient }) : t("campaign.add_tip", { name: "the recipient" })} {t("campaign.tip_optional")}
+                    {t("campaign.additional_gift.title")} {t("campaign.tip_optional")}
                   </label>
                   <div className="flex gap-2 mb-2">
                     {TIP_OPTIONS.map((t) => (
@@ -1236,11 +1242,11 @@ export default function PublicCampaignPage() {
                 </div>
                 )}
 
-                {/* Tip the recipient */}
+                {/* Additional gift: extra on top of the contribution, not counted toward the goal */}
                 {!usesNewPricing && (
                 <div>
                   <label className="block text-sm font-medium mb-1.5">
-                    {recipient ? t("campaign.add_tip", { name: recipient }) : t("campaign.add_tip", { name: "the recipient" })} {t("campaign.tip_optional")}
+                    {t("campaign.additional_gift.title")} {t("campaign.tip_optional")}
                   </label>
                   <div className="flex gap-2 mb-2">
                     {TIP_OPTIONS.map((t) => (

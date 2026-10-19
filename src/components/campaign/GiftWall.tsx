@@ -195,7 +195,7 @@ export function GiftWall({
                     {formatDistanceToNowStrict(new Date(c.created_at))} {t("manage.ago")}
                   </>
                 ) : null}
-                {c.tip_amount ? <span className="text-accent">· +{formatAUD(c.tip_amount)} {t("manage.tip")}</span> : null}
+                {c.tip_amount ? <span className="text-accent">· +{formatAUD(c.tip_amount)} {t("campaign.additional_gift.short")}</span> : null}
               </p>
             </div>
           );

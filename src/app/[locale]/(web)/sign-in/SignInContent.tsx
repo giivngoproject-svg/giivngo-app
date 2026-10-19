@@ -100,7 +100,7 @@ function SignInInner() {
 
       <form onSubmit={submit} className="space-y-4">
         <Input
-          label={t("campaign.email")}
+          label={t("auth.signup.email_label")}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
