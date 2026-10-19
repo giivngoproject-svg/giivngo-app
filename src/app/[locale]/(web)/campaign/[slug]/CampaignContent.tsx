@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Link } from "@/i18n/navigation";
 import { useParams } from "next/navigation";
 import Swal from "sweetalert2";
@@ -249,16 +249,25 @@ export default function PublicCampaignPage() {
   const [includeEvent, setIncludeEvent] = useState(true);
   const [mediaTab, setMediaTab] = useState<"photo" | "video">("photo");
 
-  // Fee quote for the summary: same pricing as checkout, refreshed when any amount changes
+  // Fee quote for the summary: same pricing as checkout, refreshed when any amount changes.
+  // Pay stays disabled while the quote is pending or failed.
   const [quote, setQuote] = useState<FeeQuote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState(false);
+  const quoteRequest = useRef(0);
   useEffect(() => {
     if (!campaign) return;
     const p = pricingFor(campaign, amount, includeEvent, selectedItemIds);
     const tipAmount = Number(tip) || 0;
+    const requestId = ++quoteRequest.current;
     if (p.base + p.eventCost + tipAmount <= 0) {
       setQuote(null);
+      setQuoteLoading(false);
+      setQuoteError(false);
       return;
     }
+    setQuoteLoading(true);
+    setQuoteError(false);
     const timer = setTimeout(() => {
       contributionsApi
         .quote(slug, {
@@ -266,8 +275,17 @@ export default function PublicCampaignPage() {
           tipAmount: tipAmount || undefined,
           includeEventCost: p.includeEventCost || undefined,
         })
-        .then(setQuote)
-        .catch(() => setQuote(null));
+        .then((res) => {
+          if (requestId !== quoteRequest.current) return;
+          setQuote(res);
+          setQuoteLoading(false);
+        })
+        .catch(() => {
+          if (requestId !== quoteRequest.current) return;
+          setQuote(null);
+          setQuoteLoading(false);
+          setQuoteError(true);
+        });
     }, 300);
     return () => clearTimeout(timer);
   }, [campaign, slug, amount, tip, includeEvent, selectedItemIds]);
@@ -369,6 +387,9 @@ export default function PublicCampaignPage() {
     quote.tipAmount === (Number(tip) || 0)
       ? quote
       : null;
+  // Pay is only available once the fee for the amounts on screen is known
+  const quoteReady = !!feeQuote && !quoteLoading;
+  const payDisabled = usesNewPricing && (grandTotal <= 0 || !quoteReady);
   const fmt = (n: number) => formatCurrency(n, campaign.currency || "AUD", getIntlLocale(localeConfig.locale));
 
   const handlePhoto = async (file: File) => {
@@ -412,6 +433,7 @@ export default function PublicCampaignPage() {
   };
 
   const contribute = async () => {
+    if (usesNewPricing && !quoteReady) return;
     let amt: number;
     let selectedItems: Array<{ itemId: string; amount: number }> = [];
 
@@ -1366,6 +1388,8 @@ export default function PublicCampaignPage() {
                         <span>{fmt(Number(tip))}</span>
                       </div>
                     )}
+                    {quoteLoading && <p className="text-xs text-muted">{t("campaign.fee.calculating")}</p>}
+                    {quoteError && <p className="text-xs font-medium text-red-600">{t("campaign.fee.error")}</p>}
                     {feeQuote && feeQuote.feeAmount > 0 && (
                       <div className="flex justify-between gap-3">
                         <span className="text-muted">
@@ -1381,9 +1405,9 @@ export default function PublicCampaignPage() {
                   </div>
                 )}
 
-                <Button onClick={contribute} loading={submitting} className="w-full" size="lg" disabled={usesNewPricing && grandTotal <= 0}>
+                <Button onClick={contribute} loading={submitting} className="w-full" size="lg" disabled={payDisabled}>
                   <Heart size={16} />
-                  {usesNewPricing ? (grandTotal > 0 ? t("campaign.pay_amount", { amount: fmt(feeQuote ? feeQuote.checkoutTotal : grandTotal) }) : t("campaign.pay_select")) : hasItems
+                  {usesNewPricing ? (grandTotal <= 0 ? t("campaign.pay_select") : quoteError ? t("campaign.fee.error") : !quoteReady ? t("campaign.fee.calculating") : t("campaign.pay_amount", { amount: fmt(feeQuote ? feeQuote.checkoutTotal : grandTotal) })) : hasItems
                     ? selectedItemIds.size > 0
                       ? (() => {
                           const itemsTotal = Array.from(selectedItemIds).reduce(
