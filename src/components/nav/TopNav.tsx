@@ -16,16 +16,16 @@ import { Button } from "@/components/ui/Button";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 
 
-type DesktopLink = { href: string, labelKey: string, icon: React.ReactNode };
+type DesktopLink = { href: string, labelKey: string, icon: React.ReactNode, highlight?: boolean };
 
 const desktopLinks: DesktopLink[] = [
+  { href: "/search/all", labelKey: "nav.search_pool", icon: <CircleDollarSign size={15} />, highlight: true },
   { href: "/#how-it-works", labelKey: "landing.nav.how_it_works", icon: <LayoutDashboard size={15} /> },
   { href: "/#use-cases", labelKey: "landing.nav.use_cases", icon: <ToolCase size={15} /> },
   // Hidden for now — re-enable once these pages/sections exist:
   // { href: "/features", labelKey: "landing.nav.features", icon: <FolderTree size={15} /> },
   { href: "/#pricing", labelKey: "landing.nav.pricing", icon: <CircleDollarSign size={15} /> },
   { href: "/faq", labelKey: "nav.faq", icon: <HelpCircle size={15} /> },
-  { href: "/search/all", labelKey: "nav.search_pool", icon: <CircleDollarSign size={15} /> },
   // { href: "/about", labelKey: "landing.nav.about", icon: <Building2 size={15} /> },
 ];
 
@@ -72,7 +72,9 @@ export function TopNav() {
         </Link>
         <nav className="desktop-nav hidden sm:flex">
           {desktopLinks.map((link, index) => (
-            <MenuLink key={index} href={link.href} icon={null} onClick={() => setSidebarOpen(!sidebarOpen)}  > <span className={`${isTop ? "text-white" : "text-black"} text-pretty`}>{t(link.labelKey as any)}</span> </MenuLink>
+            <MenuLink key={index} href={link.href} icon={null} onClick={() => setSidebarOpen(!sidebarOpen)}  > <span className={link.highlight
+              ? "rounded-full bg-accent px-3 py-1.5 font-semibold text-white text-pretty"
+              : `${isTop ? "text-white" : "text-black"} text-pretty`}>{t(link.labelKey as any)}</span> </MenuLink>
           ))}
         </nav>
         <div className="flex items-center gap-4">
@@ -150,7 +152,7 @@ export function TopNav() {
       </div>
       <div className={`sm:hidden absolute w-full top-[64px] left-1/2 -translate-x-1/2 bg-white border-b border-border transition-all duration-300 ease-in-out ${sidebarOpen ? "block min-h-screen" : "hidden"}`}>
         {desktopLinks.map((link, index) => (
-          <MenuLink key={index} href={link.href} icon={link.icon} onClick={() => setSidebarOpen(false)}  > <span className="py-3 text-pretty text-slate-900  w-full block font-bold">{t(link.labelKey as any)}</span> </MenuLink>
+          <MenuLink key={index} href={link.href} icon={link.icon} onClick={() => setSidebarOpen(false)}  > <span className={`py-3 text-pretty w-full block font-bold ${link.highlight ? "text-accent" : "text-slate-900"}`}>{t(link.labelKey as any)}</span> </MenuLink>
         ))}
         {/* Language Switcher Mobile */}
         <div className="px-4 py-4 border-t border-border">
