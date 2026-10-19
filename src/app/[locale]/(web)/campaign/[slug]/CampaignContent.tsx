@@ -1110,7 +1110,11 @@ export default function PublicCampaignPage() {
                     )}
                 {hasItems && (
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold">{t("campaign.contribution_options")}</p>
+                    {giftVisible ? (
+                      <p className="text-sm font-semibold">{t("campaign.contribution_options")}</p>
+                    ) : (
+                      <StepHeading n={3} title={t("campaign.contribution_options")} />
+                    )}
                     {items.map((item) => {
                       const active = selectedItemIds.has(item.id);
                       return (
