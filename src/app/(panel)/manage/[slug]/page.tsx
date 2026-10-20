@@ -4,7 +4,7 @@ import { Suspense, useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import { Loader } from "lucide-react";
+import { FileText, Loader } from "lucide-react";
 
 const EMPTY_CONTRIBUTIONS: any[] = [];
 import {
@@ -214,6 +214,12 @@ function ManagePageInner() {
               <ExternalLink size={14} />
             </Button>
           </Link>
+          <a href={`/campaign/report/${campaign.slug}`} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline">
+              <FileText size={14} />
+              {t('report.view_button')}
+            </Button>
+          </a>
           <Button variant="ghost" onClick={() => setEditOpen(true)}>
             <Pencil size={14} />
             {t('manage.edit')}

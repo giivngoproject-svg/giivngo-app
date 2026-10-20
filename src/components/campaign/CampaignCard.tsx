@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
-import { Users } from "lucide-react";
+import { FileText, Users } from "lucide-react";
 import { useTranslation } from "@/lib/useTranslation";
 import type { Campaign, Contribution } from "@/lib/types";
 import { formatAUD } from "@/lib/money";
@@ -14,10 +14,13 @@ export function CampaignCard({
   campaign,
   contributions,
   href,
+  reportHref,
 }: {
   campaign: Campaign;
   contributions: Contribution[];
   href: string;
+  // Organiser report: opens in a new tab from a button inside the card
+  reportHref?: string;
 }) {
   const t = useTranslation();
   const cs = contributions;
@@ -30,8 +33,25 @@ export function CampaignCard({
   return (
     <Link
       href={href}
-      className="group block bg-background border border-border rounded-3xl overflow-hidden shadow-soft hover:shadow-lift transition-shadow"
+      className="group relative block bg-background border border-border rounded-3xl overflow-hidden shadow-soft hover:shadow-lift transition-shadow"
     >
+            {reportHref && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  // The whole card is a link; keep this button from navigating the card
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.open(reportHref, "_blank", "noopener,noreferrer");
+                }}
+                className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-lg bg-accent px-2.5 py-1 text-xs font-medium text-white shadow-soft hover:opacity-90"
+                aria-label={t("report.open_link")}
+                title={t("report.open_link")}
+              >
+                <FileText size={14} />
+                {t("report.open_link")}
+              </button>
+            )}
       <div className="aspect-[16/9] bg-foreground/5 relative overflow-hidden">
         {campaign.cover_photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -76,7 +96,9 @@ export function CampaignCard({
             <Users size={12} />
             {cs.length} {t("campaign.contributors")}
           </span>
-          <span>{timeLabel}</span>
+          <div className="flex items-center gap-3">
+            <span>{timeLabel}</span>
+          </div>
         </div>
       </div>
     </Link>
