@@ -206,7 +206,8 @@ export function GiftWall({
   const slides = chunk(cards, perSlide);
   const settings: Settings = isDesktop
     ? {
-        dots: false,
+        dots: true,
+        customPaging: () => <span className="gift-dot" />,
         arrows: true,
         prevArrow: <SlickArrow direction="prev" />,
         nextArrow: <SlickArrow direction="next" />,
@@ -216,13 +217,14 @@ export function GiftWall({
         autoplay: slides.length > 1,
         autoplaySpeed: 3000,
         pauseOnHover: true,
-        fade: true,
-        speed: 700,
+        fade: false,
+        speed: 600,
         slidesToShow: 1,
         slidesToScroll: 1,
       }
     : {
-        dots: false,
+        dots: true,
+        customPaging: () => <span className="gift-dot" />,
         arrows: false,
         infinite: false,
         autoplay: false,
@@ -236,6 +238,15 @@ export function GiftWall({
   return (
     <>
       {/* key remounts the slider when the layout switches between desktop and mobile */}
+      <div className="gift-wall-slider pb-2">
+        <style>{`
+          .gift-wall-slider .slick-dots { position: relative; bottom: auto; margin-top: 24px; display: flex !important; justify-content: center; gap: 6px; }
+          .gift-wall-slider .slick-dots li { width: 14px; height: 14px; margin: 0; }
+          .gift-wall-slider .slick-dots li button { width: 14px; height: 14px; padding: 0; }
+          .gift-wall-slider .slick-dots li button:before { content: none; }
+          .gift-wall-slider .gift-dot { display: block; width: 10px; height: 10px; margin: 2px; border-radius: 9999px; background: #d1d5db; }
+          .gift-wall-slider .slick-active .gift-dot { background: #F45F47; }
+        `}</style>
       <Slider key={isDesktop ? "desktop" : "mobile"} {...settings}>
         {slides.map((group, index) => (
           <div key={index} className="px-1.5 pb-2">
@@ -245,6 +256,7 @@ export function GiftWall({
           </div>
         ))}
       </Slider>
+      </div>
 
       {/* Media Modal */}
       {mediaModal && (

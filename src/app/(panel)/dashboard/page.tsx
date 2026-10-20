@@ -97,12 +97,21 @@ function DashboardInner() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {mine.map((c) => (
-            <CampaignCard
-              key={c.id}
-              campaign={c}
-              contributions={contributions[c.slug] || []}
-              href={`/manage/${c.slug}`}
-            />
+            <div key={c.id} className="flex flex-col gap-2">
+              <CampaignCard
+                campaign={c}
+                contributions={contributions[c.slug] || []}
+                href={`/manage/${c.slug}`}
+              />
+              <a
+                href={`/campaign/report/${c.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="self-end text-sm font-medium text-accent hover:underline"
+              >
+                {t("report.open_link")} ↗
+              </a>
+            </div>
           ))}
         </div>
       )}

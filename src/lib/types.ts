@@ -147,6 +147,8 @@ export type Contribution = {
   // Optional gratuity for the recipient, charged on top of `amount` but kept out
   // of the pool's raised total / goal progress.
   tip_amount?: number;
+  // Fixed event cost paid with this contribution (one unit per person).
+  event_cost_amount?: number;
   message?: string;
   emoji?: string;
   photo_url?: string;
