@@ -16,6 +16,7 @@ type CampaignsState = {
   loadCampaign: (slug: string) => Promise<Campaign | null>;
   refreshCampaign: (slug: string) => Promise<void>;
   updateCampaign: (slug: string, data: any) => Promise<Campaign | null>;
+  deleteCampaign: (slug: string) => Promise<boolean>;
   closeCampaign: (slug: string) => Promise<Campaign | null>;
   reactivateCampaign: (slug: string, endDate: string) => Promise<Campaign | null>;
 
@@ -94,6 +95,22 @@ export const useCampaigns = create<CampaignsState>()(
         } catch (error: unknown) {
           const message = (error as any).response?.data?.message || "Failed to refresh campaign";
           set({ error: message });
+        }
+      },
+
+      deleteCampaign: async (slug: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          await campaignsApi.remove(slug);
+          set((state) => ({
+            campaigns: state.campaigns.filter((c) => c.slug !== slug),
+            isLoading: false,
+          }));
+          return true;
+        } catch (error: unknown) {
+          const message = (error as any).response?.data?.message || "Failed to delete campaign";
+          set({ error: message, isLoading: false });
+          return false;
         }
       },
 

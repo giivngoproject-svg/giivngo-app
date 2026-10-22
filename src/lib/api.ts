@@ -249,6 +249,11 @@ export const campaignsApi = {
     return transformCampaignFromApi(res.data);
   },
 
+  remove: async (slug: string) => {
+    const res = await apiClient.delete(`/campaigns/${slug}`);
+    return res.data;
+  },
+
   update: async (slug: string, updates: any) => {
     const res = await apiClient.patch(`/campaigns/${slug}`, updates);
     return transformCampaignFromApi(res.data);

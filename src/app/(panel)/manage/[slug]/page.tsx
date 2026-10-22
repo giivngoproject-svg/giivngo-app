@@ -4,7 +4,8 @@ import { Suspense, useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import { FileText, Loader } from "lucide-react";
+import { FileText, Loader, MoreVertical } from "lucide-react";
+import { DeleteCampaignAction } from "@/components/campaign/DeleteCampaignAction";
 
 const EMPTY_CONTRIBUTIONS: any[] = [];
 import {
@@ -58,6 +59,7 @@ function ManagePageInner() {
 
   const allContributions = useCampaigns((s) => s.contributions[slug] || EMPTY_CONTRIBUTIONS);
   const [editOpen, setEditOpen] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
   const [extendOpen, setExtendOpen] = useState(false);
   const [closeOpen, setCloseOpen] = useState(false);
   const [payoutOpen, setPayoutOpen] = useState(false);
@@ -187,7 +189,9 @@ function ManagePageInner() {
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10">
       {/* Header */}
-      <div className="mb-2">
+      <div className="mb-8 flex items-start justify-between gap-3 md:gap-4">
+        <div className="min-w-0 flex-1">
+                <div className="mb-2">
         <Link
           href="/dashboard"
           className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground"
@@ -197,9 +201,7 @@ function ManagePageInner() {
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
-        <div className="min-w-0">
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap mt-3">
             <StatusBadge status={campaign.status} />
             {mode !== "standard" && <Badge tone="accent">{POOL_MODE_LABELS[mode]}</Badge>}
             <span className="text-sm text-muted">/campaign/{campaign.slug}</span>
@@ -207,23 +209,77 @@ function ManagePageInner() {
           <h1 className="text-3xl font-bold tracking-tight mt-3 break-words">{campaign.title}</h1>
           {recipient && <p className="text-sm text-muted mt-1">for {recipient}</p>}
         </div>
-        <div className="flex gap-2 shrink-0">
-          <Link href={`/campaign/${campaign.slug}`} target="_blank">
-            <Button variant="outline">
-              {t('manage.view_public')}
-              <ExternalLink size={14} />
+        <div className="flex shrink-0 items-start gap-2">
+          {/* Mobile: one menu with the actions, at the top right */}
+          <div className="relative md:hidden">
+            <button
+              type="button"
+              onClick={() => setActionsOpen((open) => !open)}
+              aria-label={t('manage.actions')}
+              aria-expanded={actionsOpen}
+              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-foreground/5"
+            >
+              <MoreVertical size={20} />
+            </button>
+            {actionsOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setActionsOpen(false)} />
+                <div className="absolute right-0 top-full z-20 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-background py-1 shadow-lift">
+                  <a
+                    href={`/campaign/${campaign.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setActionsOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-foreground/5"
+                  >
+                    <ExternalLink size={14} />
+                    {t('manage.view_public')}
+                  </a>
+                  <a
+                    href={`/campaign/report/${campaign.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setActionsOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-foreground/5"
+                  >
+                    <FileText size={14} />
+                    {t('report.view_button')}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      setEditOpen(true);
+                    }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-foreground/5"
+                  >
+                    <Pencil size={14} />
+                    {t('manage.edit')}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Desktop: buttons sized to their content */}
+          <div className="hidden md:flex flex-wrap items-center justify-end gap-2 max-w-md">
+            <Link href={`/campaign/${campaign.slug}`} target="_blank" aria-label={t('manage.view_public')} title={t('manage.view_public')}>
+              <Button variant="outline">
+                <ExternalLink size={14} />
+                {t('manage.view_public')}
+              </Button>
+            </Link>
+            <a href={`/campaign/report/${campaign.slug}`} target="_blank" rel="noopener noreferrer" aria-label={t('report.view_button')} title={t('report.view_button')}>
+              <Button variant="outline">
+                <FileText size={14} />
+                {t('report.view_button')}
+              </Button>
+            </a>
+            <Button variant="ghost" onClick={() => setEditOpen(true)} aria-label={t('manage.edit')} title={t('manage.edit')}>
+              <Pencil size={14} />
+              {t('manage.edit')}
             </Button>
-          </Link>
-          <a href={`/campaign/report/${campaign.slug}`} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline">
-              <FileText size={14} />
-              {t('report.view_button')}
-            </Button>
-          </a>
-          <Button variant="ghost" onClick={() => setEditOpen(true)}>
-            <Pencil size={14} />
-            {t('manage.edit')}
-          </Button>
+          </div>
         </div>
       </div>
 
@@ -445,6 +501,12 @@ function ManagePageInner() {
               >
                 <XCircle size={14} /> {t('manage.close_early')}
               </button>
+              <DeleteCampaignAction
+                variant="menu"
+                slug={campaign.slug}
+                contributionCount={allContributions === EMPTY_CONTRIBUTIONS ? null : allContributions.length}
+                onDeleted={() => router.push('/dashboard')}
+              />
               {campaign.status === "ended" && (
                 <button
                   onClick={() => setPayoutOpen(true)}

@@ -99,10 +99,10 @@ function DashboardInner() {
           {mine.map((c) => (
             <CampaignCard
               key={c.id}
-              campaign={c}
-              contributions={contributions[c.slug] || []}
-              href={`/manage/${c.slug}`}
-              reportHref={`/campaign/report/${c.slug}`}
+                campaign={c}
+                contributions={contributions[c.slug] || []}
+                href={`/manage/${c.slug}`}
+                reportHref={`/campaign/report/${c.slug}`}
             />
           ))}
         </div>
