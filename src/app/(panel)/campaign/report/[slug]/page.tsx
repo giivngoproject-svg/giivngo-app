@@ -253,7 +253,7 @@ function CampaignReport() {
           ))}
         </div>
 
-        <h2 className="mt-8 text-lg font-semibold">{t("report.who_paid")} ({rows.length + 1})</h2>
+        <h2 className="mt-8 text-lg font-semibold">{t("report.who_paid")} ({rows.length})</h2>
         {rows.length === 0 ? (
           <p className="mt-2 text-sm text-gray-500">{t("report.none")}</p>
         ) : (

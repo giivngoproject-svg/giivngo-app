@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { CampaignCard } from "@/components/campaign/CampaignCard";
 import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
+import { StripeVerifyBanner } from "@/components/ledger/StripeVerifyBanner";
 
 function DashboardInner() {
   const t = useTranslation();
@@ -42,6 +43,7 @@ function DashboardInner() {
 
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10">
+      <StripeVerifyBanner />
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div>
           <p className="text-sm text-muted">

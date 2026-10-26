@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import process from 'process';
+import type { UserNotification } from '@/lib/types';
 //import next .env NEXT_PUBLIC_API_URL
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -431,3 +432,79 @@ export const anonymousAvatarsApi = {
 
 };
 
+/**
+ * Transform notification response from backend (camelCase, enum upper case) to frontend
+ */
+function transformNotificationFromApi(data: any): UserNotification {
+  return {
+    id: data.id,
+    type: String(data.type).toLowerCase() as UserNotification['type'],
+    title: data.title,
+    body: data.body,
+    country_code: data.countryCode ?? null,
+    is_direct: Boolean(data.isDirect),
+    link_url: data.linkUrl ?? null,
+    read: Boolean(data.read),
+    read_at: data.readAt ?? null,
+    created_at: data.createdAt,
+  };
+}
+
+export type LedgerStatus = {
+  payoutsEnabled: boolean;
+  onboardingComplete: boolean;
+  totalRaised: number;
+  currency: string;
+  needsVerification: boolean;
+};
+
+export type WithdrawalStatus = {
+  canWithdraw: boolean;
+  amount: number;
+  currency: string;
+  blockers: string[];
+  // ISO date when withdrawals open (3 days after the campaign ended)
+  payoutDate?: string;
+};
+
+/**
+ * Campaign ledger: verification status and withdrawals
+ */
+export const ledgerApi = {
+  status: async (): Promise<LedgerStatus> => {
+    const res = await apiClient.get('/ledger/status');
+    return res.data;
+  },
+
+  withdrawalStatus: async (slug: string): Promise<WithdrawalStatus> => {
+    const res = await apiClient.get(`/campaigns/${slug}/withdrawal`);
+    return res.data;
+  },
+
+  withdraw: async (slug: string) => {
+    const res = await apiClient.post(`/campaigns/${slug}/withdraw`);
+    return res.data;
+  },
+};
+
+export const notificationsApi = {
+  list: async (params: { limit?: number; offset?: number; unreadOnly?: boolean; countryCode?: string } = {}) => {
+    const res = await apiClient.get('/notifications', {
+      params: {
+        limit: params.limit,
+        offset: params.offset,
+        unreadOnly: params.unreadOnly,
+        countryCode: params.countryCode,
+      },
+    });
+    return {
+      items: (res.data.items as any[]).map(transformNotificationFromApi),
+      unreadCount: res.data.unreadCount as number,
+    };
+  },
+
+  setRead: async (id: string, read: boolean): Promise<UserNotification> => {
+    const res = await apiClient.patch(`/notifications/${id}`, { read });
+    return transformNotificationFromApi(res.data);
+  },
+};

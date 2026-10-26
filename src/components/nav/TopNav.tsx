@@ -14,6 +14,7 @@ import { toast } from "@/stores/toast";
 import { useTranslation } from "@/lib/useTranslation";
 import { Button } from "@/components/ui/Button";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 
 type DesktopLink = { href: string, labelKey: string, icon: React.ReactNode, highlight?: boolean };
@@ -78,6 +79,8 @@ export function TopNav() {
           ))}
         </nav>
         <div className="flex items-center gap-4">
+          {user && <NotificationBell />}
+
           {/* Language Switcher */}
           <LanguageSwitcher
             compact

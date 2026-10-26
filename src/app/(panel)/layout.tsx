@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { LayoutDashboard, Plus, Settings, LogOut, ChevronDown, Menu, PersonStanding, CircleUserRound, Cog } from 'lucide-react';
+import { LayoutDashboard, Plus, Settings, LogOut, ChevronDown, Menu, PersonStanding, CircleUserRound, Cog, Bell } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Toaster } from '@/components/ui/Toaster';
 import { Avatar, Logo } from '@/components/nav/TopNav';
 import { useAuth } from '@/stores/auth';
 import { Button } from '@/components/ui/Button';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useTranslation } from '@/lib/useTranslation';
 import { NextIntlClientProvider } from 'next-intl';
 import { useLanguage } from '@/stores/language';
@@ -51,6 +52,7 @@ function PanelShell({
   const SIDEBAR_ITEMS = [
     { href: '/dashboard', label: mounted ? t('nav.dashboard') : 'Dashboard', icon: LayoutDashboard },
     { href: '/create', label: mounted ? t('nav.create') : 'Create Campaign', icon: Plus },
+    { href: '/notifications', label: mounted ? t('nav.notifications') : 'Notifications', icon: Bell },
     { href: '/profile', label: mounted ? t('nav.profile') : 'Profile', icon: CircleUserRound },
     { href: '/settings', label: mounted ? t('nav.settings') : 'Settings', icon: Cog },
   ];
@@ -160,6 +162,9 @@ function PanelShell({
               <p className="text-sm text-gray-500 mt-1">
                 {mounted ? t('layout.welcome_back', { name: user?.display_name || user?.name?.split(' ')[0] || 'User' }) : `Welcome back, ${user?.display_name || user?.name?.split(' ')[0] || 'User'}! 👋`}
               </p>
+            </div>
+            <div className="ml-auto">
+              <NotificationBell />
             </div>
           </div>
         </div>

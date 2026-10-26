@@ -6,8 +6,23 @@ import { useParams, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { FileText, Loader, MoreVertical } from "lucide-react";
 import { DeleteCampaignAction } from "@/components/campaign/DeleteCampaignAction";
+import { WithdrawPanel } from "@/components/ledger/WithdrawPanel";
 
 const EMPTY_CONTRIBUTIONS: any[] = [];
+
+/**
+ * Every part of one contribution. `amount` already includes the selected items,
+ * so the gift is what is left after them. Total = amount + event cost + tip (fee not included).
+ */
+function contributionParts(c: Contribution) {
+  const items = c.selected_items ?? [];
+  const itemsTotal = items.reduce((sum, i) => sum + i.amount, 0);
+  const gift = Math.max(0, c.amount - itemsTotal);
+  const event = c.event_cost_amount ?? 0;
+  const tip = c.tip_amount ?? 0;
+  const fee = c.fee_amount ?? 0;
+  return { items, gift, event, tip, fee, total: c.amount + event + tip };
+}
 import {
   Banknote,
   Calendar,
@@ -32,7 +47,8 @@ import { useCampaigns } from "@/stores/campaigns";
 import { formatAUD, calcFee } from "@/lib/money";
 import { poolMode, tipTotal, POOL_MODE_LABELS } from "@/lib/pool";
 import { uid } from "@/lib/slug";
-import type { ContributionItem } from "@/lib/types";
+import type { Contribution, ContributionItem } from "@/lib/types";
+import { ledgerApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Progress } from "@/components/ui/Progress";
@@ -77,15 +93,6 @@ function ManagePageInner() {
     }
   }, [slug]);
 
-  // Load payout data from backend
-  useEffect(() => {
-    if (campaign?.id) {
-      fetch(`/api/payouts/campaigns/${campaign.id}`)
-        .then(res => res.json())
-        .then(data => setPayout(data))
-        .catch(console.error);
-    }
-  }, [campaign?.id]);
 
   const contributions = useMemo(
     () =>
@@ -188,6 +195,8 @@ function ManagePageInner() {
 
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10">
+      <WithdrawPanel slug={campaign.slug} />
+
       {/* Header */}
       <div className="mb-8 flex items-start justify-between gap-3 md:gap-4">
         <div className="min-w-0 flex-1">
@@ -378,13 +387,24 @@ function ManagePageInner() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-right font-semibold tabular-nums">
-                        {formatAUD(c.amount)}
-                        {c.tip_amount ? (
-                          <span className="block text-[11px] font-normal text-accent">
-                            +{formatAUD(c.tip_amount)} {t('manage.tip')}
-                          </span>
-                        ) : null}
+                      <td className="px-5 py-3 text-right font-semibold tabular-nums align-top">
+                        {(() => {
+                          const parts = contributionParts(c);
+                          return (
+                            <>
+                              {formatAUD(parts.total)}
+                              <div className="mt-1 space-y-0.5 text-[11px] font-normal text-muted">
+                                {parts.items.map((i) => (
+                                  <div key={i.item_id}>{i.label} · {formatAUD(i.amount)}</div>
+                                ))}
+                                {parts.gift > 0 && <div>{t('manage.col_gift')} · {formatAUD(parts.gift)}</div>}
+                                {parts.event > 0 && <div>{t('manage.col_event')} · {formatAUD(parts.event)}</div>}
+                                {parts.tip > 0 && <div className="text-accent">+{formatAUD(parts.tip)} {t('manage.tip')}</div>}
+                                {parts.fee > 0 && <div>{t('manage.col_fee')} · {formatAUD(parts.fee)}</div>}
+                              </div>
+                            </>
+                          );
+                        })()}
                       </td>
                       <td className="px-5 py-3 text-muted text-xs">
                         {formatDistanceToNowStrict(new Date(c.created_at))} {t('manage.ago')}
@@ -451,7 +471,8 @@ function ManagePageInner() {
                             : "—"}
                         </td>
                         <td className="px-5 py-3 text-right font-semibold tabular-nums">
-                          {formatAUD(c.amount)}
+                          {/* Tip has its own column here, so the amount column is gift + items + event cost */}
+                          {formatAUD(contributionParts(c).total - contributionParts(c).tip)}
                         </td>
                         <td className="px-5 py-3 text-right text-muted text-xs">
                           {c.tip_amount ? formatAUD(c.tip_amount) : "—"}
@@ -637,12 +658,13 @@ function ManagePageInner() {
           {user.stripe_account_id ? (
             <Button
               onClick={async () => {
-                await Swal.fire({
-                  title: t('manage.payout_initiated'),
-                  text: `${formatAUD(fee.net)} ${t('manage.payout_mock')}`,
-                  icon: "success",
-                  confirmButtonColor: "#1E1B4B",
-                });
+                // Real withdrawal: the backend validates the rules and creates the transfers
+                try {
+                  await ledgerApi.withdraw(campaign.slug);
+                  await Swal.fire({ title: t('ledger.withdraw.done'), icon: "success", confirmButtonColor: "#1E1B4B" });
+                } catch {
+                  await Swal.fire({ title: t('ledger.withdraw.failed'), icon: "error", confirmButtonColor: "#1E1B4B" });
+                }
                 setPayoutOpen(false);
               }}
             >

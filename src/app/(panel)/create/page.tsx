@@ -66,30 +66,7 @@ function CreatePageInner() {
   const createCampaign = useCampaigns((s) => s.createCampaign);
   const [isPublishing, setIsPublishing] = useState(false);
 
-  useEffect(() => {
-    // Validate Stripe Connect on page load
-    if (user && !user.stripe_account_id) {
-      Swal.fire({
-        title: "Stripe Connect Required",
-        text: "You need to link your Stripe account to create campaigns and receive payments.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Go to Profile",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#1E1B4B",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.push("/profile");
-        } else {
-          router.push("/dashboard");
-        }
-      });
-    }
-
-    return () => {
-      // wizard state is session-only; keep across navigations within the wizard.
-    };
-  }, [user, router]);
+  // Stripe Connect is not required to create a campaign.
 
   if (!user) return null;
 

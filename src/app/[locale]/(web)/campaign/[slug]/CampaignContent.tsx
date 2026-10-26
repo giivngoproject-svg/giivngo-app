@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Users, Heart, Lock, Camera as CameraIcon, Gift, EyeOff, CheckCircle2, Image as ImageIcon, Video as VideoIcon, Flag } from "lucide-react";
 import { useCampaigns } from "@/stores/campaigns";
+import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 import { useTranslation } from "@/lib/useTranslation";
 import type { Campaign } from "@/lib/types";
 import { contributionsApi, storageApi, campaignsApi, type FeeQuote } from "@/lib/api";
@@ -160,11 +161,15 @@ export default function PublicCampaignPage() {
   const loadContributions = useCampaigns((s) => s.loadContributions);
   const refreshCampaign = useCampaigns((s) => s.refreshCampaign);
   const allContributions = useCampaigns((s) => s.contributions[slug] ?? EMPTY_CONTRIBUTIONS);
+  // Slug whose load attempt has finished. Until then the campaign is "loading", not "not found".
+  const [attemptedSlug, setAttemptedSlug] = useState<string | null>(null);
 
   // Load campaign and contributions on mount
   useEffect(() => {
     if (slug) {
-      loadCampaign(slug).catch(console.error);
+      loadCampaign(slug)
+        .catch(console.error)
+        .finally(() => setAttemptedSlug(slug));
       loadContributions(slug).catch(console.error);
 
       // Check if returning from Stripe checkout
@@ -290,48 +295,68 @@ export default function PublicCampaignPage() {
     return () => clearTimeout(timer);
   }, [campaign, slug, amount, tip, includeEvent, selectedItemIds]);
 
-  // Show loading skeleton while fetching
-  if (storeIsLoading && !campaign) {
+  // Show loading skeleton until the load attempt for this slug has finished
+  if (!campaign && (storeIsLoading || attemptedSlug !== slug)) {
     return (
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
-        {/* Hero skeleton */}
-        <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft mb-8 animate-pulse">
-          <div className="aspect-[16/9] bg-foreground/10" />
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-8">
+          {/* Left: info (same order as the loaded page: hero, title + key facts, gift wall) */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="rounded-3xl overflow-hidden bg-background border border-border shadow-soft">
+              <Skeleton className="aspect-[16/9] w-full" />
+            </div>
 
-        {/* Title skeleton */}
-        <div className="space-y-4 mb-8 animate-pulse">
-          <div className="h-8 bg-foreground/10 rounded-lg w-3/4" />
-          <div className="h-4 bg-foreground/10 rounded-lg w-full" />
-          <div className="h-4 bg-foreground/10 rounded-lg w-5/6" />
-        </div>
-
-        {/* Progress bar skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 animate-pulse">
-          <div className="space-y-3">
-            <div className="h-4 bg-foreground/10 rounded-lg w-1/2" />
-            <div className="h-8 bg-foreground/10 rounded-lg" />
-          </div>
-        </div>
-
-        {/* Gift wall skeleton */}
-        <div className="space-y-4 animate-pulse">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex gap-4 p-4 border border-border rounded-lg">
-              <div className="w-10 h-10 bg-foreground/10 rounded-full shrink-0" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-foreground/10 rounded-lg w-1/3" />
-                <div className="h-3 bg-foreground/10 rounded-lg w-2/3" />
+            <div className="rounded-3xl border border-border bg-background p-6">
+              <Skeleton className="h-8 w-3/4" />
+              <div className="mt-3">
+                <SkeletonText lines={2} />
+              </div>
+              <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-border">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className={`flex flex-col items-center gap-2 p-3 ${i > 0 ? "border-l border-border" : ""}`}>
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+
+            <div className="rounded-3xl border border-border bg-background p-6 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex gap-4">
+                  <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-3 w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: contribute (raised amount, progress and form) */}
+          <aside className="lg:col-span-3 space-y-4">
+            <div className="rounded-3xl border border-border bg-background p-5 space-y-4">
+              <div className="flex items-baseline justify-between">
+                <Skeleton className="h-8 w-32" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <Skeleton className="h-3 w-full rounded-full" />
+              <div className="grid grid-cols-2 gap-3">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          </aside>
         </div>
       </div>
     );
   }
 
-  // Only show "not found" after loading is complete and campaign doesn't exist
-  if (!storeIsLoading && !campaign) {
+  // "Not found" only after the load attempt for this slug finished without a campaign
+  if (attemptedSlug === slug && !campaign) {
     return (
       <div className="max-w-md mx-auto px-5 py-20 text-center">
         <h1 className="text-2xl font-semibold">{t("campaign.not_found")}</h1>

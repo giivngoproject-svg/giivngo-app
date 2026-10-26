@@ -196,3 +196,18 @@ export const CAMPAIGN_TYPE_LABELS: Record<CampaignType, string> = {
   event_entry: "Group event",
   custom: "Custom",
 };
+
+export type NotificationType = "maintenance" | "important" | "recommendation" | "general";
+
+export type UserNotification = {
+  id: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  country_code: string | null; // ISO alpha-2 of the message language; null = all countries
+  is_direct: boolean; // false = general notification: no read state
+  link_url: string | null;
+  read: boolean;
+  read_at: string | null;
+  created_at: string;
+};

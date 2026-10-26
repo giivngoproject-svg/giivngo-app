@@ -3,16 +3,11 @@
 import { useTranslation } from "@/lib/useTranslation";
 import { useLanguage } from "@/stores/language";
 import { AuthCheck } from "@/components/AuthCheck";
+import { MARKETS } from "@/i18n/markets";
 
 export default function SettingsPage() {
   const t = useTranslation();
-  const { language, setLanguage } = useLanguage();
-
-  const languageOptions = [
-    { code: "en" as const, label: t("settings.language.en") },
-    { code: "es" as const, label: t("settings.language.es") },
-    { code: "pt-br" as const, label: t("settings.language.pt-br") },
-  ];
+  const { countryCode, setMarket } = useLanguage();
 
   return (
     <AuthCheck requireAuth={true}>
@@ -33,17 +28,18 @@ export default function SettingsPage() {
               {t("settings.language.description")}
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {languageOptions.map((option) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {MARKETS.map((market) => (
                 <button
-                  key={option.code}
-                  onClick={() => setLanguage(option.code)}
-                  className={`px-4 py-3 rounded-lg border-2 transition-all ${language === option.code
+                  key={market.locale}
+                  onClick={() => setMarket(market)}
+                  className={`px-4 py-3 rounded-lg border-2 text-left transition-all ${countryCode === market.country
                       ? "border-accent bg-accent/10 font-semibold"
                       : "border-border bg-transparent hover:bg-foreground/5"
                     }`}
                 >
-                  {option.label}
+                  <span className="block">{market.flag} {market.countryName}</span>
+                  <span className="block text-xs text-muted font-normal">{market.languageLabel}</span>
                 </button>
               ))}
             </div>

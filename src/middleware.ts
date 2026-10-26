@@ -81,7 +81,7 @@ export const config = {
   //   _next        -> internals de Next (/_next/**)
   //   _vercel      -> internals de Vercel
   //   auth         -> callback OAuth de Supabase (/auth/**) — sin prefijo ni redirect
-  //   dashboard, create, manage, profile, settings -> TODO el grupo (panel)
+  //   dashboard, create, manage, profile, settings, notifications -> TODO el grupo (panel)
   //   campaign/report/ -> reporte del organizador (panel, sin prefijo)
   //   .*\..*       -> cualquier archivo con extensión (favicon.ico, sitemap.xml,
   //                   robots.txt, imágenes, etc.)
@@ -89,8 +89,9 @@ export const config = {
   // ⚠️  Los nombres del panel (dashboard|create|manage|profile|settings) están
   //     hardcodeados porque el panel vive en rutas raíz sin prefijo. Si se añade una
   //     ruta de panel nueva a nivel raíz, DEBE agregarse a este matcher o el middleware
-  //     intentará localizarla y dará 404.
+  //     intentará localizarla y dará 404. (Ej.: /notifications, agregado para que la
+  //     campana del sitio público no lo redirija a /{locale}/notifications.)
   matcher: [
-    "/((?!api|_next|_vercel|auth|dashboard|create|manage|profile|settings|campaign/report/|.*\\..*).*)",
+    "/((?!api|_next|_vercel|auth|dashboard|create|manage|profile|settings|notifications|campaign/report/|.*\\..*).*)",
   ],
 };

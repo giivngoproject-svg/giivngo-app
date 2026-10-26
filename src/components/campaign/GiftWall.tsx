@@ -151,8 +151,11 @@ export function GiftWall({
                   <p className="font-medium truncate">
                     {displayName}
                   </p>
+                  {/* Total paid to the campaign: gift + event cost (tip is shown on its own line) */}
                   {showAmounts && (
-                    <p className="text-sm font-semibold text-accent tabular-nums">{formatAUD(c.amount)}</p>
+                    <p className="text-sm font-semibold text-accent tabular-nums">
+                      {formatAUD(c.amount + (c.event_cost_amount ?? 0))}
+                    </p>
                   )}
                 </div>
               </div>
