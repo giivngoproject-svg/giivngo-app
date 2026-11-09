@@ -219,6 +219,11 @@ export const authApi = {
     return transformUserFromApi(res.data);
   },
 
+  forgotPassword: async (email: string, locale: string) => {
+    const res = await apiClient.post('/auth/forgot-password', { email, locale });
+    return res.data as { success: boolean };
+  },
+
   verifyEmail: async (token: string) => {
     const res = await apiClient.post('/auth/verify-email', { token });
     return res.data;

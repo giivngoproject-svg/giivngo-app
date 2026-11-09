@@ -117,6 +117,11 @@ function SignInInner() {
           required
           disabled={isLoading}
         />
+        <div className="text-right -mt-2">
+          <Link href="/forgot-password" className="text-sm text-accent hover:underline">
+            {t("auth.forgot.link")}
+          </Link>
+        </div>
         <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
           {isLoading ? t("auth.signin.signing_button") : t("auth.signin.signin_button")}
         </Button>

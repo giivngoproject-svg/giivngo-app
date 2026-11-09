@@ -8,7 +8,6 @@ import {
   Shield,
   Users,
   ChevronRight,
-  Star,
   Heart,
   Zap,
   TrendingUp,
@@ -112,27 +111,6 @@ const FEATURES = [
     title: 'Built for groups',
     desc: 'Scale from 2 to 2,000 people',
     color: '#00C29A',
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    name: 'Sarah M.',
-    role: 'Event Organizer',
-    text: 'Organized my wedding gift registry in minutes. Everyone knew exactly what to contribute.',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop',
-  },
-  {
-    name: 'James L.',
-    role: 'Travel Enthusiast',
-    text: 'Group trips are now so easy. No more Venmo chains or awkward conversations.',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop',
-  },
-  {
-    name: 'Emma R.',
-    role: 'Community Leader',
-    text: 'We raised $5,000 for our local cause in just two weeks with Giivngo.',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop',
   },
 ];
 
@@ -250,7 +228,7 @@ export default function Home2() {
                 </span>
                 <span className="flex items-center gap-2">
                   <Shield size={16} />
-                  Bank-Level Security
+                  Secured by Stripe
                 </span>
                 <span className="flex items-center gap-2">
                   <Users size={16} />
@@ -472,50 +450,6 @@ export default function Home2() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-[#1E1B4B] text-center mb-4">
-            Trusted by thousands of{' '}
-            <span className="text-[#FF6B6B]">happy groups</span>
-          </h2>
-
-          <div className="text-center mb-12 flex items-center justify-center gap-2">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Star
-                key={i}
-                size={20}
-                className="fill-[#FFC857] text-[#FFC857]"
-              />
-            ))}
-            <span className="font-semibold text-gray-900 ml-2">
-              4.9/5 from 10,000+ reviews
-            </span>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((testimonial, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-8 shadow-lg">
-                <div className="flex items-center gap-4 mb-4">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">
-                      {testimonial.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 italic">"{testimonial.text}"</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
