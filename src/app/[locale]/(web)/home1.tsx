@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/Button';
 import { poppins } from '@/components/landing/fonts';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { Pricing } from '@/components/landing/Pricing';
-import { Testimonials } from '@/components/landing/Testimonials';
 import { useTranslation } from '@/lib/useTranslation';
 
 const FEATURED_CARDS = [
@@ -289,7 +288,6 @@ export default function Home1() {
         <div id="pricing" className="scroll-mt-20">
           <Pricing />
         </div>
-        <Testimonials />
       </div>
 
       {/* Final CTA Section */}
