@@ -536,7 +536,7 @@ export const translations = {
 
     // Landing Page - Features
     "landing.features.secure": "Safe & secure",
-    "landing.features.banking": "Bank-level security",
+    "landing.features.banking": "Secured by Stripe",
     "landing.features.loved": "Loved by thousands",
 
     // Landing Page - Social Proof
@@ -1421,7 +1421,7 @@ export const translations = {
     "landing.hero.secondary_cta": "Ver cómo funciona",
 
     "landing.features.secure": "Seguro y confiable",
-    "landing.features.banking": "Seguridad de nivel bancario",
+    "landing.features.banking": "Protegido por Stripe",
     "landing.features.loved": "Elegido por miles",
 
     "landing.social.friends_joined": "amigos ya se sumaron",
@@ -2278,7 +2278,7 @@ export const translations = {
     "landing.hero.secondary_cta": "Veja como funciona",
 
     "landing.features.secure": "Seguro e confiável",
-    "landing.features.banking": "Segurança de nível bancário",
+    "landing.features.banking": "Protegido pela Stripe",
     "landing.features.loved": "Escolhido por milhares",
 
     "landing.social.friends_joined": "amigos já entraram",
