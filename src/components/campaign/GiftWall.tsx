@@ -270,12 +270,15 @@ export function GiftWall({
       </div>
 
       {/* Media Modal */}
+      {/* Media modal: the media keeps its aspect ratio (16:9 or 9:16) and never exceeds the viewport height */}
       {mediaModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="relative max-w-2xl w-full">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-hidden">
+          <div className="relative flex items-center justify-center w-[min(92vw,56rem)] min-w-[min(280px,90vw)] max-h-[90dvh]">
             <button
+              type="button"
               onClick={() => setMediaModal(null)}
-              className="absolute -top-10 right-0 p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
+              aria-label="Close"
+              className="absolute top-2 right-2 z-10 p-2 text-white bg-black/50 hover:bg-black/70 rounded-lg transition-colors"
             >
               <X size={24} />
             </button>
@@ -284,13 +287,14 @@ export function GiftWall({
               <img
                 src={mediaModal.url}
                 alt="Contribution photo"
-                className="w-full rounded-lg"
+                className="block w-auto h-auto max-w-full max-h-[85dvh] object-contain rounded-lg"
               />
             ) : (
               <video
                 src={mediaModal.url}
                 controls
-                className="w-full rounded-lg bg-black"
+                playsInline
+                className="block w-auto h-auto max-w-full max-h-[85dvh] min-h-[min(240px,50dvh)] object-contain rounded-lg bg-black"
               />
             )}
           </div>
