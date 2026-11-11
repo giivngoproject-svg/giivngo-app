@@ -810,6 +810,8 @@ export const translations = {
     "form.emoji_optional": "Add an emoji (optional)",
     "form.tip_badge": "· +{amount} tip",
     "form.video_title": "Video message",
+    "giftwall.image_button": "Image",
+    "giftwall.video_button": "Video Message",
     "form.video_optional": "Add a video (optional)",
 
     // Checkout
@@ -1673,6 +1675,8 @@ export const translations = {
     "form.emoji_optional": "Agrega un emoji (opcional)",
     "form.tip_badge": "· +{amount} de extra",
     "form.video_title": "Mensaje de video",
+    "giftwall.image_button": "Imagen",
+    "giftwall.video_button": "Mensaje de video",
     "form.video_optional": "Agrega un video (opcional)",
 
     "checkout.successful": "Pago exitoso",
@@ -2530,6 +2534,8 @@ export const translations = {
     "form.emoji_optional": "Adicione um emoji (opcional)",
     "form.tip_badge": "· +{amount} de mimo",
     "form.video_title": "Mensagem de vídeo",
+    "giftwall.image_button": "Imagem",
+    "giftwall.video_button": "Mensagem de vídeo",
     "form.video_optional": "Adicione um vídeo (opcional)",
 
     "checkout.successful": "Pagamento bem-sucedido",

@@ -160,29 +160,37 @@ export function GiftWall({
                 </div>
               </div>
 
-              {/* Media buttons (photo/video) */}
-              {(c.photo_url || c.video_url) && (
-                <div className="flex gap-2">
-                  {c.photo_url && (
-                    <button
-                      onClick={() => setMediaModal({ type: 'image', url: c.photo_url! })}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-xs font-medium transition-colors"
-                    >
-                      <ImageIcon size={12} />
-                      {t("form.video_title")}
-                    </button>
+              {/* Media buttons (image/video): orange + pointer when the contribution has that media, gray and disabled otherwise */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={!c.photo_url}
+                  onClick={() => c.photo_url && setMediaModal({ type: 'image', url: c.photo_url })}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                    c.photo_url
+                      ? "cursor-pointer bg-accent/10 text-accent hover:bg-accent/20"
+                      : "cursor-default bg-foreground/5 text-muted",
                   )}
-                  {c.video_url && (
-                    <button
-                      onClick={() => setMediaModal({ type: 'video', url: c.video_url! })}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-xs font-medium transition-colors"
-                    >
-                      <PlayCircle size={12} />
-                      {t("form.video_title")}
-                    </button>
+                >
+                  <ImageIcon size={12} />
+                  {t("giftwall.image_button")}
+                </button>
+                <button
+                  type="button"
+                  disabled={!c.video_url}
+                  onClick={() => c.video_url && setMediaModal({ type: 'video', url: c.video_url })}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                    c.video_url
+                      ? "cursor-pointer bg-accent/10 text-accent hover:bg-accent/20"
+                      : "cursor-default bg-foreground/5 text-muted",
                   )}
-                </div>
-              )}
+                >
+                  <PlayCircle size={12} />
+                  {t("giftwall.video_button")}
+                </button>
+              </div>
 
               {/* Message */}
               {c.message && (
