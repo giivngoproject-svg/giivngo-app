@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Swal from "sweetalert2";
-import { formatDistanceToNowStrict } from "date-fns";
+import { format } from "date-fns";
 import { CheckCircle2, Building2, Banknote, Clock } from "lucide-react";
 import { useAuth } from "@/stores/auth";
 import { useCampaigns } from "@/stores/campaigns";
 import { useTranslation } from "@/lib/useTranslation";
 import { AuthCheck } from "@/components/AuthCheck";
-import { storageApi, profileApi } from "@/lib/api";
+import { storageApi, profileApi, type MyContribution } from "@/lib/api";
 import { formatAUD } from "@/lib/money";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -22,9 +22,10 @@ function ProfilePageInner() {
   const user = useAuth((s) => s.user);
   const updateUser = useAuth((s) => s.updateUser);
   const campaigns = useCampaigns((s) => s.campaigns);
-  const contributions = useCampaigns((s) => s.contributions);
+  const loadCampaigns = useCampaigns((s) => s.loadCampaigns);
 
   const [tab, setTab] = useState<"created" | "contributed">("created");
+  const [myContributions, setMyContributions] = useState<MyContribution[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [stripeStatus, setStripeStatus] = useState<{
@@ -76,13 +77,19 @@ function ProfilePageInner() {
     }
   }, [user?.stripe_account_id]);
 
+  // Load the organizer's campaigns and the contributions made with this account
+  useEffect(() => {
+    if (!user) return;
+    loadCampaigns();
+    profileApi
+      .getMyContributions()
+      .then(setMyContributions)
+      .catch((err) => console.error("Failed to load contributions", err));
+  }, [user?.id, loadCampaigns]);
+
   const mine = useMemo(
     () => (user ? campaigns.filter((c) => c.user_id === user.id) : []),
     [campaigns, user],
-  );
-  const myContributions = useMemo(
-    () => (user ? Object.values(contributions).flat().filter((c) => c.contributor_email === user?.email) : []),
-    [contributions, user],
   );
 
   if (!user) return null;
@@ -314,15 +321,15 @@ function ProfilePageInner() {
             ) : (
               <ul className="divide-y divide-border">
                 {mine.map((c) => (
-                  <li key={c.id} className="py-3 flex items-center justify-between gap-3">
+                  <li key={c.id} className="py-3 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                     <Link
                       href={`/manage/${c.slug}`}
-                      className="font-medium hover:underline truncate"
+                      className="font-medium hover:underline break-words min-w-0"
                     >
                       {c.title}
                     </Link>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-sm tabular-nums">{formatAUD(c.raised_amount)}</span>
+                    <div className="flex items-center gap-3 text-sm text-muted shrink-0">
+                      <span className="tabular-nums">{format(new Date(c.created_at), "d MMM yyyy")}</span>
                       <StatusBadge status={c.status} />
                     </div>
                   </li>
@@ -335,25 +342,23 @@ function ProfilePageInner() {
             </p>
           ) : (
             <ul className="divide-y divide-border">
-              {myContributions.map((c) => {
-                const camp = campaigns.find((x) => x.id === c.campaign_id);
-                return (
-                  <li key={c.id} className="py-3 flex items-center justify-between gap-3">
-                    <Link
-                      href={camp ? `/campaign/${camp.slug}` : "#"}
-                      className="font-medium hover:underline truncate"
-                    >
-                      {camp?.title || "Unknown campaign"}
-                    </Link>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-sm tabular-nums">{formatAUD(c.amount)}</span>
-                      <span className="text-xs text-muted">
-                        {formatDistanceToNowStrict(new Date(c.created_at))} ago
-                      </span>
-                    </div>
-                  </li>
-                );
-              })}
+              {myContributions.map((c) => (
+                <li key={c.id} className="py-3 flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm text-muted tabular-nums">
+                      {format(new Date(c.createdAt), "d MMM yyyy")}
+                    </span>
+                    <span className="font-semibold tabular-nums">{formatAUD(c.amount)}</span>
+                  </div>
+                  {c.message && <p className="text-sm break-words">{c.message}</p>}
+                  <Link
+                    href={`/campaign/${c.campaign.slug}`}
+                    className="text-xs text-muted hover:underline break-words"
+                  >
+                    {c.campaign.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           )}
         </div>

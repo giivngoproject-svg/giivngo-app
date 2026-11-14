@@ -319,7 +319,22 @@ export const contributionsApi = {
 /**
  * Profile API calls
  */
+export type MyContribution = {
+  id: string;
+  amount: number;
+  tipAmount: number | null;
+  message: string | null;
+  emoji: string | null;
+  createdAt: string;
+  campaign: { slug: string; title: string };
+};
+
 export const profileApi = {
+  getMyContributions: async (): Promise<MyContribution[]> => {
+    const res = await apiClient.get('/profile/contributions');
+    return Array.isArray(res.data) ? res.data : [];
+  },
+
   getCountries: async () => {
     const res = await apiClient.get('/profile/countries');
     return res.data;
