@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/lib/useTranslation";
 import { Link } from "@/i18n/navigation";
+import { SocialLinks } from "@/components/nav/SocialLinks";
 
 export function Footer() {
   const t = useTranslation();
@@ -9,7 +10,10 @@ export function Footer() {
   return (
     <footer className="bg-white border-t border-gray-200">
       <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
-        <p>{t("landing.footer.copyright")}</p>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <p>{t("landing.footer.copyright")}</p>
+          <SocialLinks />
+        </div>
         <div className="flex items-center gap-6">
           <Link href="/faq" className="hover:text-gray-900">
             {t("landing.footer.faq")}

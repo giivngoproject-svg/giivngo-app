@@ -6,6 +6,7 @@ import {
   LOCALE_TO_OG,
   LOCALE_TO_OG_IMAGE,
 } from "./markets";
+import { SOCIAL_LINKS } from "@/lib/socials";
 
 // Fuente única de la URL canónica del sitio (sin www).
 export const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://giivngo.com";
@@ -117,8 +118,8 @@ export function getSiteJsonLd() {
         name: SITE_NAME,
         url: SITE_URL,
         description: SITE_DESCRIPTION,
-        // TODO: añadir `logo` (URL absoluta a un PNG/SVG cuadrado en public/) y
-        // `sameAs` (array de URLs de redes sociales) cuando estén disponibles.
+        // TODO: añadir `logo` (URL absoluta a un PNG/SVG cuadrado en public/).
+        sameAs: SOCIAL_LINKS.map((s) => s.url),
       },
       {
         "@type": "WebSite",

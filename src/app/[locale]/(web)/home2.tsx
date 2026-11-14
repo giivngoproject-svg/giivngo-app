@@ -22,6 +22,7 @@ import {
   Users2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { SocialLinks } from '@/components/nav/SocialLinks';
 
 const USE_CASES = [
   {
@@ -529,19 +530,8 @@ export default function Home2() {
               </a>
             </div>
 
-            <div className="flex gap-4 text-gray-600 justify-end">
-              <a href="#" className="hover:text-gray-900">
-                f
-              </a>
-              <a href="#" className="hover:text-gray-900">
-                in
-              </a>
-              <a href="#" className="hover:text-gray-900">
-                𝕏
-              </a>
-              <a href="#" className="hover:text-gray-900">
-                📷
-              </a>
+            <div className="flex text-gray-600 justify-end">
+              <SocialLinks />
             </div>
           </div>
 
