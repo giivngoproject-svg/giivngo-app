@@ -132,7 +132,7 @@ export const terms: LegalDocSet = {
         { k: "p", lead: "8.2.", text: "Giivngo does not guarantee, verify, or take responsibility for how an Organiser ultimately uses contributed funds, beyond the platform-level restrictions in Section 6." },
       ] },
       { n: "9", title: "Payouts, Holds, and Chargebacks", body: [
-        { k: "p", lead: "9.1.", text: "Funds raised in a Pool may be paid out to the Organiser or nominated recipient in accordance with the Payment Partner's processing timelines. Giivngo does not guarantee a specific payout timeframe." },
+        { k: "p", lead: "9.1.", text: "Funds contributed to a Pool may be paid out to the Organiser or nominated recipient in accordance with the Payment Partner's processing timelines. Giivngo does not guarantee a specific payout timeframe." },
         { k: "p", lead: "9.2.", text: "Giivngo may place a temporary hold on a Pool or payout where it reasonably believes further verification is needed to confirm compliance with these Terms or where required by law or a Payment Partner's rules." },
         { k: "p", lead: "9.3.", text: "Where a Contributor disputes a transaction with their card issuer or bank, Giivngo may provide information to the Payment Partner to assist in resolving that dispute." },
       ] },

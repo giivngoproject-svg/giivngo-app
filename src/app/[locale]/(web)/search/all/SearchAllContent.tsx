@@ -161,7 +161,7 @@ export default function SearchAllPage() {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-xs text-muted uppercase tracking-wider">
-                              Raised
+                              Contributed
                             </p>
                             <p className="font-bold text-foreground">
                               A${campaign.raisedAmount?.toFixed(2) || '0.00'}

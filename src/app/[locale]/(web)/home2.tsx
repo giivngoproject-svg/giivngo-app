@@ -289,7 +289,7 @@ export default function Home2() {
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">Total raised</span>
+                        <span className="font-medium">Total contributed</span>
                         <span className="text-[#FF6B6B] font-bold">$1,200.00</span>
                       </div>
                       <div className="flex items-center justify-between">
