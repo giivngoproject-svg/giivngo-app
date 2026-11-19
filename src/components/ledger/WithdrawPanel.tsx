@@ -31,8 +31,16 @@ export function WithdrawPanel({ slug }: { slug: string }) {
     try {
       await ledgerApi.withdraw(slug);
       await Swal.fire({ title: t("ledger.withdraw.done"), icon: "success", confirmButtonColor: "#1E1B4B" });
-    } catch {
-      await Swal.fire({ title: t("ledger.withdraw.failed"), icon: "error", confirmButtonColor: "#1E1B4B" });
+    } catch (err: any) {
+      // The API returns the reasons (blockers) so the organizer knows what to fix
+      const blockers: string[] = err?.response?.data?.blockers ?? [];
+      const reasons = blockers.map((b) => `• ${t(`ledger.blocker.${b}` as any)}`).join("<br/>");
+      await Swal.fire({
+        title: t("ledger.withdraw.failed"),
+        html: reasons || (err?.response?.data?.message ?? ""),
+        icon: "error",
+        confirmButtonColor: "#1E1B4B",
+      });
     } finally {
       setBusy(false);
       load();
