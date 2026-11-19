@@ -251,7 +251,8 @@ function ProfilePageInner() {
                     {t("profile.stripe_connected")}
                   </p>
                   <p className="text-xs text-blue-700 font-mono mb-2">{user.stripe_account_id}</p>
-                  {stripeStatus?.chargesEnabled ? (
+                  {/* Withdrawals need payouts enabled, not only charges: same condition as the dashboard */}
+                  {stripeStatus?.chargesEnabled && stripeStatus?.payoutsEnabled ? (
                     <p className="text-xs text-emerald-700 font-medium">
                       {t("profile.stripe_ready")}
                     </p>
